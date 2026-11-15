@@ -39,7 +39,7 @@ jobs:
       - name: Build the CLI
         run: pnpm build
 
-      # examples/ and fixtures/ are deliberately complex teaching material.
+      # test/fixtures/ holds deliberately complex code for the tests; measure the product code only.
       - uses: ./
         with:
           path: src

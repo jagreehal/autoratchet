@@ -56,7 +56,7 @@ export async function collectFiles(root: string, files: string[]): Promise<Snaps
   functionsByFile.clear();
   // Nothing to measure (a base with no copy of a brand-new file): an empty, complete result.
   if (files.length === 0) return new Snapshots();
-  const copy = fs.mkdtempSync(path.join(os.tmpdir(), 'complexity-ratchet-'));
+  const copy = fs.mkdtempSync(path.join(os.tmpdir(), 'autoratchet-'));
   try {
     const copies: string[] = [];
     for (const file of files) {

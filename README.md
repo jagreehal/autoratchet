@@ -104,6 +104,7 @@ comments once there is something to say).
 | `threshold` | `10` | Cyclomatic limit for new functions |
 | `cognitive-threshold` | `15` | Cognitive limit for new functions |
 | `override-approval` | `none` | `none`, `strict`, `review` or `label` (see [Overrides](#overrides)) |
+| `approval-label` | `complexity-override-approved` | The label `label` mode looks for |
 | `comment` | `true` | Keep one sticky PR comment |
 | `annotations` | `true` | Mark regressions in the diff |
 | `fail-on-regression` | `true` | Fail the job on a regression or incomplete measurement |

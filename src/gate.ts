@@ -47,7 +47,8 @@ export type GateOptions = {
   /**
    * Strict mode: a new override approves nothing and fails the gate instead.
    * Use it where approval has to come from somewhere an author cannot grant
-   * themselves, such as a protected PR label (README, Part 6).
+   * themselves, such as an approving review from someone other than the PR author
+   * (README, Overrides).
    */
   requireOverrideApproval?: boolean;
 };
