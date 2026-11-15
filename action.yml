@@ -167,6 +167,7 @@ runs:
           echo "::error::AutoRatchet failed (exit $status) before writing a report; see the log above."
           exit 1
         fi
+        jq -r '"AutoRatchet: \(.verdict), \(.functions) functions measured, \(.regressions | length) regressions."' "$out/report.json"
         jq -r .markdown "$out/report.json" > "$out/report.md"
         cat "$out/report.md" >> "$GITHUB_STEP_SUMMARY"
         {
