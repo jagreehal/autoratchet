@@ -211,7 +211,10 @@ export function runOxlint(targets: string[], config = collectorConfigPath()): Ox
 
   try {
     const parsed = JSON.parse(stdout) as OxlintJson;
-    return parsed.diagnostics ?? [];
+    // Oxlint prints paths relative to its working directory (this package); callers get absolute ones.
+    return (parsed.diagnostics ?? []).map((d) =>
+      d.filename ? { ...d, filename: path.resolve(repoRoot, d.filename) } : d,
+    );
   } catch (error) {
     throw new Error(`Failed to parse oxlint JSON output:\n${stdout}\n${String(error)}`);
   }
