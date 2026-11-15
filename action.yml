@@ -1,0 +1,223 @@
+name: 'AutoRatchet'
+description: >-
+  Prevent complexity regressions, one pull request at a time. Compares every function's
+  cyclomatic and cognitive complexity with the PR's base, fails the check when a function
+  gets worse than the ratchet allows, annotates the diff, and keeps one sticky PR comment.
+author: 'Jag Reehal'
+branding:
+  icon: 'trending-down'
+  color: 'green'
+
+inputs:
+  path:
+    description: 'Git pathspec(s) to measure, space separated, e.g. "src :!src/generated". Empty measures the whole repo.'
+    default: ''
+  base:
+    description: 'Ref to compare against. Defaults to the PR base, or the previous commit on push.'
+    default: ''
+  threshold:
+    description: 'Maximum cyclomatic complexity for new functions.'
+    default: '10'
+  cognitive-threshold:
+    description: 'Maximum cognitive complexity for new functions.'
+    default: '15'
+  override-approval:
+    description: >-
+      How a new override comment (oxlint-disable / eslint-disable / biome-ignore for a complexity rule)
+      gets approved. "none": the override approves its function's current score and the comment lists it.
+      "strict": every new override fails the check. "review": a new override passes only once someone
+      other than the PR author, with write access, approves the PR's current head commit.
+      "label": passes when the PR has the approval-label (anyone with write access can add labels).
+    default: 'none'
+  approval-label:
+    description: 'Label that approves new overrides when override-approval is "label".'
+    default: 'complexity-override-approved'
+  comment:
+    description: 'Post (and keep updating) one comment on the pull request. Only posts once there is something to say.'
+    default: 'true'
+  annotations:
+    description: 'Mark each regression on the function in the PR diff.'
+    default: 'true'
+  fail-on-regression:
+    description: 'Fail the job on a regression or an incomplete measurement.'
+    default: 'true'
+  cli:
+    description: 'Command that runs AutoRatchet. Empty builds it from this action''s source.'
+    default: ''
+  github-token:
+    description: 'Token used to read reviews and post the comment.'
+    default: ${{ github.token }}
+
+outputs:
+  verdict:
+    description: 'pass, fail or incomplete.'
+    value: ${{ steps.check.outputs.verdict }}
+  report:
+    description: 'Path of the JSON report.'
+    value: ${{ steps.check.outputs.report }}
+
+runs:
+  using: composite
+  steps:
+    - name: Check Node
+      shell: bash
+      run: |
+        node -e 'process.exit(+process.versions.node.split(".")[0] >= 24 ? 0 : 1)' \
+          || { echo "::error::AutoRatchet needs Node 24+; add actions/setup-node with node-version: 24 before this step"; exit 1; }
+
+    - name: Resolve base
+      id: refs
+      shell: bash
+      env:
+        INPUT_BASE: ${{ inputs.base }}
+        PR_BASE: ${{ github.event.pull_request.base.sha }}
+        PUSH_BEFORE: ${{ github.event.before }}
+      run: |
+        base="${INPUT_BASE:-${PR_BASE:-$PUSH_BEFORE}}"
+        # First push of a branch has an all-zero "before".
+        case "$base" in ''|0000000000000000000000000000000000000000) base=HEAD~1; git fetch --no-tags --deepen=1 origin 2>/dev/null || true ;; esac
+        # A shallow checkout lacks the base; fetch it, then history back to where it meets HEAD,
+        # so the check compares the change with its merge base, not the base branch's later commits.
+        git fetch --no-tags --depth=1 origin "$base" 2>/dev/null || true
+        for depth in 50 200 1000; do
+          git merge-base "$base" HEAD >/dev/null 2>&1 && break
+          git fetch --no-tags --deepen="$depth" origin "$base" 2>/dev/null || true
+        done
+        git merge-base "$base" HEAD >/dev/null 2>&1 || git fetch --no-tags --unshallow origin 2>/dev/null || true
+        echo "base=$base" >> "$GITHUB_OUTPUT"
+
+    - name: Build AutoRatchet
+      id: cli
+      shell: bash
+      env:
+        CLI: ${{ inputs.cli }}
+      run: |
+        set -euo pipefail
+        if [ -z "$CLI" ]; then
+          cd "$GITHUB_ACTION_PATH"
+          pnpm="npx -y $(node -p 'require("./package.json").packageManager')"
+          if [ ! -f dist/cli.js ]; then
+            $pnpm install --frozen-lockfile >&2
+            $pnpm build >&2
+          fi
+          CLI="node $GITHUB_ACTION_PATH/dist/cli.js"
+        fi
+        echo "cli=$CLI" >> "$GITHUB_OUTPUT"
+
+    - name: Decide override approval
+      id: approval
+      shell: bash
+      env:
+        MODE: ${{ inputs.override-approval }}
+        LABEL: ${{ inputs.approval-label }}
+        GH_TOKEN: ${{ inputs.github-token }}
+        REPO: ${{ github.repository }}
+        PR: ${{ github.event.pull_request.number }}
+        AUTHOR: ${{ github.event.pull_request.user.login }}
+        HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+      run: |
+        set -euo pipefail
+        strict=false
+        case "$MODE" in
+          none) ;;
+          strict) strict=true ;;
+          label)
+            # Anyone with write access can add a label, the author included. This keeps out agents
+            # whose token cannot label; it does not stop a person approving their own override.
+            echo "$LABELS" | jq -e --arg l "$LABEL" 'index($l)' >/dev/null || strict=true ;;
+          review)
+            strict=true
+            if [ -n "$PR" ]; then
+              # Latest review per reviewer; it must be an approval of this exact commit, from someone
+              # other than the author with write access. A new push makes older approvals not count.
+              approvals=$(gh api "repos/$REPO/pulls/$PR/reviews" --paginate | jq -s --arg author "$AUTHOR" --arg head "$HEAD_SHA" '
+                add | map(select(.user.login != $author and .state != "COMMENTED"))
+                | group_by(.user.login) | map(last)
+                | map(select(.state == "APPROVED" and .commit_id == $head
+                    and (.author_association | IN("OWNER", "MEMBER", "COLLABORATOR"))))
+                | length')
+              [ "$approvals" -gt 0 ] && strict=false
+            fi ;;
+          *) echo "::error::override-approval must be none, strict, review or label, got \"$MODE\""; exit 1 ;;
+        esac
+        echo "strict=$strict" >> "$GITHUB_OUTPUT"
+
+    - name: Check
+      id: check
+      shell: bash
+      env:
+        CLI: ${{ steps.cli.outputs.cli }}
+        PATHS: ${{ inputs.path }}
+        BASE: ${{ steps.refs.outputs.base }}
+        THRESHOLD: ${{ inputs.threshold }}
+        COGNITIVE: ${{ inputs.cognitive-threshold }}
+        STRICT: ${{ steps.approval.outputs.strict }}
+      run: |
+        set -uo pipefail
+        out="$RUNNER_TEMP/autoratchet"
+        mkdir -p "$out"
+        strict_flag=()
+        [ "$STRICT" = "true" ] && strict_flag=(--require-override-approval)
+        # shellcheck disable=SC2086
+        $CLI check --base "$BASE" --threshold "$THRESHOLD" --cognitive-threshold "$COGNITIVE" \
+          "${strict_flag[@]}" --format json -o "$out/report.json" -- $PATHS
+        status=$?
+        if [ ! -s "$out/report.json" ]; then
+          echo "::error::AutoRatchet failed (exit $status) before writing a report; see the log above."
+          exit 1
+        fi
+        jq -r .markdown "$out/report.json" > "$out/report.md"
+        cat "$out/report.md" >> "$GITHUB_STEP_SUMMARY"
+        {
+          echo "verdict=$(jq -r .verdict "$out/report.json")"
+          echo "report=$out/report.json"
+          echo "status=$status"
+        } >> "$GITHUB_OUTPUT"
+
+    - name: Annotate the diff
+      if: inputs.annotations == 'true'
+      shell: bash
+      env:
+        REPORT: ${{ steps.check.outputs.report }}
+      run: |
+        jq -r '.regressions[] |
+          "::error file=\(.filePath),line=\(.line // 1),title=AutoRatchet: \(.functionName)::\(.metric) complexity \(.previous // "new") → \(.current) (limit \(if .kind == "new" then .threshold else ([.previous, .threshold] | max) end))"' \
+          "$REPORT"
+
+    - name: Post comment
+      if: inputs.comment == 'true' && github.event.pull_request
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        REPORT: ${{ steps.check.outputs.report }}
+        REPO: ${{ github.repository }}
+        PR: ${{ github.event.pull_request.number }}
+      run: |
+        set -euo pipefail
+        marker='<!-- autoratchet -->'
+        body="$RUNNER_TEMP/autoratchet/comment.md"
+        { echo "$marker"; jq -r .markdown "$REPORT"; } > "$body"
+        # Update only a comment this token posted: anyone can write the marker.
+        # The default token can't read /user; it posts as github-actions[bot].
+        me=$(gh api user --jq .login 2>/dev/null || echo 'github-actions[bot]')
+        existing=$( (gh api "repos/$REPO/issues/$PR/comments" --paginate \
+          --jq "map(select(.user.login == \"$me\" and (.body | startswith(\"$marker\")))) | .[].id" || true) | head -n1)
+        # A clean PR with nothing to say gets no comment, unless one exists to update.
+        quiet=$(jq '.verdict == "pass" and (.approvals + .unmatchedOverrides + .untracked | length) == 0' "$REPORT")
+        if [ "$quiet" = "true" ] && [ -z "$existing" ]; then exit 0; fi
+        create() { gh api "repos/$REPO/issues/$PR/comments" -F body=@"$body" --silent; }
+        if [ -n "$existing" ]; then
+          gh api -X PATCH "repos/$REPO/issues/comments/$existing" -F body=@"$body" --silent || create
+        else
+          create
+        fi || echo "::warning::could not post the AutoRatchet comment (read-only token? fork PR?). The report is in the job summary."
+
+    - name: Gate
+      if: inputs.fail-on-regression == 'true' && steps.check.outputs.verdict != 'pass'
+      shell: bash
+      env:
+        VERDICT: ${{ steps.check.outputs.verdict }}
+      run: |
+        echo "::error::AutoRatchet: $VERDICT (see the PR comment or job summary)"
+        exit 1

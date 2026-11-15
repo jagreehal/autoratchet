@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "rules": {
+    "complexity": [
+      "warn",
+      {
+        "max": 10,
+        "variant": "modified"
+      }
+    ]
+  },
+  "ignorePatterns": [
+    "test/fixtures/**",
+    "dist/**"
+  ]
+}
