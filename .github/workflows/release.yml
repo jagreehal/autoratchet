@@ -33,8 +33,9 @@ jobs:
         run: |
           version=$(node -p "require('./package.json').version")
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          # Pending changesets go through the release PR first, which also syncs the crate version.
-          pending=$(find .changeset -name '*.md' ! -name README.md | wc -l)
+          # Changesets that release something go through the release PR first, which also syncs
+          # the crate version. An empty changeset releases nothing.
+          pending=$( (grep -lE "^['\"]?autoratchet['\"]?:" .changeset/*.md || true) | wc -l)
           if [ "$pending" -gt 0 ] || npm view "autoratchet@$version" version >/dev/null 2>&1; then
             echo "publish=false" >> "$GITHUB_OUTPUT"
           else
