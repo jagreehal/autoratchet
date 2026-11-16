@@ -1,5 +1,11 @@
 # autoratchet
 
+## 0.4.0
+
+### Minor Changes
+
+- cd6423b: AutoRatchet measures Python and Go. Python scores follow radon for cyclomatic complexity and complexipy for cognitive complexity; Go scores follow gocyclo and gocognit. Each language reads the override comments its developers write today (`# noqa: C901`, `# complexipy: ignore`, `//nolint:gocyclo,gocognit`, `//gocognit:ignore`), and both run from the AutoRatchet binary alone.
+
 ## 0.3.1
 
 ### Patch Changes
