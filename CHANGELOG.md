@@ -1,5 +1,11 @@
 # autoratchet
 
+## 0.4.4
+
+### Patch Changes
+
+- a1a89b4: The GitHub Action updates its pull request comment on every run, so the comment shows the latest verdict once a fix lands.
+
 ## 0.4.3
 
 ### Patch Changes
