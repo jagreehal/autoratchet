@@ -7,5 +7,6 @@ pub mod gate;
 pub mod git;
 pub mod overrides;
 pub mod report;
+pub mod rust;
 pub mod snapshots;
 pub mod tools;

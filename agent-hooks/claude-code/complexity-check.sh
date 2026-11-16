@@ -6,20 +6,21 @@
 # Blocks on what CI would fail (a function over its limit that got worse, a new function over a limit,
 # a function that crossed a limit, a file that cannot be measured) and on any new complexity override
 # comment: a new override approves a score, and an agent may not approve its own. A person commits those.
-# Needs: jq, git, and AutoRatchet installed (node_modules/.bin/autoratchet).
+# Needs: jq, git, and AutoRatchet (node_modules/.bin/autoratchet, or autoratchet on PATH).
 set -uo pipefail
 
 mode=${1:-edited}
 input=$(cat)
 cd "${CLAUDE_PROJECT_DIR:-.}" || exit 0
+# The project's npm install, else an autoratchet on PATH (Rust projects install the binary).
 ratchet=${AUTORATCHET:-node_modules/.bin/autoratchet}
-[ -x "$ratchet" ] || exit 0
+[ -x "$ratchet" ] || ratchet=$(command -v autoratchet) || exit 0
 git rev-parse --verify -q HEAD >/dev/null || exit 0 # no commit to compare with yet
 
 is_source() {
   case "$1" in
-    node_modules/* | dist/* | build/* | coverage/* | */generated/* | *.d.ts) return 1 ;;
-    *.ts | *.tsx | *.js | *.jsx | *.mts | *.cts | *.mjs | *.cjs) return 0 ;;
+    node_modules/* | dist/* | build/* | coverage/* | target/* | */target/* | */generated/* | *.d.ts) return 1 ;;
+    *.ts | *.tsx | *.js | *.jsx | *.mts | *.cts | *.mjs | *.cjs | *.rs) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -51,7 +52,7 @@ fi
 
 problems=""
 [ "$status" -eq 3 ] && problems+="$report\n\nMake every changed file parse, then the check can measure it.\n"
-[ "$status" -eq 1 ] && problems+="$report\n\nFix the code, not the score: guard clauses, a lookup table, a switch over a union, named predicates, or a decision table. Do not split a function at an arbitrary point.\n"
+[ "$status" -eq 1 ] && problems+="$report\n\nFix the code, not the score: guard clauses, a lookup table, a switch over a union (a match over an enum in Rust), named predicates, or a decision table. Do not split a function at an arbitrary point.\n"
 if printf '%s' "$report" | grep -qE 'Approved by a new override|sit on no single function'; then
   overrides=$(printf '%s' "$report" | grep -E '^\s+line [0-9]+: |^  [^ ].*:[0-9]+  ')
   problems+="New complexity override comments:\n$overrides\nRemove them. If you believe a score is a false positive, stop and ask the user; a person commits overrides.\n"

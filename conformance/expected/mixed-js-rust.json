@@ -1,0 +1,245 @@
+{
+  "exit": 1,
+  "textExit": 1,
+  "report": {
+    "approvals": [
+      {
+        "functionName": "parse",
+        "override": {
+          "filePath": "orders.rs",
+          "line": 58,
+          "metric": "cognitive",
+          "text": "#[expect(clippy::cognitive_complexity, reason = \"follows the parsing steps of the spec in order\")]"
+        },
+        "score": 23
+      },
+      {
+        "functionName": "status",
+        "override": {
+          "filePath": "orders.rs",
+          "line": 41,
+          "metric": "cyclomatic",
+          "text": "// autoratchet-disable-next-line complexity -- one arm per status code, no logic"
+        },
+        "score": 12
+      }
+    ],
+    "blockedOverrides": [],
+    "functions": 10,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Approved by a new override** (a reviewer must accept each reason; still measured):",
+      "**Failed.** A function got more complex than the ratchet allows.",
+      "- `orders.rs::parse` cognitive 23: #[expect(clippy::cognitive_complexity, reason = \"follows the parsing steps of the spec in order\")]",
+      "- `orders.rs::status` cyclomatic 12: // autoratchet-disable-next-line complexity -- one arm per status code, no logic",
+      "<sub>10 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `orders.rs::route` | cyclomatic | 3 | 12 | 10 |",
+      "| `payments.ts::processPayment` | cognitive | 28 | 38 | 28 |",
+      "| `payments.ts::processPayment` | cyclomatic | 19 | 24 | 19 |",
+      "| `payments.ts::validateCustomer` | cyclomatic | 12 | 13 | 12 |",
+      "|---|---|--:|--:|--:|"
+    ],
+    "regressions": [
+      {
+        "current": 12,
+        "filePath": "orders.rs",
+        "functionName": "route",
+        "kind": "worsened",
+        "line": 16,
+        "metric": "cyclomatic",
+        "previous": 3,
+        "threshold": 10
+      },
+      {
+        "current": 13,
+        "filePath": "payments.ts",
+        "functionName": "validateCustomer",
+        "kind": "worsened",
+        "line": 63,
+        "metric": "cyclomatic",
+        "previous": 12,
+        "threshold": 10
+      },
+      {
+        "current": 24,
+        "filePath": "payments.ts",
+        "functionName": "processPayment",
+        "kind": "worsened",
+        "line": 16,
+        "metric": "cyclomatic",
+        "previous": 19,
+        "threshold": 10
+      },
+      {
+        "current": 38,
+        "filePath": "payments.ts",
+        "functionName": "processPayment",
+        "kind": "worsened",
+        "line": 16,
+        "metric": "cognitive",
+        "previous": 28,
+        "threshold": 15
+      }
+    ],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "fail"
+  },
+  "text": [
+    "    cognitive: 28 → 38 (+10)",
+    "    cyclomatic: 12 → 13 (+1)",
+    "    cyclomatic: 19 → 24 (+5)",
+    "    cyclomatic: 3 → 12 (+9)",
+    "    line 41: // autoratchet-disable-next-line complexity -- one arm per status code, no logic",
+    "    line 58: #[expect(clippy::cognitive_complexity, reason = \"follows the parsing steps of the spec in order\")]",
+    "  orders.rs::parse cognitive 23",
+    "  orders.rs::status cyclomatic 12",
+    "  processPayment",
+    "  route",
+    "  validateCustomer",
+    "Approved by a new override. A reviewer must accept each reason:",
+    "Complexity regressions detected:",
+    "Quality gate failed.",
+    "Still measured: if one of these gets worse in a later PR, the gate fails.",
+    "orders.rs",
+    "payments.ts"
+  ],
+  "measureBase": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "orders.rs",
+        "functionName": "Order::total",
+        "line": 7
+      },
+      {
+        "cognitive": 14,
+        "cyclomatic": 12,
+        "filePath": "payments.ts",
+        "functionName": "validateCustomer",
+        "line": 56
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 2,
+        "filePath": "orders.rs",
+        "functionName": "Order::discount",
+        "line": 11
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 3,
+        "filePath": "orders.rs",
+        "functionName": "route",
+        "line": 16
+      },
+      {
+        "cognitive": 28,
+        "cyclomatic": 19,
+        "filePath": "payments.ts",
+        "functionName": "processPayment",
+        "line": 15
+      },
+      {
+        "cognitive": 3,
+        "cyclomatic": 4,
+        "filePath": "payments.ts",
+        "functionName": "flat",
+        "line": 92
+      },
+      {
+        "cognitive": 4,
+        "cyclomatic": 5,
+        "filePath": "payments.ts",
+        "functionName": "createOrder",
+        "line": 74
+      },
+      {
+        "cognitive": 6,
+        "cyclomatic": 4,
+        "filePath": "payments.ts",
+        "functionName": "nested",
+        "line": 81
+      }
+    ],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "orders.rs",
+        "functionName": "Order::total",
+        "line": 7
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 12,
+        "filePath": "orders.rs",
+        "functionName": "status",
+        "line": 42
+      },
+      {
+        "cognitive": 15,
+        "cyclomatic": 12,
+        "filePath": "orders.rs",
+        "functionName": "route",
+        "line": 16
+      },
+      {
+        "cognitive": 15,
+        "cyclomatic": 13,
+        "filePath": "payments.ts",
+        "functionName": "validateCustomer",
+        "line": 63
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 2,
+        "filePath": "orders.rs",
+        "functionName": "Order::discount",
+        "line": 11
+      },
+      {
+        "cognitive": 23,
+        "cyclomatic": 9,
+        "filePath": "orders.rs",
+        "functionName": "parse",
+        "line": 59
+      },
+      {
+        "cognitive": 3,
+        "cyclomatic": 4,
+        "filePath": "payments.ts",
+        "functionName": "flat",
+        "line": 102
+      },
+      {
+        "cognitive": 38,
+        "cyclomatic": 24,
+        "filePath": "payments.ts",
+        "functionName": "processPayment",
+        "line": 16
+      },
+      {
+        "cognitive": 6,
+        "cyclomatic": 4,
+        "filePath": "payments.ts",
+        "functionName": "nested",
+        "line": 91
+      },
+      {
+        "cognitive": 7,
+        "cyclomatic": 8,
+        "filePath": "payments.ts",
+        "functionName": "createOrder",
+        "line": 82
+      }
+    ],
+    "problems": []
+  }
+}

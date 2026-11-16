@@ -3,7 +3,7 @@ name = "autoratchet"
 version = "0.2.0"
 edition = "2024"
 rust-version = "1.97"
-description = "Prevent code complexity regressions, one pull request at a time: a threshold-aware ratchet on cyclomatic and cognitive complexity for TypeScript and JavaScript."
+description = "Prevent code complexity regressions, one pull request at a time: a threshold-aware ratchet on cyclomatic and cognitive complexity for TypeScript, JavaScript and Rust."
 license = "Apache-2.0"
 repository = "https://github.com/jagreehal/autoratchet"
 homepage = "https://github.com/jagreehal/autoratchet"
@@ -13,7 +13,10 @@ categories = ["command-line-utilities", "development-tools"]
 
 [dependencies]
 oxc = { version = "=0.158.0", features = ["serialize"] }
+proc-macro2 = { version = "1.0.107", features = ["span-locations"] }
+quote = "1.0.47"
 regex = "1.13.1"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = { version = "1.0.154", features = ["preserve_order", "unbounded_depth"] }
+syn = { version = "3.0.10", features = ["full", "visit"] }
 tempfile = "3.27.0"

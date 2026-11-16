@@ -43,7 +43,7 @@ fn override_metrics(comment: &str) -> Vec<Metric> {
 static FUNCTION_LEVEL_RE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"-disable-next-line|-disable-line|biome-ignore\s").unwrap());
 
-static SOURCE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\.(?:[cm]?[jt]sx?)$").unwrap());
+static SOURCE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\.(?:[cm]?[jt]sx?|rs)$").unwrap());
 static DECLARATION_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\.d\.[cm]?ts$").unwrap());
 
 #[derive(Clone, Debug, PartialEq, Serialize)]
@@ -54,6 +54,9 @@ pub struct Override {
     pub text: String,
     /// `complexity` overrides cover cyclomatic; `sonarjs/cognitive-complexity` and Biome's cover cognitive.
     pub metric: Metric,
+    /// Rust: the function the attribute or comment is attached to; none for one on a file or module.
+    #[serde(skip)]
+    pub function: Option<String>,
 }
 
 /// A new override on a function: it approves that function's current score on one metric.
@@ -67,7 +70,11 @@ pub struct Approval {
     pub score: Option<u32>,
 }
 
-/// JavaScript and TypeScript sources the ratchet measures. Declaration files hold no functions.
+/// JavaScript, TypeScript and Rust sources the ratchet measures. Declaration files hold no functions.
+pub fn is_rust(file: &str) -> bool {
+    file.ends_with(".rs")
+}
+
 pub fn is_source_file(file: &str) -> bool {
     SOURCE_RE.is_match(file) && !DECLARATION_RE.is_match(file)
 }
@@ -82,6 +89,10 @@ pub fn source_files(dir: &Path) -> std::io::Result<Vec<PathBuf>> {
             continue;
         }
         let path = entry.path();
+        // Cargo marks its build directory with CACHEDIR.TAG.
+        if entry.file_type()?.is_dir() && path.join("CACHEDIR.TAG").exists() {
+            continue;
+        }
         if entry.file_type()?.is_dir() {
             out.extend(source_files(&path)?);
         } else if is_source_file(&name) {
@@ -96,6 +107,19 @@ pub fn source_files(dir: &Path) -> std::io::Result<Vec<PathBuf>> {
 fn overrides_in_file(root: &Path, file: &Path) -> std::io::Result<Vec<Override>> {
     let source = String::from_utf8_lossy(&std::fs::read(file)?).into_owned();
     let file_path = normalize_path(&crate::collect::relative(root, file));
+    if is_rust(&file_path) {
+        let found = crate::rust::analyse_rust(&source).overrides;
+        return Ok(found
+            .into_iter()
+            .map(|o| Override {
+                file_path: file_path.clone(),
+                line: o.line,
+                text: o.text,
+                metric: o.metric,
+                function: o.function,
+            })
+            .collect());
+    }
     let mut out = Vec::new();
     for (start, end) in analyse(file, &source).comments {
         let Some(text) = source.get(start as usize..end as usize) else {
@@ -108,6 +132,7 @@ fn overrides_in_file(root: &Path, file: &Path) -> std::io::Result<Vec<Override>>
                 line,
                 text: text.trim().to_string(),
                 metric,
+                function: None,
             });
         }
     }
@@ -148,6 +173,23 @@ pub fn match_overrides(overrides: &[Override], current: &Snapshots) -> (Vec<Appr
     let mut approvals = Vec::new();
     let mut unmatched = Vec::new();
     for o in overrides {
+        // Rust overrides know their function from the syntax tree.
+        if is_rust(&o.file_path) {
+            let f = o.function.as_ref().and_then(|name| {
+                current
+                    .values()
+                    .find(|s| s.file_path == o.file_path && &s.function_name == name)
+            });
+            match f {
+                Some(f) => approvals.push(Approval {
+                    override_: o.clone(),
+                    function_name: f.function_name.clone(),
+                    score: f.score(o.metric),
+                }),
+                None => unmatched.push(o.clone()),
+            }
+            continue;
+        }
         if !FUNCTION_LEVEL_RE.is_match(&o.text) {
             unmatched.push(o.clone());
             continue;

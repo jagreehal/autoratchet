@@ -2,7 +2,7 @@
 
 **Prevent code quality regressions, one pull request at a time.**
 
-AutoRatchet stops functions in your TypeScript and JavaScript code from getting more complex,
+AutoRatchet stops functions in your TypeScript, JavaScript and Rust code from getting more complex,
 without asking you to fix the complex code you already have. Install it on a ten-year-old
 codebase today, and from tomorrow no pull request can make it worse.
 
@@ -44,11 +44,6 @@ It measures two things, because each misses regressions the other catches:
 |--------|----------|-------------------:|
 | Cyclomatic complexity ([Oxlint](https://oxc.rs/docs/guide/usage/linter), modified variant) | Decisions in a function: roughly, testing effort | 10 |
 | Cognitive complexity ([SonarSource](https://www.sonarsource.com/docs/CognitiveComplexity.pdf), scored as [Biome](https://biomejs.dev/linter/rules/no-excessive-cognitive-complexity/) does) | How hard the function is to read, weighted by nesting | 15 |
-
-New to these metrics? The companion guide,
-[Cyclomatic and cognitive complexity, explained](https://github.com/jagreehal/cyclomatic-and-cognitive-complexity-explained),
-teaches both from scratch with runnable examples, including false positives worth overriding
-and how quality gates get gamed.
 
 ## Use it
 
@@ -187,13 +182,46 @@ CODEOWNERS so workflow and configuration changes need their owners' approval.
 AutoRatchet fails closed. A function it could not measure is not evidence that the function is
 fine.
 
+## Rust
+
+AutoRatchet measures `.rs` files itself, so a Rust project needs only the binary: download it
+from a GitHub release (below), or use the npm package if the project already has one. `check`,
+the GitHub Action and the agent hooks work the same way; the hook finds `autoratchet` on your
+`PATH` when there is no `node_modules`. Cargo's `target/` directory is skipped.
+
+- **Cyclomatic**, the modified variant: 1, plus each `if` and `if let`, `while` and `while let`,
+  `for`, `match` (one per match), match guard, `let … else`, `&&` and `||`. `?` does not count.
+- **Cognitive**, after SonarSource's specification: `if`, `match` and loops cost 1 plus their
+  nesting; `else`, `else if`, labelled `break`/`continue` and each run of one logical operator
+  cost 1. A closure scores on its own, one level deeper than the code around it.
+
+Functions are named `parse`, `Order::total`, `<Order as Display>::fmt`, `Validate::check`
+(a trait's default method), `billing::charge` (an inline module), `charge>retry` (a function
+inside a function) and `charge>items.iter().map()` or `charge>on_error` for closures.
+
+Overrides go on the function:
+
+```rust
+#[expect(clippy::cognitive_complexity, reason = "follows the RFC 3986 parsing steps in order")]
+pub fn parse_uri(input: &str) -> Option<Uri> {
+```
+
+```rust
+// autoratchet-disable-next-line complexity -- one arm per status code, no logic
+pub fn status_text(code: u16) -> &'static str {
+```
+
+`clippy::cognitive_complexity` (in `#[allow]` or `#[expect]`) covers the cognitive score. Rust has
+no cyclomatic lint, so a comment covers that one: `complexity`, `cognitive-complexity`, or both,
+comma-separated. A crate- or module-wide `#![allow(…)]` approves nothing.
+
 ## Without npm
 
 Each GitHub release has an archive per platform with the `autoratchet` binary, and a
-`SHA256SUMS` file. Put the binary on your `PATH`, then install the
-[Oxlint](https://github.com/oxc-project/oxc/releases) 1.93.0 binary, which measures cyclomatic
-complexity. AutoRatchet looks for it in `AUTORATCHET_OXLINT`, then in `node_modules/.bin`, then
-on `PATH`. Another Oxlint version can score code differently.
+`SHA256SUMS` file. Put the binary on your `PATH`. That is all Rust needs. For JavaScript and
+TypeScript, also install the [Oxlint](https://github.com/oxc-project/oxc/releases) 1.93.0 binary,
+which measures their cyclomatic complexity. AutoRatchet looks for it in `AUTORATCHET_OXLINT`,
+then in `node_modules/.bin`, then on `PATH`. Another Oxlint version can score code differently.
 
 ## CLI
 
@@ -238,8 +266,8 @@ and exit codes. Add a case under `conformance/cases/<name>/{base,head}`, then
 
 ## How functions are identified
 
-Each function is matched across commits by file path and a qualified name from its syntax:
-`PaymentService.validate`, `handlers.onSubmit`, `createChart>helper`,
+Each function is matched across commits by file path and a qualified name from its syntax
+(Rust's are in [Rust](#rust)): `PaymentService.validate`, `handlers.onSubmit`, `createChart>helper`,
 `render>items.map()`, `PAYMENT_RULES["flagged-vip-review"]`. Moving a function to another file
 or renaming it makes it look new, so it must meet the limits for new code. Callbacks and table
 entries without a key are named by position, so reordering them pairs a function with another
@@ -248,7 +276,8 @@ to avoid that.
 
 ## Limits
 
-- JavaScript and TypeScript only (`.js`, `.jsx`, `.ts`, `.tsx` and the `m`/`c` variants).
+- JavaScript, TypeScript (`.js`, `.jsx`, `.ts`, `.tsx` and the `m`/`c` variants) and Rust (`.rs`).
+- Rust code inside macro invocations (`vec![…]`, `assert!(…)`, `macro_rules!`) is not measured.
 - Two metrics: cyclomatic and cognitive complexity.
 - Cognitive scores of 0 and 1 are both recorded as 1, as earlier versions recorded them.
 - Getters and setters have no cognitive score of their own: their logic counts toward the

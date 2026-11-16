@@ -28,9 +28,12 @@ name = "autoratchet"
 version = "0.2.0"
 dependencies = [
  "oxc",
+ "proc-macro2",
+ "quote",
  "regex",
  "serde",
  "serde_json",
+ "syn 3.0.10",
  "tempfile",
 ]
 

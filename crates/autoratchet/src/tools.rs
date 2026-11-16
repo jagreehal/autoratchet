@@ -8,7 +8,8 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 pub struct Tools {
-    pub oxlint: PathBuf,
+    /// Needed only to measure JavaScript and TypeScript: the reason it is missing otherwise.
+    pub oxlint: Result<PathBuf, String>,
     pub node: Option<PathBuf>,
 }
 
@@ -16,7 +17,7 @@ impl Tools {
     pub fn discover() -> Result<Tools, String> {
         let cwd = std::env::current_dir().map_err(|e| e.to_string())?;
         Ok(Tools {
-            oxlint: find("oxlint", "AUTORATCHET_OXLINT", &cwd)?,
+            oxlint: find("oxlint", "AUTORATCHET_OXLINT", &cwd),
             node: std::env::var_os("AUTORATCHET_NODE")
                 .filter(|p| !p.is_empty())
                 .map(PathBuf::from),

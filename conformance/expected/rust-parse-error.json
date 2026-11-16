@@ -1,0 +1,82 @@
+{
+  "exit": 3,
+  "textExit": 3,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 3,
+    "incomplete": [
+      "head: broken.rs: does not parse (cannot parse string into token stream (line 1))"
+    ],
+    "markdown": [
+      "## AutoRatchet",
+      "**Could not measure:**",
+      "**Failed.** AutoRatchet could not measure every function, so it cannot vouch for this change.",
+      "- head: broken.rs: does not parse (cannot parse string into token stream (line 1))",
+      "<sub>3 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+    ],
+    "regressions": [],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "incomplete"
+  },
+  "text": [
+    "  head: broken.rs: does not parse (cannot parse string into token stream (line 1))",
+    "Measurement incomplete. The gate fails until every function can be measured:",
+    "Quality gate failed."
+  ],
+  "measureBase": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "orders.rs",
+        "functionName": "Order::total",
+        "line": 7
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 2,
+        "filePath": "orders.rs",
+        "functionName": "Order::discount",
+        "line": 11
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 3,
+        "filePath": "orders.rs",
+        "functionName": "route",
+        "line": 16
+      }
+    ],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "orders.rs",
+        "functionName": "Order::total",
+        "line": 7
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 2,
+        "filePath": "orders.rs",
+        "functionName": "Order::discount",
+        "line": 11
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 3,
+        "filePath": "orders.rs",
+        "functionName": "route",
+        "line": 16
+      }
+    ],
+    "problems": [
+      "broken.rs: does not parse (cannot parse string into token stream (line 1))"
+    ]
+  }
+}

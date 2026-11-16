@@ -1,0 +1,162 @@
+{
+  "exit": 0,
+  "textExit": 0,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 17,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Overrides on no single function** (ignored by the gate):",
+      "**Passed.** No function got more complex than the ratchet allows.",
+      "- `lib.rs:1` #![allow(clippy::cognitive_complexity)]",
+      "<sub>17 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+    ],
+    "regressions": [],
+    "unmatchedOverrides": [
+      {
+        "filePath": "lib.rs",
+        "line": 1,
+        "metric": "cognitive",
+        "text": "#![allow(clippy::cognitive_complexity)]"
+      }
+    ],
+    "untracked": [],
+    "verdict": "pass"
+  },
+  "text": [
+    "  lib.rs:1  #![allow(clippy::cognitive_complexity)]",
+    "No complexity regressions detected.",
+    "Quality gate passed.",
+    "Warning: new overrides that sit on no single function (file-wide or misplaced). The gate ignores them:"
+  ],
+  "measureBase": {
+    "functions": [],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "lib.rs",
+        "functionName": "again::twice",
+        "line": 39
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "lib.rs",
+        "functionName": "billing::charge",
+        "line": 28
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "lib.rs",
+        "functionName": "billing::charge>amounts.iter().map().filter()",
+        "line": 31
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "lib.rs",
+        "functionName": "billing::charge>amounts.iter().map()",
+        "line": 31
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "lib.rs",
+        "functionName": "billing::charge>round",
+        "line": 29
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "lib.rs",
+        "functionName": "callbacks",
+        "line": 42
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "lib.rs",
+        "functionName": "callbacks>std::thread::spawn()",
+        "line": 45
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "lib.rs",
+        "functionName": "callbacks>v.iter().filter()",
+        "line": 43
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "lib.rs",
+        "functionName": "callbacks>v.iter().filter()#2",
+        "line": 44
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "lib.rs",
+        "functionName": "tests::it_works",
+        "line": 51
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "lib.rs",
+        "functionName": "twice",
+        "line": 36
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "lib.rs",
+        "functionName": "Wrapper::map",
+        "line": 14
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "lib.rs",
+        "functionName": "Wrapper::new",
+        "line": 13
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 2,
+        "filePath": "lib.rs",
+        "functionName": "<Wrapper as Display>::fmt",
+        "line": 7
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 2,
+        "filePath": "lib.rs",
+        "functionName": "billing::tax::rate",
+        "line": 26
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 2,
+        "filePath": "lib.rs",
+        "functionName": "Shape::describe",
+        "line": 19
+      },
+      {
+        "cognitive": 3,
+        "cyclomatic": 2,
+        "filePath": "lib.rs",
+        "functionName": "billing::charge>on_error",
+        "line": 30
+      }
+    ],
+    "problems": []
+  }
+}

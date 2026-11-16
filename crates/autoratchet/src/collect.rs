@@ -64,10 +64,55 @@ pub fn collect_from_directory(dir: &Path, tools: &Tools) -> Result<Snapshots, St
 
 /// Measure the given source files. Paths in the result are relative to `root`.
 pub fn collect_files(root: &Path, files: &[PathBuf], tools: &Tools) -> Result<Snapshots, String> {
+    let (rust, js): (Vec<PathBuf>, Vec<PathBuf>) = files
+        .iter()
+        .cloned()
+        .partition(|f| crate::overrides::is_rust(&f.to_string_lossy()));
+    let mut snapshots = collect_rust(root, &rust)?;
+    let js = collect_js(root, &js, tools)?;
+    js.values().for_each(|s| snapshots.insert(s.clone()));
+    snapshots.problems.extend(js.problems);
+    Ok(snapshots)
+}
+
+/// Rust files: measured in-process, one parse each.
+fn collect_rust(root: &Path, files: &[PathBuf]) -> Result<Snapshots, String> {
+    let analyses = parallel(files.iter().collect(), |file| {
+        let source =
+            String::from_utf8_lossy(&std::fs::read(file).map_err(|e| format!("{}: {e}", file.display()))?).into_owned();
+        Ok((
+            normalize_path(&relative(root, file)),
+            crate::rust::analyse_rust(&source),
+        ))
+    })?;
+    let mut snapshots = Snapshots::default();
+    for (file_path, analysis) in analyses {
+        if let Some(error) = analysis.error {
+            snapshots
+                .problems
+                .push(format!("{file_path}: does not parse ({error})"));
+        }
+        for f in analysis.functions {
+            snapshots.insert(FunctionSnapshot {
+                file_path: file_path.clone(),
+                function_name: f.name,
+                cyclomatic: f.cyclomatic,
+                line: Some(f.line),
+                // Recorded as for JavaScript: 0 and 1 are both 1.
+                cognitive: Some(f.cognitive.max(1)),
+            });
+        }
+    }
+    Ok(snapshots)
+}
+
+/// JavaScript and TypeScript: Oxlint for cyclomatic complexity, the parser for the rest.
+fn collect_js(root: &Path, files: &[PathBuf], tools: &Tools) -> Result<Snapshots, String> {
     // Nothing to measure (a base with no copy of a brand-new file): an empty, complete result.
     if files.is_empty() {
         return Ok(Snapshots::default());
     }
+    let oxlint = tools.oxlint.as_ref().map_err(Clone::clone)?;
     let copy = tempfile::Builder::new()
         .prefix("autoratchet-")
         .tempdir()
@@ -92,7 +137,7 @@ pub fn collect_files(root: &Path, files: &[PathBuf], tools: &Tools) -> Result<Sn
     let parsed: HashMap<&Path, &Analysis> = copies.iter().map(PathBuf::as_path).zip(&analyses).collect();
 
     let target = copy.path();
-    let mut snapshots = snapshots_from_diagnostics(run_oxlint(tools, target, config.path())?, target, &parsed);
+    let mut snapshots = snapshots_from_diagnostics(run_oxlint(tools, oxlint, target, config.path())?, target, &parsed);
     for file in &copies {
         if let Some(error) = parsed[file.as_path()].errors.first() {
             let rel = normalize_path(&relative(target, file));
@@ -151,18 +196,18 @@ struct OxlintSpan {
     line: Option<u32>,
 }
 
-fn run_oxlint(tools: &Tools, target: &Path, config_dir: &Path) -> Result<Vec<OxlintDiagnostic>, String> {
+fn run_oxlint(tools: &Tools, oxlint: &Path, target: &Path, config_dir: &Path) -> Result<Vec<OxlintDiagnostic>, String> {
     let config = config_dir.join("oxlint.json");
     std::fs::write(&config, OXLINT_CONFIG).map_err(|e| e.to_string())?;
     let output = tools
-        .command(&tools.oxlint)
+        .command(oxlint)
         .arg("-c")
         .arg(&config)
         .args(["-f", "json"])
         .arg(target)
         .current_dir(config_dir)
         .output()
-        .map_err(|e| format!("could not run oxlint ({}): {e}", tools.oxlint.display()))?;
+        .map_err(|e| format!("could not run oxlint ({}): {e}", oxlint.display()))?;
     let stdout = String::from_utf8_lossy(&output.stdout);
     if stdout.trim().is_empty() {
         return Err(format!(
