@@ -54,7 +54,8 @@ problems=""
 [ "$status" -eq 3 ] && problems+="$report\n\nMake every changed file parse, then the check can measure it.\n"
 [ "$status" -eq 1 ] && problems+="$report\n\nFix the code, not the score: guard clauses, a lookup table, a switch over a union (a match over an enum in Rust), named predicates, or a decision table. Do not split a function at an arbitrary point.\n"
 if printf '%s' "$report" | grep -qE 'Approved by a new override|sit on no single function'; then
-  overrides=$(printf '%s' "$report" | grep -E '^\s+line [0-9]+: |^  [^ ].*:[0-9]+  ')
+  # One comment can cover both metrics: list it once.
+  overrides=$(printf '%s' "$report" | grep -E '^\s+line [0-9]+: |^  [^ ].*:[0-9]+  ' | awk '!seen[$0]++')
   problems+="New complexity override comments:\n$overrides\nRemove them. If you believe a score is a false positive, stop and ask the user; a person commits overrides.\n"
 fi
 
