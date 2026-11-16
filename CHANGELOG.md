@@ -1,5 +1,11 @@
 # autoratchet
 
+## 0.4.2
+
+### Patch Changes
+
+- 18551a2: The npm package description fits npm's 255-character limit, so the package page shows it in full.
+
 ## 0.4.1
 
 ### Patch Changes
