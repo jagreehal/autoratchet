@@ -43,7 +43,7 @@ fn override_metrics(comment: &str) -> Vec<Metric> {
 static FUNCTION_LEVEL_RE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"-disable-next-line|-disable-line|biome-ignore\s").unwrap());
 
-static SOURCE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\.(?:[cm]?[jt]sx?|rs)$").unwrap());
+static SOURCE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\.(?:[cm]?[jt]sx?|rs|py|go)$").unwrap());
 static DECLARATION_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\.d\.[cm]?ts$").unwrap());
 
 #[derive(Clone, Debug, PartialEq, Serialize)]
@@ -54,7 +54,7 @@ pub struct Override {
     pub text: String,
     /// `complexity` overrides cover cyclomatic; `sonarjs/cognitive-complexity` and Biome's cover cognitive.
     pub metric: Metric,
-    /// Rust: the function the attribute or comment is attached to; none for one on a file or module.
+    /// Rust, Python and Go: the function the override is attached to; none for one on a file or module.
     #[serde(skip)]
     pub function: Option<String>,
 }
@@ -70,36 +70,58 @@ pub struct Approval {
     pub score: Option<u32>,
 }
 
-/// JavaScript, TypeScript and Rust sources the ratchet measures. Declaration files hold no functions.
-pub fn is_rust(file: &str) -> bool {
-    file.ends_with(".rs")
+/// JavaScript, TypeScript, Rust, Python and Go sources the ratchet measures. Declaration files hold no functions.
+/// Rust, Python and Go: measured in-process, with overrides that know their function.
+pub fn is_native(file: &str) -> bool {
+    file.ends_with(".rs") || file.ends_with(".py") || file.ends_with(".go")
+}
+
+/// Names, scores and overrides for a Rust, Python or Go file.
+pub fn analyse_native(file: &str, source: &str) -> crate::lang::NativeAnalysis {
+    if file.ends_with(".py") {
+        crate::python::analyse_python(source)
+    } else if file.ends_with(".go") {
+        crate::go::analyse_go(source)
+    } else {
+        crate::rust::analyse_rust(source)
+    }
 }
 
 pub fn is_source_file(file: &str) -> bool {
-    SOURCE_RE.is_match(file) && !DECLARATION_RE.is_match(file)
+    // Go's vendored dependencies: someone else's code, whichever way the file was found.
+    let vendored_go = file.ends_with(".go") && file.split(['/', '\\']).any(|part| part == "vendor");
+    !vendored_go && SOURCE_RE.is_match(file) && !DECLARATION_RE.is_match(file)
 }
 
 /// Source files under `dir`, skipping `node_modules` and dot-directories.
 pub fn source_files(dir: &Path) -> std::io::Result<Vec<PathBuf>> {
+    walk(dir, false)
+}
+
+fn walk(dir: &Path, in_vendor: bool) -> std::io::Result<Vec<PathBuf>> {
     let mut out = Vec::new();
     for entry in std::fs::read_dir(dir)? {
         let entry = entry?;
         let name = entry.file_name().to_string_lossy().into_owned();
-        if name == "node_modules" || name.starts_with('.') {
-            continue;
-        }
         let path = entry.path();
-        // Cargo marks its build directory with CACHEDIR.TAG.
-        if entry.file_type()?.is_dir() && path.join("CACHEDIR.TAG").exists() {
-            continue;
-        }
         if entry.file_type()?.is_dir() {
-            out.extend(source_files(&path)?);
-        } else if is_source_file(&name) {
+            if !skipped_dir(&name, &path) {
+                out.extend(walk(&path, in_vendor || name == "vendor")?);
+            }
+        } else if is_source_file(&name) && !(in_vendor && name.ends_with(".go")) {
             out.push(path);
         }
     }
     Ok(out)
+}
+
+/// `node_modules`, dot-directories, and build and environment directories: Cargo's target
+/// (CACHEDIR.TAG) and Python virtual environments (pyvenv.cfg).
+fn skipped_dir(name: &str, path: &Path) -> bool {
+    name == "node_modules"
+        || name.starts_with('.')
+        || path.join("CACHEDIR.TAG").exists()
+        || path.join("pyvenv.cfg").exists()
 }
 
 /// One override per metric a real comment switches off. Text that only looks like a directive
@@ -107,8 +129,8 @@ pub fn source_files(dir: &Path) -> std::io::Result<Vec<PathBuf>> {
 fn overrides_in_file(root: &Path, file: &Path) -> std::io::Result<Vec<Override>> {
     let source = String::from_utf8_lossy(&std::fs::read(file)?).into_owned();
     let file_path = normalize_path(&crate::collect::relative(root, file));
-    if is_rust(&file_path) {
-        let found = crate::rust::analyse_rust(&source).overrides;
+    if is_native(&file_path) {
+        let found = analyse_native(&file_path, &source).overrides;
         return Ok(found
             .into_iter()
             .map(|o| Override {
@@ -173,8 +195,8 @@ pub fn match_overrides(overrides: &[Override], current: &Snapshots) -> (Vec<Appr
     let mut approvals = Vec::new();
     let mut unmatched = Vec::new();
     for o in overrides {
-        // Rust overrides know their function from the syntax tree.
-        if is_rust(&o.file_path) {
+        // Rust, Python and Go overrides know their function from the syntax tree.
+        if is_native(&o.file_path) {
             let f = o.function.as_ref().and_then(|name| {
                 current
                     .values()
@@ -255,5 +277,8 @@ mod tests {
     fn source_file_filter() {
         assert!(is_source_file("a.ts") && is_source_file("a.mjs") && is_source_file("a.tsx"));
         assert!(!is_source_file("a.d.ts") && !is_source_file("a.json"));
+        // Go's vendored dependencies, whichever way the file was found.
+        assert!(!is_source_file("vendor/github.com/x/y.go") && !is_source_file("cmd/vendor/x.go"));
+        assert!(is_source_file("vendor/lib.js") && is_source_file("vendored/x.go"));
     }
 }

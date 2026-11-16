@@ -175,6 +175,19 @@ const gitCases: Record<string, (tmp: string) => unknown> = {
       strict: checkResult(repo, ['--base', 'main', '--require-override-approval']),
     };
   },
+  'git-go-vendor': (tmp) => {
+    // Vendored Go dependencies are someone else's code: tracked or not, check leaves them out.
+    const simple =
+      'package lib\n\nfunc Lib(a bool) int {\n\tif a {\n\t\treturn 1\n\t}\n\treturn 0\n}\n';
+    const nested =
+      'package lib\n\nfunc Lib(a, b, c bool, xs []int) int {\n\tif a {\n\t\tif b {\n\t\t\tif c {\n\t\t\t\tfor _, x := range xs {\n\t\t\t\t\tif x > 0 && b || c {\n\t\t\t\t\t\treturn 1\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\treturn 0\n}\n';
+    const repo = newRepo(tmp, 'vendor', {
+      'main.go': 'package main\n\nfunc main() {}\n',
+      'vendor/example.com/lib/lib.go': simple,
+    });
+    write(repo, { 'vendor/example.com/lib/lib.go': nested });
+    return { check: checkResult(repo, ['--base', 'main']) };
+  },
   'large-file': (tmp) => {
     const dir = path.join(tmp, 'large');
     const nested =

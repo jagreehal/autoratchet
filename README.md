@@ -2,9 +2,9 @@
 
 **Prevent code quality regressions, one pull request at a time.**
 
-AutoRatchet stops functions in your TypeScript, JavaScript and Rust code from getting more complex,
-without asking you to fix the complex code you already have. Install it on a ten-year-old
-codebase today, and from tomorrow no pull request can make it worse.
+AutoRatchet stops functions in your TypeScript, JavaScript, Rust, Python and Go code from getting
+more complex, without asking you to fix the complex code you already have. Install it on a
+ten-year-old codebase today, and from tomorrow no pull request can make it worse.
 
 ```bash
 npm install -D autoratchet
@@ -214,13 +214,68 @@ pub fn status_text(code: u16) -> &'static str {
 no cyclomatic lint, so a comment covers that one: `complexity`, `cognitive-complexity`, or both,
 comma-separated. A crate- or module-wide `#![allow(…)]` approves nothing.
 
+## Python
+
+AutoRatchet measures `.py` files itself and scores them the way Python's own tools do:
+
+- **Cyclomatic** as [radon](https://radon.readthedocs.io/) scores it, plus the decisions in
+  functions nested inside the function.
+- **Cognitive** as [complexipy](https://github.com/rohaquinlop/complexipy) scores it, nested
+  functions and recursion included.
+
+Across five open-source Python projects and 34,000 functions, the scores match radon's and
+complexipy's on over 99.9% of functions.
+
+The functions are the ones complexipy reports: top-level functions and class methods, named
+`parse`, `Order.total`, `Order.total.setter` (or `.deleter`) and `Outer.Inner.method`. A function
+nested inside another one counts as part of it. AutoRatchet skips `@overload` signatures and
+virtual environments (directories holding `pyvenv.cfg`).
+
+Overrides use the comments Python developers write today, on the `def` line or on the comment
+lines above it:
+
+```python
+def status_text(code):  # noqa: C901 -- one branch per status code, no logic
+```
+
+```python
+# complexipy: ignore -- follows the RFC 3986 parsing steps in order
+def parse_uri(text):
+```
+
+`# noqa: C901` covers the cyclomatic score; `# noqa: complexipy` and `# complexipy: ignore` the
+cognitive one.
+
+## Go
+
+AutoRatchet measures `.go` files itself and scores them the way
+[gocyclo](https://github.com/fzipp/gocyclo) and [gocognit](https://github.com/uudashr/gocognit) do,
+recursion across the package included. Across five open-source Go projects, the scores match theirs
+on every function with a body.
+
+Functions are named as both tools name them: `Parse`, `(*Server).Handle`, `(Point).String`, and
+`Handler` for `var Handler = func(…) {…}`. Function literals count toward the function they sit
+in. Overrides use golangci-lint's directive, or gocognit's own:
+
+```go
+//nolint:gocyclo // one case per status code, no logic
+func StatusText(code int) string {
+```
+
+`gocyclo` (or `cyclop`) covers the cyclomatic score and `gocognit` the cognitive one; name both,
+comma-separated, to cover both. `//gocognit:ignore` also covers the cognitive score. AutoRatchet
+skips Go's `vendor/` directory.
+
+For Rust, Python and Go, a comment on the line above a function reading
+`autoratchet-disable-next-line complexity, cognitive-complexity -- reason` covers the scores it names.
+
 ## Without npm
 
-Each GitHub release has an archive per platform with the `autoratchet` binary, and a
-`SHA256SUMS` file. Put the binary on your `PATH`. That is all Rust needs. For JavaScript and
+Each GitHub release has an archive per platform with the `autoratchet` binary, and a `SHA256SUMS`
+file. Put the binary on your `PATH`. That is all Rust, Python and Go need. For JavaScript and
 TypeScript, also install the [Oxlint](https://github.com/oxc-project/oxc/releases) 1.93.0 binary,
-which measures their cyclomatic complexity. AutoRatchet looks for it in `AUTORATCHET_OXLINT`,
-then in `node_modules/.bin`, then on `PATH`. Another Oxlint version can score code differently.
+which measures their cyclomatic complexity. AutoRatchet looks for it in `AUTORATCHET_OXLINT`, then
+in `node_modules/.bin`, then on `PATH`. Another Oxlint version can score code differently.
 
 ## CLI
 
@@ -275,13 +330,17 @@ to avoid that.
 
 ## Limits
 
-- JavaScript, TypeScript (`.js`, `.jsx`, `.ts`, `.tsx` and the `m`/`c` variants) and Rust (`.rs`).
+- JavaScript, TypeScript (`.js`, `.jsx`, `.ts`, `.tsx` and the `m`/`c` variants), Rust (`.rs`),
+  Python (`.py`) and Go (`.go`).
 - Rust code inside macro invocations (`vec![…]`, `assert!(…)`, `macro_rules!`) is not measured.
 - Two metrics: cyclomatic and cognitive complexity.
 - Cognitive scores of 0 and 1 are both recorded as 1, as earlier versions recorded them.
 - Getters and setters have no cognitive score of their own: their logic counts toward the
   function around them, as in Biome.
 - Class field initialisers that are not functions are not measured.
+- Python: the code of a class defined inside a function counts toward that function's cognitive
+  score, as in complexipy, and stays out of its cyclomatic score, as in radon.
+- Go: AutoRatchet skips body-less declarations (`//go:linkname`), which hold no code to measure.
 
 ## License
 

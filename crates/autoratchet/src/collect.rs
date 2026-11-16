@@ -64,27 +64,27 @@ pub fn collect_from_directory(dir: &Path, tools: &Tools) -> Result<Snapshots, St
 
 /// Measure the given source files. Paths in the result are relative to `root`.
 pub fn collect_files(root: &Path, files: &[PathBuf], tools: &Tools) -> Result<Snapshots, String> {
-    let (rust, js): (Vec<PathBuf>, Vec<PathBuf>) = files
+    let (native, js): (Vec<PathBuf>, Vec<PathBuf>) = files
         .iter()
         .cloned()
-        .partition(|f| crate::overrides::is_rust(&f.to_string_lossy()));
-    let mut snapshots = collect_rust(root, &rust)?;
+        .partition(|f| crate::overrides::is_native(&f.to_string_lossy()));
+    let mut snapshots = collect_native(root, &native)?;
     let js = collect_js(root, &js, tools)?;
     js.values().for_each(|s| snapshots.insert(s.clone()));
     snapshots.problems.extend(js.problems);
     Ok(snapshots)
 }
 
-/// Rust files: measured in-process, one parse each.
-fn collect_rust(root: &Path, files: &[PathBuf]) -> Result<Snapshots, String> {
-    let analyses = parallel(files.iter().collect(), |file| {
+/// Rust, Python and Go files: measured in-process, one parse each.
+fn collect_native(root: &Path, files: &[PathBuf]) -> Result<Snapshots, String> {
+    let mut analyses = parallel(files.iter().collect(), |file| {
         let source =
             String::from_utf8_lossy(&std::fs::read(file).map_err(|e| format!("{}: {e}", file.display()))?).into_owned();
-        Ok((
-            normalize_path(&relative(root, file)),
-            crate::rust::analyse_rust(&source),
-        ))
+        let file_path = normalize_path(&relative(root, file));
+        let analysis = crate::overrides::analyse_native(&file_path, &source);
+        Ok((file_path, analysis))
     })?;
+    crate::lang::add_cross_file_recursion(&mut analyses);
     let mut snapshots = Snapshots::default();
     for (file_path, analysis) in analyses {
         if let Some(error) = analysis.error {

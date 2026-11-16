@@ -1,0 +1,21 @@
+{
+  "check": {
+    "exit": 0,
+    "report": {
+      "approvals": [],
+      "baseCommit": "6e16be9fc630f19063483c150dc778365dac43b3",
+      "blockedOverrides": [],
+      "functions": 1,
+      "incomplete": [],
+      "markdown": [
+        "## AutoRatchet",
+        "**Passed.** No function got more complex than the ratchet allows.",
+        "<sub>1 functions measured against `6e16be9`. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+      ],
+      "regressions": [],
+      "unmatchedOverrides": [],
+      "untracked": [],
+      "verdict": "pass"
+    }
+  }
+}

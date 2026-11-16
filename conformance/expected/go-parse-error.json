@@ -1,0 +1,68 @@
+{
+  "exit": 3,
+  "textExit": 3,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 2,
+    "incomplete": [
+      "head: broken.go: does not parse (missing ) (line 3))"
+    ],
+    "markdown": [
+      "## AutoRatchet",
+      "**Could not measure:**",
+      "**Failed.** AutoRatchet could not measure every function, so it cannot vouch for this change.",
+      "- head: broken.go: does not parse (missing ) (line 3))",
+      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+    ],
+    "regressions": [],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "incomplete"
+  },
+  "text": [
+    "  head: broken.go: does not parse (missing ) (line 3))",
+    "Measurement incomplete. The gate fails until every function can be measured:",
+    "Quality gate failed."
+  ],
+  "measureBase": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "orders.go",
+        "functionName": "(*Order).Total",
+        "line": 8
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 3,
+        "filePath": "orders.go",
+        "functionName": "Route",
+        "line": 16
+      }
+    ],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "orders.go",
+        "functionName": "(*Order).Total",
+        "line": 8
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 3,
+        "filePath": "orders.go",
+        "functionName": "Route",
+        "line": 16
+      }
+    ],
+    "problems": [
+      "broken.go: does not parse (missing ) (line 3))"
+    ]
+  }
+}

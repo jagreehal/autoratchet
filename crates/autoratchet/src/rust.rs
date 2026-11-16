@@ -24,44 +24,21 @@
 //! - A closure scores separately, starting one level deeper than the code around it.
 
 use std::collections::{HashMap, HashSet};
-use std::sync::LazyLock;
 
 use proc_macro2::Span;
-use regex::Regex;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::visit::{self, Visit};
 use syn::{Attribute, BinOp, Block, Expr, ExprClosure, Meta, Pat, Token, Type};
 
 use crate::gate::Metric;
+use crate::lang::{MeasuredFunction, NativeAnalysis, NativeOverride, directive_metrics};
 
-pub struct RustFunction {
-    pub name: String,
-    pub line: u32,
-    pub cyclomatic: u32,
-    pub cognitive: u32,
-}
-
-/// An override on a function, or (with no function) one that covers a whole file or module.
-pub struct RustOverride {
-    pub line: u32,
-    pub text: String,
-    pub metric: Metric,
-    pub function: Option<String>,
-}
-
-#[derive(Default)]
-pub struct RustAnalysis {
-    pub functions: Vec<RustFunction>,
-    pub overrides: Vec<RustOverride>,
-    pub error: Option<String>,
-}
-
-pub fn analyse_rust(source: &str) -> RustAnalysis {
+pub fn analyse_rust(source: &str) -> NativeAnalysis {
     let file = match syn::parse_file(source) {
         Ok(file) => file,
         Err(e) => {
-            return RustAnalysis {
+            return NativeAnalysis {
                 error: Some(format!("{e} (line {})", e.span().start().line)),
                 ..Default::default()
             };
@@ -76,7 +53,7 @@ pub fn analyse_rust(source: &str) -> RustAnalysis {
     // `#![allow(clippy::cognitive_complexity)]` covers the whole file: it approves nothing.
     for attr in &file.attrs {
         if let Some((metric, text)) = attribute_override(attr, source) {
-            analyser.overrides.push(RustOverride {
+            analyser.overrides.push(NativeOverride {
                 line: line_of(attr.span()),
                 text,
                 metric,
@@ -85,10 +62,10 @@ pub fn analyse_rust(source: &str) -> RustAnalysis {
         }
     }
     analyser.visit_file(&file);
-    RustAnalysis {
+    NativeAnalysis {
         functions: analyser.functions,
         overrides: analyser.overrides,
-        error: None,
+        ..Default::default()
     }
 }
 
@@ -122,33 +99,6 @@ fn attribute_override(attr: &Attribute, source: &str) -> Option<(Metric, String)
     }
     let text = source.get(attr.span().byte_range())?.to_string();
     Some((Metric::Cognitive, text))
-}
-
-/// `// autoratchet-disable-next-line complexity, cognitive-complexity -- reason`
-static COMMENT_RE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"^//\s*autoratchet-disable-next-line\s+([^\n]*)").unwrap());
-
-fn comment_metrics(line: &str) -> Vec<Metric> {
-    let Some(caps) = COMMENT_RE.captures(line.trim()) else {
-        return Vec::new();
-    };
-    let rules = caps[1].split("--").next().unwrap_or("");
-    let names: Vec<&str> = rules
-        .split([',', ' ', '\t'])
-        .map(str::trim)
-        .filter(|r| !r.is_empty())
-        .collect();
-    let mut metrics = Vec::new();
-    if names.contains(&"complexity") {
-        metrics.push(Metric::Cyclomatic);
-    }
-    if names
-        .iter()
-        .any(|r| matches!(*r, "cognitive-complexity" | "clippy::cognitive_complexity"))
-    {
-        metrics.push(Metric::Cognitive);
-    }
-    metrics
 }
 
 /// Lines whose first token is a `//` comment. A small lexer: string literals (raw, byte and C
@@ -309,8 +259,8 @@ struct Analyser<'s> {
     scope: Vec<String>,
     stack: Vec<FnState>,
     seen: HashMap<String, u32>,
-    functions: Vec<RustFunction>,
-    overrides: Vec<RustOverride>,
+    functions: Vec<MeasuredFunction>,
+    overrides: Vec<NativeOverride>,
     /// Names for closures, decided by the expression around them before they are visited.
     closure_names: HashMap<*const ExprClosure, String>,
     /// Inner links of a logical expression, already scored with the outermost one.
@@ -347,7 +297,7 @@ impl Analyser<'_> {
 
     fn leave(&mut self) {
         let f = self.stack.pop().expect("entered");
-        self.functions.push(RustFunction {
+        self.functions.push(MeasuredFunction {
             name: f.name,
             line: f.line,
             cyclomatic: f.cyclomatic,
@@ -385,7 +335,7 @@ impl Analyser<'_> {
         for attr in attrs {
             if let Some((metric, text)) = attribute_override(attr, self.source) {
                 let line = line_of(attr.span());
-                self.overrides.push(RustOverride {
+                self.overrides.push(NativeOverride {
                     line,
                     text,
                     metric,
@@ -401,8 +351,8 @@ impl Analyser<'_> {
         }
         for number in ((above + 1)..line).filter(|n| self.comment_lines.contains(n)) {
             let text = self.lines[number as usize - 1].trim();
-            for metric in comment_metrics(text) {
-                self.overrides.push(RustOverride {
+            for metric in directive_metrics(text) {
+                self.overrides.push(NativeOverride {
                     line: number,
                     text: text.to_string(),
                     metric,
@@ -530,7 +480,7 @@ impl<'ast> Visit<'ast> for Analyser<'_> {
             if matches!(attr.style, syn::AttrStyle::Inner(_))
                 && let Some((metric, text)) = attribute_override(attr, self.source)
             {
-                self.overrides.push(RustOverride {
+                self.overrides.push(NativeOverride {
                     line: line_of(attr.span()),
                     text,
                     metric,

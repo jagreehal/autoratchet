@@ -117,7 +117,7 @@ runs:
         tar -xzf "autoratchet-$platform.tar.gz"
         echo "cli=$dir/autoratchet$exe" >> "$GITHUB_OUTPUT"
 
-        # Oxlint measures cyclomatic complexity in JavaScript and TypeScript; Rust needs none.
+        # Oxlint measures cyclomatic complexity in JavaScript and TypeScript; Rust, Python and Go need none.
         # shellcheck disable=SC2086 # pathspecs split on purpose
         js=$(git -C "$GITHUB_WORKSPACE" ls-files -- ${PATHS:-.} | grep -cE '\.[cm]?[jt]sx?$' || true)
         if [ "$js" -gt 0 ]; then

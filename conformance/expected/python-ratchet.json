@@ -1,0 +1,176 @@
+{
+  "exit": 1,
+  "textExit": 1,
+  "report": {
+    "approvals": [
+      {
+        "functionName": "parse",
+        "override": {
+          "filePath": "orders.py",
+          "line": 53,
+          "metric": "cognitive",
+          "text": "# complexipy: ignore -- follows the parsing steps of the spec in order"
+        },
+        "score": 17
+      },
+      {
+        "functionName": "status",
+        "override": {
+          "filePath": "orders.py",
+          "line": 39,
+          "metric": "cyclomatic",
+          "text": "# noqa: C901 -- one branch per status code, no logic"
+        },
+        "score": 11
+      }
+    ],
+    "blockedOverrides": [],
+    "functions": 8,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Approved by a new override** (a reviewer must accept each reason; still measured):",
+      "**Failed.** A function got more complex than the ratchet allows.",
+      "- `orders.py::parse` cognitive 17: # complexipy: ignore -- follows the parsing steps of the spec in order",
+      "- `orders.py::status` cyclomatic 11: # noqa: C901 -- one branch per status code, no logic",
+      "<sub>8 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `orders.py::route` | cognitive | 2 | 17 | 15 |",
+      "| `orders.py::route` | cyclomatic | 3 | 12 | 10 |",
+      "|---|---|--:|--:|--:|"
+    ],
+    "regressions": [
+      {
+        "current": 12,
+        "filePath": "orders.py",
+        "functionName": "route",
+        "kind": "worsened",
+        "line": 18,
+        "metric": "cyclomatic",
+        "previous": 3,
+        "threshold": 10
+      },
+      {
+        "current": 17,
+        "filePath": "orders.py",
+        "functionName": "route",
+        "kind": "worsened",
+        "line": 18,
+        "metric": "cognitive",
+        "previous": 2,
+        "threshold": 15
+      }
+    ],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "fail"
+  },
+  "text": [
+    "    cognitive: 2 → 17 (+15)",
+    "    cyclomatic: 3 → 12 (+9)",
+    "    line 39: # noqa: C901 -- one branch per status code, no logic",
+    "    line 53: # complexipy: ignore -- follows the parsing steps of the spec in order",
+    "  orders.py::parse cognitive 17",
+    "  orders.py::status cyclomatic 11",
+    "  route",
+    "Approved by a new override. A reviewer must accept each reason:",
+    "Complexity regressions detected:",
+    "Quality gate failed.",
+    "Still measured: if one of these gets worse in a later PR, the gate fails.",
+    "orders.py"
+  ],
+  "measureBase": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "orders.py",
+        "functionName": "Order.__init__",
+        "line": 2
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "orders.py",
+        "functionName": "Order.total.setter",
+        "line": 11
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "orders.py",
+        "functionName": "Order.total",
+        "line": 7
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 3,
+        "filePath": "orders.py",
+        "functionName": "route",
+        "line": 15
+      }
+    ],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "orders.py",
+        "functionName": "Order.__init__",
+        "line": 5
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "orders.py",
+        "functionName": "Order.total.setter",
+        "line": 14
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "orders.py",
+        "functionName": "Order.total",
+        "line": 10
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "orders.py",
+        "functionName": "first",
+        "line": 69
+      },
+      {
+        "cognitive": 10,
+        "cyclomatic": 11,
+        "filePath": "orders.py",
+        "functionName": "status",
+        "line": 39
+      },
+      {
+        "cognitive": 17,
+        "cyclomatic": 12,
+        "filePath": "orders.py",
+        "functionName": "route",
+        "line": 18
+      },
+      {
+        "cognitive": 17,
+        "cyclomatic": 8,
+        "filePath": "orders.py",
+        "functionName": "parse",
+        "line": 54
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 3,
+        "filePath": "orders.py",
+        "functionName": "walk",
+        "line": 73
+      }
+    ],
+    "problems": []
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "exit": 3,
+  "textExit": 3,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 4,
+    "incomplete": [
+      "head: broken.py: does not parse (missing ) (line 1))"
+    ],
+    "markdown": [
+      "## AutoRatchet",
+      "**Could not measure:**",
+      "**Failed.** AutoRatchet could not measure every function, so it cannot vouch for this change.",
+      "- head: broken.py: does not parse (missing ) (line 1))",
+      "<sub>4 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+    ],
+    "regressions": [],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "incomplete"
+  },
+  "text": [
+    "  head: broken.py: does not parse (missing ) (line 1))",
+    "Measurement incomplete. The gate fails until every function can be measured:",
+    "Quality gate failed."
+  ],
+  "measureBase": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "orders.py",
+        "functionName": "Order.__init__",
+        "line": 2
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "orders.py",
+        "functionName": "Order.total.setter",
+        "line": 11
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "orders.py",
+        "functionName": "Order.total",
+        "line": 7
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 3,
+        "filePath": "orders.py",
+        "functionName": "route",
+        "line": 15
+      }
+    ],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "orders.py",
+        "functionName": "Order.__init__",
+        "line": 2
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "orders.py",
+        "functionName": "Order.total.setter",
+        "line": 11
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "orders.py",
+        "functionName": "Order.total",
+        "line": 7
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 3,
+        "filePath": "orders.py",
+        "functionName": "route",
+        "line": 15
+      }
+    ],
+    "problems": [
+      "broken.py: does not parse (missing ) (line 1))"
+    ]
+  }
+}

@@ -19,8 +19,8 @@ git rev-parse --verify -q HEAD >/dev/null || exit 0 # no commit to compare with 
 
 is_source() {
   case "$1" in
-    node_modules/* | dist/* | build/* | coverage/* | target/* | */target/* | */generated/* | *.d.ts) return 1 ;;
-    *.ts | *.tsx | *.js | *.jsx | *.mts | *.cts | *.mjs | *.cjs | *.rs) return 0 ;;
+    node_modules/* | dist/* | build/* | coverage/* | target/* | */target/* | vendor/* | */vendor/* | .venv/* | venv/* | */generated/* | *.d.ts) return 1 ;;
+    *.ts | *.tsx | *.js | *.jsx | *.mts | *.cts | *.mjs | *.cjs | *.rs | *.py | *.go) return 0 ;;
     *) return 1 ;;
   esac
 }

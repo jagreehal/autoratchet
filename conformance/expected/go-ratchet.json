@@ -1,0 +1,148 @@
+{
+  "exit": 1,
+  "textExit": 1,
+  "report": {
+    "approvals": [
+      {
+        "functionName": "Parse",
+        "override": {
+          "filePath": "orders.go",
+          "line": 70,
+          "metric": "cognitive",
+          "text": "//gocognit:ignore follows the parsing steps of the spec in order"
+        },
+        "score": 17
+      },
+      {
+        "functionName": "Status",
+        "override": {
+          "filePath": "orders.go",
+          "line": 43,
+          "metric": "cyclomatic",
+          "text": "//nolint:gocyclo // one case per status code, no logic"
+        },
+        "score": 11
+      }
+    ],
+    "blockedOverrides": [],
+    "functions": 6,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Approved by a new override** (a reviewer must accept each reason; still measured):",
+      "**Failed.** A function got more complex than the ratchet allows.",
+      "- `orders.go::Parse` cognitive 17: //gocognit:ignore follows the parsing steps of the spec in order",
+      "- `orders.go::Status` cyclomatic 11: //nolint:gocyclo // one case per status code, no logic",
+      "<sub>6 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `orders.go::Route` | cognitive | 2 | 16 | 15 |",
+      "| `orders.go::Route` | cyclomatic | 3 | 12 | 10 |",
+      "|---|---|--:|--:|--:|"
+    ],
+    "regressions": [
+      {
+        "current": 12,
+        "filePath": "orders.go",
+        "functionName": "Route",
+        "kind": "worsened",
+        "line": 16,
+        "metric": "cyclomatic",
+        "previous": 3,
+        "threshold": 10
+      },
+      {
+        "current": 16,
+        "filePath": "orders.go",
+        "functionName": "Route",
+        "kind": "worsened",
+        "line": 16,
+        "metric": "cognitive",
+        "previous": 2,
+        "threshold": 15
+      }
+    ],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "fail"
+  },
+  "text": [
+    "    cognitive: 2 → 16 (+14)",
+    "    cyclomatic: 3 → 12 (+9)",
+    "    line 43: //nolint:gocyclo // one case per status code, no logic",
+    "    line 70: //gocognit:ignore follows the parsing steps of the spec in order",
+    "  Route",
+    "  orders.go::Parse cognitive 17",
+    "  orders.go::Status cyclomatic 11",
+    "Approved by a new override. A reviewer must accept each reason:",
+    "Complexity regressions detected:",
+    "Quality gate failed.",
+    "Still measured: if one of these gets worse in a later PR, the gate fails.",
+    "orders.go"
+  ],
+  "measureBase": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "orders.go",
+        "functionName": "(*Order).Total",
+        "line": 8
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 3,
+        "filePath": "orders.go",
+        "functionName": "Route",
+        "line": 16
+      }
+    ],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 11,
+        "filePath": "orders.go",
+        "functionName": "Status",
+        "line": 44
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "orders.go",
+        "functionName": "(*Order).Total",
+        "line": 8
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "orders.go",
+        "functionName": "Handler",
+        "line": 86
+      },
+      {
+        "cognitive": 16,
+        "cyclomatic": 12,
+        "filePath": "orders.go",
+        "functionName": "Route",
+        "line": 16
+      },
+      {
+        "cognitive": 17,
+        "cyclomatic": 8,
+        "filePath": "orders.go",
+        "functionName": "Parse",
+        "line": 71
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 2,
+        "filePath": "orders.go",
+        "functionName": "Walk",
+        "line": 93
+      }
+    ],
+    "problems": []
+  }
+}
