@@ -21,6 +21,8 @@
     "oxlint",
     "ci",
     "coding-agents",
+    "typescript",
+    "javascript",
     "rust",
     "python",
     "go"

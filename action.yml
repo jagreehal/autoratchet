@@ -1,5 +1,5 @@
 name: 'AutoRatchet'
-description: 'Stop pull requests from making functions more complex: a ratchet on cyclomatic and cognitive complexity.'
+description: 'Cyclomatic and cognitive complexity ratchet for TypeScript, JavaScript, Rust, Python and Go pull requests.'
 author: 'Jag Reehal'
 branding:
   icon: 'trending-down'
