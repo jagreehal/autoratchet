@@ -293,6 +293,7 @@ autoratchet measure <dir>
 --require-override-approval   fail on any new override instead of approving its score
 --format <text|json|markdown> output format (default text)
 -o, --output <file>           write the report to a file
+-V, --version                 print the version
 ```
 
 `--format json` is for dashboards, CI annotations and coding agents. It includes the verdict,

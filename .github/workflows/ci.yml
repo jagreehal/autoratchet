@@ -80,6 +80,7 @@ jobs:
           mkdir "$RUNNER_TEMP/consumer" && cd "$RUNNER_TEMP/consumer"
           npm init -y >/dev/null
           npm install "$RUNNER_TEMP"/autoratchet-*.tgz
+          test "$(npx autoratchet --version)" = "autoratchet $(jq -r .version "$GITHUB_WORKSPACE/package.json")"
           cases="$GITHUB_WORKSPACE/conformance/cases/fixture-fail"
           set +e
           npx autoratchet compare --base "$cases/base" --head "$cases/head"

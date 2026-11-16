@@ -26,6 +26,8 @@ Options:
   --require-override-approval   fail on any new override instead of treating it as an approval
   --format <text|json|markdown> output format (default text)
   -o, --output <file>           write the report to a file instead of stdout
+  -V, --version                 print the version
+  -h, --help                    print this help
 
 Exit codes: 0 pass, 1 regression, 2 bad arguments, 3 measurement incomplete, 4 tool error.";
 
@@ -49,7 +51,7 @@ const VALUE_OPTIONS: [&str; 7] = [
     "format",
     "output",
 ];
-const FLAG_OPTIONS: [&str; 2] = ["require-override-approval", "help"];
+const FLAG_OPTIONS: [&str; 3] = ["require-override-approval", "help", "version"];
 
 struct Args {
     values: HashMap<String, String>,
@@ -79,6 +81,7 @@ fn parse_args(argv: &[String]) -> Result<Args, Error> {
             let name = match flag {
                 "o" => "output",
                 "h" => "help",
+                "V" => "version",
                 _ => return Err(Error::Usage(format!("Unknown option '{arg}'"))),
             };
             (name.to_string(), (!rest.is_empty()).then(|| rest.to_string()))
@@ -112,10 +115,22 @@ fn number(value: Option<&String>, flag: &str) -> Result<Option<f64>, Error> {
     }
 }
 
+/// What `--help` or `--version` prints, if either was asked for.
+fn info(args: &Args) -> Option<String> {
+    let asked = |flag: &str| args.flags.iter().any(|f| f == flag);
+    if asked("help") {
+        Some(USAGE.to_string())
+    } else if asked("version") {
+        Some(format!("autoratchet {}", env!("CARGO_PKG_VERSION")))
+    } else {
+        None
+    }
+}
+
 fn run(argv: &[String]) -> Result<u8, Error> {
     let args = parse_args(argv)?;
-    if args.flags.iter().any(|f| f == "help") {
-        println!("{USAGE}");
+    if let Some(text) = info(&args) {
+        println!("{text}");
         return Ok(0);
     }
     let Some((command, paths)) = args.positionals.split_first() else {
