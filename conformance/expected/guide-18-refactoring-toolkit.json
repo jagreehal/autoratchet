@@ -1,0 +1,235 @@
+{
+  "exit": 1,
+  "textExit": 1,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 25,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Failed.** A function got more complex than the ratchet allows.",
+      "<sub>25 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `code.ts::canRefundInline` | cyclomatic | new | 11 | 10 |",
+      "| `code.ts::shippingZoneLadder` | cyclomatic | new | 11 | 10 |",
+      "|---|---|--:|--:|--:|"
+    ],
+    "regressions": [
+      {
+        "current": 11,
+        "filePath": "code.ts",
+        "functionName": "canRefundInline",
+        "kind": "new",
+        "line": 52,
+        "metric": "cyclomatic",
+        "threshold": 10
+      },
+      {
+        "current": 11,
+        "filePath": "code.ts",
+        "functionName": "shippingZoneLadder",
+        "kind": "new",
+        "line": 9,
+        "metric": "cyclomatic",
+        "threshold": 10
+      }
+    ],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "fail"
+  },
+  "text": [
+    "    cyclomatic: 11 (maximum for new code: 10)",
+    "    cyclomatic: 11 (maximum for new code: 10)",
+    "  canRefundInline (new function)",
+    "  shippingZoneLadder (new function)",
+    "Complexity regressions detected:",
+    "Quality gate failed.",
+    "code.ts"
+  ],
+  "measureBase": {
+    "functions": [],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "code.ts",
+        "functionName": "PAYMENT_RULES[\"flagged-review\"]",
+        "line": 94
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "code.ts",
+        "functionName": "PAYMENT_RULES[\"intl\"]",
+        "line": 104
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "code.ts",
+        "functionName": "PAYMENT_RULES[\"invalid-amount\"]",
+        "line": 90
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "code.ts",
+        "functionName": "PAYMENT_RULES[\"large\"]",
+        "line": 105
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "code.ts",
+        "functionName": "PAYMENT_RULES[\"medium\"]",
+        "line": 106
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "code.ts",
+        "functionName": "PAYMENT_RULES[\"refund\"]",
+        "line": 102
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "code.ts",
+        "functionName": "PAYMENT_RULES[\"vip\"]",
+        "line": 99
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "code.ts",
+        "functionName": "processPaymentTable>PAYMENT_RULES.find()",
+        "line": 110
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "PAYMENT_RULES[\"flagged-intl-review\"]",
+        "line": 93
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "PAYMENT_RULES[\"flagged-vip-review\"]",
+        "line": 92
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "PAYMENT_RULES[\"intl-large\"]",
+        "line": 103
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "PAYMENT_RULES[\"refund-intl\"]",
+        "line": 100
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "PAYMENT_RULES[\"refund-large\"]",
+        "line": 101
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "PAYMENT_RULES[\"unsupported-currency\"]",
+        "line": 91
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "PAYMENT_RULES[\"vip-intl\"]",
+        "line": 97
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "PAYMENT_RULES[\"vip-large\"]",
+        "line": 98
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "PAYMENT_RULES[\"vip-refund\"]",
+        "line": 96
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "shippingZoneLookup",
+        "line": 38
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 3,
+        "filePath": "code.ts",
+        "functionName": "PAYMENT_RULES[\"vip-refund-large\"]",
+        "line": 95
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 3,
+        "filePath": "code.ts",
+        "functionName": "processPaymentTable",
+        "line": 109
+      },
+      {
+        "cognitive": 10,
+        "cyclomatic": 11,
+        "filePath": "code.ts",
+        "functionName": "shippingZoneLadder",
+        "line": 9
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 3,
+        "filePath": "code.ts",
+        "functionName": "coveredByWarranty",
+        "line": 66
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 3,
+        "filePath": "code.ts",
+        "functionName": "withinReturnWindow",
+        "line": 61
+      },
+      {
+        "cognitive": 3,
+        "cyclomatic": 4,
+        "filePath": "code.ts",
+        "functionName": "canRefundNamed",
+        "line": 70
+      },
+      {
+        "cognitive": 9,
+        "cyclomatic": 11,
+        "filePath": "code.ts",
+        "functionName": "canRefundInline",
+        "line": 52
+      }
+    ],
+    "problems": []
+  }
+}

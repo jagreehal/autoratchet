@@ -1,0 +1,176 @@
+{
+  "check": {
+    "exit": 1,
+    "report": {
+      "approvals": [
+        {
+          "functionName": "opts",
+          "override": {
+            "filePath": "o.ts",
+            "line": 10,
+            "metric": "cyclomatic",
+            "text": "// eslint-disable-next-line complexity -- options bag, each default one line"
+          },
+          "score": 12
+        },
+        {
+          "functionName": "spec",
+          "override": {
+            "filePath": "o.ts",
+            "line": 12,
+            "metric": "cognitive",
+            "text": "// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: follows the spec step by step"
+          },
+          "score": 22
+        },
+        {
+          "functionName": "tiny",
+          "override": {
+            "filePath": "o.ts",
+            "line": 2,
+            "metric": "cyclomatic",
+            "text": "// oxlint-disable-line complexity -- trivial"
+          },
+          "score": 1
+        }
+      ],
+      "baseCommit": "892ff6481a9d6920c104e5672d1af84372c4f21e",
+      "blockedOverrides": [],
+      "functions": 4,
+      "incomplete": [],
+      "markdown": [
+        "## AutoRatchet",
+        "**Approved by a new override** (a reviewer must accept each reason; still measured):",
+        "**Failed.** A function got more complex than the ratchet allows.",
+        "**Overrides on no single function** (ignored by the gate):",
+        "- `o.ts:17` // biome-ignore-all lint/complexity/noExcessiveCognitiveComplexity: whole file",
+        "- `o.ts:1` /* oxlint-disable complexity */",
+        "- `o.ts::opts` cyclomatic 12: // eslint-disable-next-line complexity -- options bag, each default one line",
+        "- `o.ts::spec` cognitive 22: // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: follows the spec step by step",
+        "- `o.ts::tiny` cyclomatic 1: // oxlint-disable-line complexity -- trivial",
+        "<sub>4 functions measured against `892ff64`. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+        "| Function | Metric | Before | After | Limit |",
+        "| `o.ts::big` | cyclomatic | 1 | 12 | 10 |",
+        "|---|---|--:|--:|--:|"
+      ],
+      "regressions": [
+        {
+          "current": 12,
+          "filePath": "o.ts",
+          "functionName": "big",
+          "kind": "worsened",
+          "line": 3,
+          "metric": "cyclomatic",
+          "previous": 1,
+          "threshold": 10
+        }
+      ],
+      "unmatchedOverrides": [
+        {
+          "filePath": "o.ts",
+          "line": 1,
+          "metric": "cyclomatic",
+          "text": "/* oxlint-disable complexity */"
+        },
+        {
+          "filePath": "o.ts",
+          "line": 17,
+          "metric": "cognitive",
+          "text": "// biome-ignore-all lint/complexity/noExcessiveCognitiveComplexity: whole file"
+        }
+      ],
+      "untracked": [],
+      "verdict": "fail"
+    }
+  },
+  "strict": {
+    "exit": 1,
+    "report": {
+      "approvals": [],
+      "baseCommit": "892ff6481a9d6920c104e5672d1af84372c4f21e",
+      "blockedOverrides": [
+        {
+          "filePath": "o.ts",
+          "line": 1,
+          "metric": "cyclomatic",
+          "text": "/* oxlint-disable complexity */"
+        },
+        {
+          "filePath": "o.ts",
+          "line": 10,
+          "metric": "cyclomatic",
+          "text": "// eslint-disable-next-line complexity -- options bag, each default one line"
+        },
+        {
+          "filePath": "o.ts",
+          "line": 12,
+          "metric": "cognitive",
+          "text": "// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: follows the spec step by step"
+        },
+        {
+          "filePath": "o.ts",
+          "line": 17,
+          "metric": "cognitive",
+          "text": "// biome-ignore-all lint/complexity/noExcessiveCognitiveComplexity: whole file"
+        },
+        {
+          "filePath": "o.ts",
+          "line": 2,
+          "metric": "cyclomatic",
+          "text": "// oxlint-disable-line complexity -- trivial"
+        }
+      ],
+      "functions": 4,
+      "incomplete": [],
+      "markdown": [
+        "## AutoRatchet",
+        "**Failed.** A function got more complex than the ratchet allows.",
+        "**New overrides need approval:**",
+        "- `o.ts:10` // eslint-disable-next-line complexity -- options bag, each default one line",
+        "- `o.ts:12` // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: follows the spec step by step",
+        "- `o.ts:17` // biome-ignore-all lint/complexity/noExcessiveCognitiveComplexity: whole file",
+        "- `o.ts:1` /* oxlint-disable complexity */",
+        "- `o.ts:2` // oxlint-disable-line complexity -- trivial",
+        "<sub>4 functions measured against `892ff64`. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+        "| Function | Metric | Before | After | Limit |",
+        "| `o.ts::big` | cyclomatic | 1 | 12 | 10 |",
+        "| `o.ts::opts` | cyclomatic | new | 12 | 10 |",
+        "| `o.ts::spec` | cognitive | new | 22 | 15 |",
+        "|---|---|--:|--:|--:|"
+      ],
+      "regressions": [
+        {
+          "current": 12,
+          "filePath": "o.ts",
+          "functionName": "big",
+          "kind": "worsened",
+          "line": 3,
+          "metric": "cyclomatic",
+          "previous": 1,
+          "threshold": 10
+        },
+        {
+          "current": 12,
+          "filePath": "o.ts",
+          "functionName": "opts",
+          "kind": "new",
+          "line": 11,
+          "metric": "cyclomatic",
+          "threshold": 10
+        },
+        {
+          "current": 22,
+          "filePath": "o.ts",
+          "functionName": "spec",
+          "kind": "new",
+          "line": 13,
+          "metric": "cognitive",
+          "threshold": 15
+        }
+      ],
+      "unmatchedOverrides": [],
+      "untracked": [],
+      "verdict": "fail"
+    }
+  }
+}

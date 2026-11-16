@@ -20,7 +20,7 @@ concurrency:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v7
@@ -35,8 +35,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Type check
-        run: pnpm typecheck
+      # rust-toolchain.toml selects the Rust version; rustup installs it on first use.
+      - name: Cache Rust build
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
 
       - name: Lint
         run: pnpm lint
@@ -44,11 +53,12 @@ jobs:
       - name: Format check
         run: pnpm format:check
 
-      - name: Unit tests
-        run: pnpm test
-
       - name: Build
         run: pnpm build
+
+      # Unit tests, then every conformance case: scores, names, reports and exit codes.
+      - name: Test
+        run: pnpm test
 
       - name: Shell scripts
         run: shellcheck agent-hooks/claude-code/complexity-check.sh
@@ -60,6 +70,7 @@ jobs:
           mkdir "$RUNNER_TEMP/consumer" && cd "$RUNNER_TEMP/consumer"
           npm init -y >/dev/null
           npm install "$RUNNER_TEMP"/autoratchet-*.tgz
+          cases="$GITHUB_WORKSPACE/conformance/cases/fixture-fail"
           set +e
-          npx autoratchet compare --base "$GITHUB_WORKSPACE/test/fixtures/base" --head "$GITHUB_WORKSPACE/test/fixtures/head-fail"
+          npx autoratchet compare --base "$cases/base" --head "$cases/head"
           test $? -eq 1

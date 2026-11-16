@@ -1,0 +1,46 @@
+{
+  "exit": 0,
+  "textExit": 0,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 2,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Passed.** No function got more complex than the ratchet allows.",
+      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+    ],
+    "regressions": [],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "pass"
+  },
+  "text": [
+    "No complexity regressions detected.",
+    "Quality gate passed."
+  ],
+  "measureBase": {
+    "functions": [],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 3,
+        "filePath": "code.ts",
+        "functionName": "cityLabel",
+        "line": 16
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 4,
+        "filePath": "code.ts",
+        "functionName": "marketingEligible",
+        "line": 22
+      }
+    ],
+    "problems": []
+  }
+}

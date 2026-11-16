@@ -1,0 +1,100 @@
+{
+  "exit": 1,
+  "textExit": 1,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 4,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Failed.** A function got more complex than the ratchet allows.",
+      "<sub>4 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `code.ts::createChart` | cyclomatic | new | 12 | 10 |",
+      "| `code.ts::deliveryCity` | cyclomatic | new | 11 | 10 |",
+      "| `code.ts::signupErrors` | cyclomatic | new | 12 | 10 |",
+      "|---|---|--:|--:|--:|"
+    ],
+    "regressions": [
+      {
+        "current": 11,
+        "filePath": "code.ts",
+        "functionName": "deliveryCity",
+        "kind": "new",
+        "line": 46,
+        "metric": "cyclomatic",
+        "threshold": 10
+      },
+      {
+        "current": 12,
+        "filePath": "code.ts",
+        "functionName": "createChart",
+        "kind": "new",
+        "line": 22,
+        "metric": "cyclomatic",
+        "threshold": 10
+      },
+      {
+        "current": 12,
+        "filePath": "code.ts",
+        "functionName": "signupErrors",
+        "kind": "new",
+        "line": 68,
+        "metric": "cyclomatic",
+        "threshold": 10
+      }
+    ],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "fail"
+  },
+  "text": [
+    "    cyclomatic: 11 (maximum for new code: 10)",
+    "    cyclomatic: 12 (maximum for new code: 10)",
+    "    cyclomatic: 12 (maximum for new code: 10)",
+    "  createChart (new function)",
+    "  deliveryCity (new function)",
+    "  signupErrors (new function)",
+    "Complexity regressions detected:",
+    "Quality gate failed.",
+    "code.ts"
+  ],
+  "measureBase": {
+    "functions": [],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 11,
+        "filePath": "code.ts",
+        "functionName": "deliveryCity",
+        "line": 46
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 12,
+        "filePath": "code.ts",
+        "functionName": "createChart",
+        "line": 22
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "statusCode",
+        "line": 97
+      },
+      {
+        "cognitive": 11,
+        "cyclomatic": 12,
+        "filePath": "code.ts",
+        "functionName": "signupErrors",
+        "line": 68
+      }
+    ],
+    "problems": []
+  }
+}

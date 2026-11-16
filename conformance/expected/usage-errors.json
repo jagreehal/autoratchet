@@ -1,0 +1,8 @@
+{
+  "noCommand": 2,
+  "unknownCommand": 2,
+  "badFormat": 2,
+  "badThreshold": 2,
+  "missingHead": 2,
+  "missingDir": 4
+}

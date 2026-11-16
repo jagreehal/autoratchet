@@ -1,0 +1,60 @@
+{
+  "exit": 0,
+  "textExit": 0,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 4,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Passed.** No function got more complex than the ratchet allows.",
+      "<sub>4 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+    ],
+    "regressions": [],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "pass"
+  },
+  "text": [
+    "No complexity regressions detected.",
+    "Quality gate passed."
+  ],
+  "measureBase": {
+    "functions": [],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 4,
+        "filePath": "code.ts",
+        "functionName": "eligibleAnd",
+        "line": 3
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 5,
+        "filePath": "code.ts",
+        "functionName": "eligibleOr",
+        "line": 7
+      },
+      {
+        "cognitive": 3,
+        "cyclomatic": 4,
+        "filePath": "code.ts",
+        "functionName": "eligibleMixed",
+        "line": 13
+      },
+      {
+        "cognitive": 6,
+        "cyclomatic": 5,
+        "filePath": "code.ts",
+        "functionName": "eligibleNestedIf",
+        "line": 22
+      }
+    ],
+    "problems": []
+  }
+}

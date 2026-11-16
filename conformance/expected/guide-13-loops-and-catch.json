@@ -1,0 +1,53 @@
+{
+  "exit": 0,
+  "textExit": 0,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 3,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Passed.** No function got more complex than the ratchet allows.",
+      "<sub>3 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+    ],
+    "regressions": [],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "pass"
+  },
+  "text": [
+    "No complexity regressions detected.",
+    "Quality gate passed."
+  ],
+  "measureBase": {
+    "functions": [],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 3,
+        "cyclomatic": 3,
+        "filePath": "code.ts",
+        "functionName": "sumPositive",
+        "line": 3
+      },
+      {
+        "cognitive": 5,
+        "cyclomatic": 4,
+        "filePath": "code.ts",
+        "functionName": "parseNumbers",
+        "line": 11
+      },
+      {
+        "cognitive": 9,
+        "cyclomatic": 6,
+        "filePath": "code.ts",
+        "functionName": "findFirstMatch",
+        "line": 25
+      }
+    ],
+    "problems": []
+  }
+}

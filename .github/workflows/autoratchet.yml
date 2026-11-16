@@ -1,6 +1,6 @@
 name: AutoRatchet
 
-# Runs ./action.yml on this repo's own pull requests, with the CLI built from the
+# Runs ./action.yml on this repo's own pull requests, with the binary built from the
 # branch under review. New override comments need an approving review from someone
 # other than the author, on the commit being merged.
 
@@ -22,7 +22,7 @@ concurrency:
 jobs:
   ratchet:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
 
@@ -36,12 +36,23 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build the CLI
+      - name: Cache Rust build
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Build the binary
         run: pnpm build
 
-      # test/fixtures/ holds deliberately complex code for the tests; measure the product code only.
+      # conformance/cases holds deliberately complex code for the tests; measure the tooling only.
       - uses: ./
         with:
-          path: src
-          cli: node dist/cli.js
+          path: bin scripts conformance/run.ts conformance/bench.ts
+          cli: node bin/autoratchet.js
           override-approval: review

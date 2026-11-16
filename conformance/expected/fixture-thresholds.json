@@ -1,0 +1,201 @@
+{
+  "exit": 1,
+  "textExit": 1,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 6,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Failed.** A function got more complex than the ratchet allows.",
+      "<sub>6 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `payments.ts::createOrder` | cyclomatic | 5 | 8 | 5 |",
+      "| `payments.ts::processPayment` | cognitive | 28 | 38 | 28 |",
+      "| `payments.ts::processPayment` | cyclomatic | 19 | 24 | 19 |",
+      "| `payments.ts::validateCustomer` | cognitive | 14 | 15 | 14 |",
+      "| `payments.ts::validateCustomer` | cyclomatic | 12 | 13 | 12 |",
+      "| `refunds.ts::createRefund` | cognitive | new | 18 | 8 |",
+      "| `refunds.ts::createRefund` | cyclomatic | new | 14 | 5 |",
+      "|---|---|--:|--:|--:|"
+    ],
+    "regressions": [
+      {
+        "current": 13,
+        "filePath": "payments.ts",
+        "functionName": "validateCustomer",
+        "kind": "worsened",
+        "line": 63,
+        "metric": "cyclomatic",
+        "previous": 12,
+        "threshold": 5
+      },
+      {
+        "current": 14,
+        "filePath": "refunds.ts",
+        "functionName": "createRefund",
+        "kind": "new",
+        "line": 15,
+        "metric": "cyclomatic",
+        "threshold": 5
+      },
+      {
+        "current": 15,
+        "filePath": "payments.ts",
+        "functionName": "validateCustomer",
+        "kind": "worsened",
+        "line": 63,
+        "metric": "cognitive",
+        "previous": 14,
+        "threshold": 8
+      },
+      {
+        "current": 18,
+        "filePath": "refunds.ts",
+        "functionName": "createRefund",
+        "kind": "new",
+        "line": 15,
+        "metric": "cognitive",
+        "threshold": 8
+      },
+      {
+        "current": 24,
+        "filePath": "payments.ts",
+        "functionName": "processPayment",
+        "kind": "worsened",
+        "line": 16,
+        "metric": "cyclomatic",
+        "previous": 19,
+        "threshold": 5
+      },
+      {
+        "current": 38,
+        "filePath": "payments.ts",
+        "functionName": "processPayment",
+        "kind": "worsened",
+        "line": 16,
+        "metric": "cognitive",
+        "previous": 28,
+        "threshold": 8
+      },
+      {
+        "current": 8,
+        "filePath": "payments.ts",
+        "functionName": "createOrder",
+        "kind": "worsened",
+        "line": 82,
+        "metric": "cyclomatic",
+        "previous": 5,
+        "threshold": 5
+      }
+    ],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "fail"
+  },
+  "text": [
+    "    cognitive: 14 → 15 (+1)",
+    "    cognitive: 18 (maximum for new code: 8)",
+    "    cognitive: 28 → 38 (+10)",
+    "    cyclomatic: 12 → 13 (+1)",
+    "    cyclomatic: 14 (maximum for new code: 5)",
+    "    cyclomatic: 19 → 24 (+5)",
+    "    cyclomatic: 5 → 8 (+3)",
+    "  createOrder",
+    "  createRefund (new function)",
+    "  processPayment",
+    "  validateCustomer",
+    "Complexity regressions detected:",
+    "Quality gate failed.",
+    "payments.ts",
+    "refunds.ts"
+  ],
+  "measureBase": {
+    "functions": [
+      {
+        "cognitive": 14,
+        "cyclomatic": 12,
+        "filePath": "payments.ts",
+        "functionName": "validateCustomer",
+        "line": 56
+      },
+      {
+        "cognitive": 28,
+        "cyclomatic": 19,
+        "filePath": "payments.ts",
+        "functionName": "processPayment",
+        "line": 15
+      },
+      {
+        "cognitive": 3,
+        "cyclomatic": 4,
+        "filePath": "payments.ts",
+        "functionName": "flat",
+        "line": 92
+      },
+      {
+        "cognitive": 4,
+        "cyclomatic": 5,
+        "filePath": "payments.ts",
+        "functionName": "createOrder",
+        "line": 74
+      },
+      {
+        "cognitive": 6,
+        "cyclomatic": 4,
+        "filePath": "payments.ts",
+        "functionName": "nested",
+        "line": 81
+      }
+    ],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 15,
+        "cyclomatic": 13,
+        "filePath": "payments.ts",
+        "functionName": "validateCustomer",
+        "line": 63
+      },
+      {
+        "cognitive": 18,
+        "cyclomatic": 14,
+        "filePath": "refunds.ts",
+        "functionName": "createRefund",
+        "line": 15
+      },
+      {
+        "cognitive": 3,
+        "cyclomatic": 4,
+        "filePath": "payments.ts",
+        "functionName": "flat",
+        "line": 102
+      },
+      {
+        "cognitive": 38,
+        "cyclomatic": 24,
+        "filePath": "payments.ts",
+        "functionName": "processPayment",
+        "line": 16
+      },
+      {
+        "cognitive": 6,
+        "cyclomatic": 4,
+        "filePath": "payments.ts",
+        "functionName": "nested",
+        "line": 91
+      },
+      {
+        "cognitive": 7,
+        "cyclomatic": 8,
+        "filePath": "payments.ts",
+        "functionName": "createOrder",
+        "line": 82
+      }
+    ],
+    "problems": []
+  }
+}

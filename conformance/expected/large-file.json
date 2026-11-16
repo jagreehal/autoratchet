@@ -1,0 +1,64 @@
+{
+  "exit": 1,
+  "textExit": 1,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 1,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Failed.** A function got more complex than the ratchet allows.",
+      "<sub>1 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `big.ts::f` | cognitive | 1 | 28 | 15 |",
+      "|---|---|--:|--:|--:|"
+    ],
+    "regressions": [
+      {
+        "current": 28,
+        "filePath": "big.ts",
+        "functionName": "f",
+        "kind": "worsened",
+        "line": 1,
+        "metric": "cognitive",
+        "previous": 1,
+        "threshold": 15
+      }
+    ],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "fail"
+  },
+  "text": [
+    "    cognitive: 1 → 28 (+27)",
+    "  f",
+    "Complexity regressions detected:",
+    "Quality gate failed.",
+    "big.ts"
+  ],
+  "measureBase": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "big.ts",
+        "functionName": "f",
+        "line": 1
+      }
+    ],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 28,
+        "cyclomatic": 8,
+        "filePath": "big.ts",
+        "functionName": "f",
+        "line": 1
+      }
+    ],
+    "problems": []
+  }
+}

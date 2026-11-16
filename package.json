@@ -19,7 +19,6 @@
     "code-quality",
     "technical-debt",
     "oxlint",
-    "biome",
     "ci",
     "coding-agents"
   ],
@@ -29,52 +28,37 @@
     "node": ">=24"
   },
   "bin": {
-    "autoratchet": "./dist/cli.js"
-  },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./internals": {
-      "types": "./dist/internals.d.ts",
-      "import": "./dist/internals.js"
-    },
-    "./package.json": "./package.json"
+    "autoratchet": "./bin/autoratchet.js"
   },
   "files": [
-    "dist",
-    "config",
+    "bin",
+    "binaries",
     "agent-hooks",
     "README.md",
     "LICENSE",
     "NOTICE"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "prepublishOnly": "pnpm build",
+    "build": "cargo build --release && node scripts/stage-binary.mjs",
     "changeset": "changeset",
-    "version-packages": "changeset version && pnpm install --lockfile-only",
-    "release": "pnpm build && changeset publish",
-    "test": "vitest run",
-    "typecheck": "tsc",
-    "lint": "oxlint",
-    "format": "oxfmt src",
-    "format:check": "oxfmt --check src",
-    "quality": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build",
-    "autoratchet": "tsx src/cli.ts"
+    "version-packages": "changeset version && node scripts/sync-cargo-version.mjs && pnpm install --lockfile-only",
+    "prepublishOnly": "node scripts/check-binaries.mjs",
+    "release": "changeset publish",
+    "test": "cargo test --release && pnpm conformance",
+    "conformance": "tsx conformance/run.ts --cli target/release/autoratchet",
+    "bench": "tsx conformance/bench.ts",
+    "lint": "cargo clippy --release --all-targets -- -D warnings && oxlint",
+    "format": "cargo fmt && oxfmt bin scripts conformance/run.ts conformance/bench.ts",
+    "format:check": "cargo fmt --check && oxfmt --check bin scripts conformance/run.ts conformance/bench.ts",
+    "quality": "pnpm lint && pnpm format:check && pnpm build && pnpm test"
   },
   "dependencies": {
-    "@biomejs/biome": "2.6.7",
-    "oxc-parser": "0.158.0",
-    "oxlint": "^1.93.0"
+    "oxlint": "1.93.0"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",
     "@types/node": "^26.6.6",
     "oxfmt": "0.78.0",
-    "tsx": "^4.23.15",
-    "typescript": "^7.0.2",
-    "vitest": "^5.1.0"
+    "tsx": "^4.23.15"
   }
 }

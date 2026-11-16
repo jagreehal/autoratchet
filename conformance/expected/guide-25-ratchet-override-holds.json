@@ -1,0 +1,78 @@
+{
+  "exit": 1,
+  "textExit": 1,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 2,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Failed.** A function got more complex than the ratchet allows.",
+      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `charts.ts::createChart` | cyclomatic | 12 | 13 | 12 |",
+      "|---|---|--:|--:|--:|"
+    ],
+    "regressions": [
+      {
+        "current": 13,
+        "filePath": "charts.ts",
+        "functionName": "createChart",
+        "kind": "worsened",
+        "line": 26,
+        "metric": "cyclomatic",
+        "previous": 12,
+        "threshold": 10
+      }
+    ],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "fail"
+  },
+  "text": [
+    "    cyclomatic: 12 → 13 (+1)",
+    "  createChart",
+    "Complexity regressions detected:",
+    "Quality gate failed.",
+    "charts.ts"
+  ],
+  "measureBase": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "charts.ts",
+        "functionName": "chartTitle",
+        "line": 1
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 12,
+        "filePath": "charts.ts",
+        "functionName": "createChart",
+        "line": 21
+      }
+    ],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "charts.ts",
+        "functionName": "chartTitle",
+        "line": 5
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 13,
+        "filePath": "charts.ts",
+        "functionName": "createChart",
+        "line": 26
+      }
+    ],
+    "problems": []
+  }
+}

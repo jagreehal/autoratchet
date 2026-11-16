@@ -1,5 +1,10 @@
 name: Release
 
+# On every push to main, one of two things happens:
+# - The version in package.json is already on npm: changesets opens or updates the release PR.
+# - It is not (the release PR just merged): build a binary per platform, publish to npm with
+#   provenance, and attach the binaries to the GitHub release.
+
 on:
   push:
     branches:
@@ -11,10 +16,99 @@ permissions:
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  release:
-    name: Release
+  plan:
     runs-on: ubuntu-latest
     if: github.repository_owner == 'jagreehal'
+    outputs:
+      publish: ${{ steps.plan.outputs.publish }}
+      version: ${{ steps.plan.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      - id: plan
+        run: |
+          version=$(node -p "require('./package.json').version")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if npm view "autoratchet@$version" version >/dev/null 2>&1; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  version:
+    needs: plan
+    if: needs.plan.outputs.publish == 'false'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create or update the release pull request
+        uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
+        with:
+          # Bumps the crate version with the npm one, and keeps pnpm-lock.yaml in step.
+          version-script: pnpm version-packages
+          commit-message: "chore: release"
+          pr-title: "chore: release"
+
+  build:
+    needs: plan
+    if: needs.plan.outputs.publish == 'true'
+    strategy:
+      matrix:
+        include:
+          - { platform: darwin-arm64, target: aarch64-apple-darwin, os: macos-latest }
+          - { platform: darwin-x64, target: x86_64-apple-darwin, os: macos-latest }
+          - { platform: linux-x64, target: x86_64-unknown-linux-musl, os: ubuntu-latest }
+          - { platform: linux-arm64, target: aarch64-unknown-linux-musl, os: ubuntu-24.04-arm }
+          - { platform: win32-x64, target: x86_64-pc-windows-msvc, os: windows-latest }
+          - { platform: win32-arm64, target: aarch64-pc-windows-msvc, os: windows-11-arm }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Add the target
+        shell: bash
+        run: rustup target add ${{ matrix.target }}
+
+      # Static musl binaries run on any Linux distribution.
+      - name: Install musl
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+
+      - name: Build
+        shell: bash
+        run: |
+          cargo build --release --locked --target ${{ matrix.target }}
+          exe=autoratchet; [ "$RUNNER_OS" = Windows ] && exe=autoratchet.exe
+          mkdir -p "out/${{ matrix.platform }}"
+          cp "target/${{ matrix.target }}/release/$exe" "out/${{ matrix.platform }}/"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ${{ matrix.platform }}
+          path: out/${{ matrix.platform }}
+          if-no-files-found: error
+
+  publish:
+    needs: [plan, build]
+    runs-on: ubuntu-latest
     environment: release
     permissions:
       contents: write
@@ -35,29 +129,36 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
 
-      - name: Get pnpm store path
-        id: pnpm-store
-        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
-
-      - name: Cache pnpm dependencies
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ${{ steps.pnpm-store.outputs.path }}
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Create Release Pull Request or Publish to npm
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          path: binaries
+
+      - name: Check the binaries
+        run: |
+          chmod +x binaries/*/autoratchet
+          node scripts/check-binaries.mjs
+          node bin/autoratchet.js --help > /dev/null
+
+      - name: Publish to npm
         uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
         with:
-          # Keeps pnpm-lock.yaml in step with the bumped version, so the next
-          # run's `pnpm install --frozen-lockfile` still resolves.
-          version-script: pnpm version-packages
           publish-script: pnpm release
-          commit-message: "chore: release"
-          pr-title: "chore: release"
         env:
           NPM_CONFIG_PROVENANCE: true
+
+      # For installs without npm: one archive per platform on the GitHub release.
+      - name: Attach binaries to the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.plan.outputs.version }}
+        run: |
+          mkdir -p archives
+          for dir in binaries/*/; do
+            platform=$(basename "$dir")
+            tar -czf "archives/autoratchet-$platform.tar.gz" -C "$dir" .
+          done
+          (cd archives && sha256sum ./*.tar.gz > SHA256SUMS)
+          gh release upload "v$VERSION" archives/* --clobber

@@ -42,7 +42,7 @@ inputs:
     description: 'Fail the job on a regression or an incomplete measurement.'
     default: 'true'
   cli:
-    description: 'Command that runs AutoRatchet. Empty builds it from this action''s source.'
+    description: 'Command that runs AutoRatchet. Empty installs the npm release matching this action''s version.'
     default: ''
   github-token:
     description: 'Token used to read reviews and post the comment.'
@@ -86,7 +86,7 @@ runs:
         git merge-base "$base" HEAD >/dev/null 2>&1 || git fetch --no-tags --unshallow origin 2>/dev/null || true
         echo "base=$base" >> "$GITHUB_OUTPUT"
 
-    - name: Build AutoRatchet
+    - name: Install AutoRatchet
       id: cli
       shell: bash
       env:
@@ -94,13 +94,11 @@ runs:
       run: |
         set -euo pipefail
         if [ -z "$CLI" ]; then
-          cd "$GITHUB_ACTION_PATH"
-          pnpm="npx -y $(node -p 'require("./package.json").packageManager')"
-          if [ ! -f dist/cli.js ]; then
-            $pnpm install --frozen-lockfile >&2
-            $pnpm build >&2
-          fi
-          CLI="node $GITHUB_ACTION_PATH/dist/cli.js"
+          # The npm release that matches this action's version: the native binary and Oxlint.
+          version=$(node -p 'require(process.env.GITHUB_ACTION_PATH + "/package.json").version')
+          dir="$RUNNER_TEMP/autoratchet-cli"
+          npm install --prefix "$dir" --no-audit --no-fund --loglevel=error "autoratchet@$version" >&2
+          CLI="$dir/node_modules/.bin/autoratchet"
         fi
         echo "cli=$CLI" >> "$GITHUB_OUTPUT"
 

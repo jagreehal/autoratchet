@@ -1,0 +1,54 @@
+{
+  "exit": 3,
+  "textExit": 3,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 1,
+    "incomplete": [
+      "head: u.ts: does not parse (Expected `}` but found `EOF`)"
+    ],
+    "markdown": [
+      "## AutoRatchet",
+      "**Could not measure:**",
+      "**Failed.** AutoRatchet could not measure every function, so it cannot vouch for this change.",
+      "- head: u.ts: does not parse (Expected `}` but found `EOF`)",
+      "<sub>1 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+    ],
+    "regressions": [],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "incomplete"
+  },
+  "text": [
+    "  head: u.ts: does not parse (Expected `}` but found `EOF`)",
+    "Measurement incomplete. The gate fails until every function can be measured:",
+    "Quality gate failed."
+  ],
+  "measureBase": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "u.ts",
+        "functionName": "cold",
+        "line": 1
+      }
+    ],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "ok.ts",
+        "functionName": "cold",
+        "line": 1
+      }
+    ],
+    "problems": [
+      "u.ts: does not parse (Expected `}` but found `EOF`)"
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "exit": 0,
+  "textExit": 0,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 1,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Passed.** No function got more complex than the ratchet allows.",
+      "<sub>1 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+    ],
+    "regressions": [],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "pass"
+  },
+  "text": [
+    "No complexity regressions detected.",
+    "Quality gate passed."
+  ],
+  "measureBase": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "orders.ts",
+        "functionName": "createOrder",
+        "line": 1
+      }
+    ],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 7,
+        "cyclomatic": 8,
+        "filePath": "orders.ts",
+        "functionName": "createOrder",
+        "line": 5
+      }
+    ],
+    "problems": []
+  }
+}

@@ -43,7 +43,7 @@ It measures two things, because each misses regressions the other catches:
 | Metric | Measures | Limit for new code |
 |--------|----------|-------------------:|
 | Cyclomatic complexity ([Oxlint](https://oxc.rs/docs/guide/usage/linter), modified variant) | Decisions in a function: roughly, testing effort | 10 |
-| Cognitive complexity ([Biome](https://biomejs.dev/linter/rules/no-excessive-cognitive-complexity/)) | How hard the function is to read, weighted by nesting | 15 |
+| Cognitive complexity ([SonarSource](https://www.sonarsource.com/docs/CognitiveComplexity.pdf), scored as [Biome](https://biomejs.dev/linter/rules/no-excessive-cognitive-complexity/) does) | How hard the function is to read, weighted by nesting | 15 |
 
 New to these metrics? The companion guide,
 [Cyclomatic and cognitive complexity, explained](https://github.com/jagreehal/cyclomatic-and-cognitive-complexity-explained),
@@ -52,7 +52,9 @@ and how quality gates get gamed.
 
 ## Use it
 
-Needs Node.js 24 or newer and a git repository.
+Needs a git repository. AutoRatchet is a native binary for macOS, Linux and Windows (x64 and
+arm64). It scores cognitive complexity itself, and runs the [Oxlint](https://oxc.rs) version the
+npm package ships with for cyclomatic complexity, so your scores match on every machine.
 
 ### Locally
 
@@ -87,7 +89,7 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-      - uses: jagreehal/autoratchet@v0.1.0
+      - uses: jagreehal/autoratchet@v0.2.0
         with:
           path: src
           override-approval: review
@@ -140,12 +142,15 @@ export function createChart({ width = 640, height = 400 /* … */ } = {}) {
 ```
 
 ```ts
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: follows the RFC 3986 parsing steps in order
+// eslint-disable-next-line sonarjs/cognitive-complexity -- follows the RFC 3986 parsing steps in order
 export function parseUri(input: string) {
 ```
 
-Put `disable-next-line` or `biome-ignore` on the line above the function, or `disable-line` at
-the end of the function's first line.
+`complexity` covers the cyclomatic score and `sonarjs/cognitive-complexity` the cognitive one;
+name both, comma-separated, to cover both. `oxlint-` and `eslint-` spellings both work, and so
+does Biome's `biome-ignore lint/complexity/noExcessiveCognitiveComplexity`. Put a
+`disable-next-line` comment on the line above the function, or `disable-line` at the end of the
+function's first line.
 
 An override **approves a score; it does not stop measurement.** AutoRatchet measures a copy of
 your code with every disable comment defused, so:
@@ -153,9 +158,8 @@ your code with every disable comment defused, so:
 - The PR that adds the override approves that function's current score on that one metric,
   and the report lists the function, metric, score and reason for a reviewer.
 - Every later PR compares against that score. Make the function worse and the check fails.
-- The other metric stays enforced. An Oxlint comment covers cyclomatic only, `biome-ignore`
-  covers cognitive only.
-- File-wide disables (`/* oxlint-disable */`, `biome-ignore-all`) approve nothing.
+- A metric the comment does not name stays enforced.
+- File-wide disables (`/* oxlint-disable complexity */`, `biome-ignore-all`) approve nothing.
 
 Who may approve a new override, with `override-approval`:
 
@@ -183,11 +187,20 @@ CODEOWNERS so workflow and configuration changes need their owners' approval.
 AutoRatchet fails closed. A function it could not measure is not evidence that the function is
 fine.
 
+## Without npm
+
+Each GitHub release has an archive per platform with the `autoratchet` binary, and a
+`SHA256SUMS` file. Put the binary on your `PATH`, then install the
+[Oxlint](https://github.com/oxc-project/oxc/releases) 1.93.0 binary, which measures cyclomatic
+complexity. AutoRatchet looks for it in `AUTORATCHET_OXLINT`, then in `node_modules/.bin`, then
+on `PATH`. Another Oxlint version can score code differently.
+
 ## CLI
 
 ```text
 autoratchet check [--base <ref>] [options] [pathspec...]
 autoratchet compare --base <dir|json> --head <dir|json> [options]
+autoratchet measure <dir>
 
 --threshold <n>               cyclomatic limit for new functions (default 10)
 --cognitive-threshold <n>     cognitive limit for new functions (default 15)
@@ -198,25 +211,30 @@ autoratchet compare --base <dir|json> --head <dir|json> [options]
 
 `--format json` is for dashboards, CI annotations and coding agents. It includes the verdict,
 every regression with file and line, approvals, measurement problems, and the Markdown report.
+`measure` prints every function's scores as JSON; save it and pass the file to `compare` as a
+`--base` or `--head`.
 
-## API
-
-```ts
-import { check, formatReport, verdict } from 'autoratchet';
-
-const result = await check({ base: 'main', paths: ['src'] });
-if (verdict(result) !== 'pass') {
-  console.error(formatReport(result));
-  process.exitCode = 1;
-}
-```
-
-`compareSources` and `comparePaths` compare two sets of files directly, and `passesComplexityGate`
-is the ratchet rule on its own:
+The ratchet rule, applied to each metric of each function:
 
 ```ts
 current <= Math.max(previous ?? 0, threshold);
 ```
+
+The Rust crate in `crates/autoratchet` exposes the same pieces as a library: `git::check`,
+`compare::compare_paths`, `gate::passes_complexity_gate` and the report formatters.
+
+## Development
+
+```bash
+pnpm install
+pnpm build    # cargo build --release, then stage the binary for bin/autoratchet.js
+pnpm test     # Rust unit tests, then the conformance suite
+pnpm bench -- --cli rust=target/release/autoratchet --repo ../some-large-repo
+```
+
+`conformance/` holds the cases every release must reproduce: each one's scores, names, reports
+and exit codes. Add a case under `conformance/cases/<name>/{base,head}`, then
+`pnpm conformance --update <name>` and review the expected file it writes.
 
 ## How functions are identified
 
@@ -232,7 +250,9 @@ to avoid that.
 
 - JavaScript and TypeScript only (`.js`, `.jsx`, `.ts`, `.tsx` and the `m`/`c` variants).
 - Two metrics: cyclomatic and cognitive complexity.
-- Biome does not report cognitive scores of 0 or 1, so both are recorded as 1.
+- Cognitive scores of 0 and 1 are both recorded as 1, as earlier versions recorded them.
+- Getters and setters have no cognitive score of their own: their logic counts toward the
+  function around them, as in Biome.
 - Class field initialisers that are not functions are not measured.
 
 ## License

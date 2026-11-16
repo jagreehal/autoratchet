@@ -1,0 +1,31 @@
+{
+  "check": {
+    "exit": 0,
+    "report": {
+      "approvals": [],
+      "baseCommit": "5051ea25452d2dfb6080415eb9870f06019c5cfc",
+      "blockedOverrides": [],
+      "functions": 3,
+      "incomplete": [],
+      "markdown": [
+        "## AutoRatchet",
+        "**Over a limit on base, missing on head** (deleted, renamed or moved):",
+        "**Passed.** No function got more complex than the ratchet allows.",
+        "- `a.ts::hot`",
+        "<sub>3 functions measured against `5051ea2`. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+      ],
+      "regressions": [],
+      "unmatchedOverrides": [],
+      "untracked": [
+        {
+          "cognitive": 11,
+          "cyclomatic": 12,
+          "filePath": "a.ts",
+          "functionName": "hot",
+          "line": 1
+        }
+      ],
+      "verdict": "pass"
+    }
+  }
+}

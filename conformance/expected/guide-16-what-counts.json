@@ -1,0 +1,165 @@
+{
+  "exit": 0,
+  "textExit": 0,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 19,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Passed.** No function got more complex than the ratchet allows.",
+      "<sub>19 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+    ],
+    "regressions": [],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "pass"
+  },
+  "text": [
+    "No complexity regressions detected.",
+    "Quality gate passed."
+  ],
+  "measureBase": {
+    "functions": [],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "code.ts",
+        "functionName": "callbackWithBranch",
+        "line": 102
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "code.ts",
+        "functionName": "straightLine",
+        "line": 6
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "code.ts",
+        "functionName": "tryFinally",
+        "line": 81
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "defaultParameter",
+        "line": 53
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "forLoop",
+        "line": 62
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "ifStatement",
+        "line": 10
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "logicalAnd",
+        "line": 29
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "logicalAssignment",
+        "line": 57
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "logicalOr",
+        "line": 33
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "nullishCoalescing",
+        "line": 41
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "switchFourCases",
+        "line": 89
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "ternary",
+        "line": 49
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "tryCatch",
+        "line": 73
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "whileLoop",
+        "line": 68
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 3,
+        "filePath": "code.ts",
+        "functionName": "optionalChaining",
+        "line": 45
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 4,
+        "filePath": "code.ts",
+        "functionName": "logicalChain",
+        "line": 37
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "callbackWithBranch>values.map()",
+        "line": 104
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 2,
+        "filePath": "code.ts",
+        "functionName": "ifElse",
+        "line": 15
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 3,
+        "filePath": "code.ts",
+        "functionName": "elseIf",
+        "line": 23
+      }
+    ],
+    "problems": []
+  }
+}

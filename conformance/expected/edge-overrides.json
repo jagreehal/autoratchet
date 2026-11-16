@@ -1,0 +1,154 @@
+{
+  "exit": 1,
+  "textExit": 1,
+  "report": {
+    "approvals": [
+      {
+        "functionName": "opts",
+        "override": {
+          "filePath": "o.ts",
+          "line": 10,
+          "metric": "cyclomatic",
+          "text": "// eslint-disable-next-line complexity -- options bag, each default one line"
+        },
+        "score": 12
+      },
+      {
+        "functionName": "spec",
+        "override": {
+          "filePath": "o.ts",
+          "line": 12,
+          "metric": "cognitive",
+          "text": "// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: follows the spec step by step"
+        },
+        "score": 22
+      },
+      {
+        "functionName": "tiny",
+        "override": {
+          "filePath": "o.ts",
+          "line": 2,
+          "metric": "cyclomatic",
+          "text": "// oxlint-disable-line complexity -- trivial"
+        },
+        "score": 1
+      }
+    ],
+    "blockedOverrides": [],
+    "functions": 4,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Approved by a new override** (a reviewer must accept each reason; still measured):",
+      "**Failed.** A function got more complex than the ratchet allows.",
+      "**Overrides on no single function** (ignored by the gate):",
+      "- `o.ts:17` // biome-ignore-all lint/complexity/noExcessiveCognitiveComplexity: whole file",
+      "- `o.ts:1` /* oxlint-disable complexity */",
+      "- `o.ts::opts` cyclomatic 12: // eslint-disable-next-line complexity -- options bag, each default one line",
+      "- `o.ts::spec` cognitive 22: // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: follows the spec step by step",
+      "- `o.ts::tiny` cyclomatic 1: // oxlint-disable-line complexity -- trivial",
+      "<sub>4 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `o.ts::big` | cyclomatic | 1 | 12 | 10 |",
+      "|---|---|--:|--:|--:|"
+    ],
+    "regressions": [
+      {
+        "current": 12,
+        "filePath": "o.ts",
+        "functionName": "big",
+        "kind": "worsened",
+        "line": 3,
+        "metric": "cyclomatic",
+        "previous": 1,
+        "threshold": 10
+      }
+    ],
+    "unmatchedOverrides": [
+      {
+        "filePath": "o.ts",
+        "line": 1,
+        "metric": "cyclomatic",
+        "text": "/* oxlint-disable complexity */"
+      },
+      {
+        "filePath": "o.ts",
+        "line": 17,
+        "metric": "cognitive",
+        "text": "// biome-ignore-all lint/complexity/noExcessiveCognitiveComplexity: whole file"
+      }
+    ],
+    "untracked": [],
+    "verdict": "fail"
+  },
+  "text": [
+    "    cyclomatic: 1 → 12 (+11)",
+    "    line 10: // eslint-disable-next-line complexity -- options bag, each default one line",
+    "    line 12: // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: follows the spec step by step",
+    "    line 2: // oxlint-disable-line complexity -- trivial",
+    "  big",
+    "  o.ts:1  /* oxlint-disable complexity */",
+    "  o.ts:17  // biome-ignore-all lint/complexity/noExcessiveCognitiveComplexity: whole file",
+    "  o.ts::opts cyclomatic 12",
+    "  o.ts::spec cognitive 22",
+    "  o.ts::tiny cyclomatic 1",
+    "Approved by a new override. A reviewer must accept each reason:",
+    "Complexity regressions detected:",
+    "Quality gate failed.",
+    "Still measured: if one of these gets worse in a later PR, the gate fails.",
+    "Warning: new overrides that sit on no single function (file-wide or misplaced). The gate ignores them:",
+    "o.ts"
+  ],
+  "measureBase": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "o.ts",
+        "functionName": "big",
+        "line": 2
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "o.ts",
+        "functionName": "tiny",
+        "line": 1
+      }
+    ],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "o.ts",
+        "functionName": "tiny",
+        "line": 2
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 12,
+        "filePath": "o.ts",
+        "functionName": "opts",
+        "line": 11
+      },
+      {
+        "cognitive": 11,
+        "cyclomatic": 12,
+        "filePath": "o.ts",
+        "functionName": "big",
+        "line": 3
+      },
+      {
+        "cognitive": 22,
+        "cyclomatic": 8,
+        "filePath": "o.ts",
+        "functionName": "spec",
+        "line": 13
+      }
+    ],
+    "problems": []
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "exit": 1,
+  "textExit": 1,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 1,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Failed.** A function got more complex than the ratchet allows.",
+      "<sub>1 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `checkout.ts::applyDiscount` | cognitive | 14 | 19 | 15 |",
+      "| `checkout.ts::applyDiscount` | cyclomatic | 16 | 21 | 16 |",
+      "|---|---|--:|--:|--:|"
+    ],
+    "regressions": [
+      {
+        "current": 19,
+        "filePath": "checkout.ts",
+        "functionName": "applyDiscount",
+        "kind": "worsened",
+        "line": 6,
+        "metric": "cognitive",
+        "previous": 14,
+        "threshold": 15
+      },
+      {
+        "current": 21,
+        "filePath": "checkout.ts",
+        "functionName": "applyDiscount",
+        "kind": "worsened",
+        "line": 6,
+        "metric": "cyclomatic",
+        "previous": 16,
+        "threshold": 10
+      }
+    ],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "fail"
+  },
+  "text": [
+    "    cognitive: 14 → 19 (+5)",
+    "    cyclomatic: 16 → 21 (+5)",
+    "  applyDiscount",
+    "Complexity regressions detected:",
+    "Quality gate failed.",
+    "checkout.ts"
+  ],
+  "measureBase": {
+    "functions": [
+      {
+        "cognitive": 14,
+        "cyclomatic": 16,
+        "filePath": "checkout.ts",
+        "functionName": "applyDiscount",
+        "line": 2
+      }
+    ],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 19,
+        "cyclomatic": 21,
+        "filePath": "checkout.ts",
+        "functionName": "applyDiscount",
+        "line": 6
+      }
+    ],
+    "problems": []
+  }
+}

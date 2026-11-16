@@ -1,0 +1,46 @@
+{
+  "exit": 0,
+  "textExit": 0,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 2,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Passed.** No function got more complex than the ratchet allows.",
+      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+    ],
+    "regressions": [],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "pass"
+  },
+  "text": [
+    "No complexity regressions detected.",
+    "Quality gate passed."
+  ],
+  "measureBase": {
+    "functions": [],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 10,
+        "cyclomatic": 5,
+        "filePath": "m.ts",
+        "functionName": "Repo.find",
+        "line": 15
+      },
+      {
+        "cognitive": 15,
+        "cyclomatic": 6,
+        "filePath": "m.ts",
+        "functionName": "load",
+        "line": 1
+      }
+    ],
+    "problems": []
+  }
+}

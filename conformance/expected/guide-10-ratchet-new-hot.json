@@ -1,0 +1,81 @@
+{
+  "exit": 1,
+  "textExit": 1,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 2,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Failed.** A function got more complex than the ratchet allows.",
+      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `orders.ts::routeOrder` | cognitive | new | 21 | 15 |",
+      "| `orders.ts::routeOrder` | cyclomatic | new | 12 | 10 |",
+      "|---|---|--:|--:|--:|"
+    ],
+    "regressions": [
+      {
+        "current": 12,
+        "filePath": "orders.ts",
+        "functionName": "routeOrder",
+        "kind": "new",
+        "line": 8,
+        "metric": "cyclomatic",
+        "threshold": 10
+      },
+      {
+        "current": 21,
+        "filePath": "orders.ts",
+        "functionName": "routeOrder",
+        "kind": "new",
+        "line": 8,
+        "metric": "cognitive",
+        "threshold": 15
+      }
+    ],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "fail"
+  },
+  "text": [
+    "    cognitive: 21 (maximum for new code: 15)",
+    "    cyclomatic: 12 (maximum for new code: 10)",
+    "  routeOrder (new function)",
+    "Complexity regressions detected:",
+    "Quality gate failed.",
+    "orders.ts"
+  ],
+  "measureBase": {
+    "functions": [
+      {
+        "cognitive": 2,
+        "cyclomatic": 3,
+        "filePath": "orders.ts",
+        "functionName": "createOrder",
+        "line": 1
+      }
+    ],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 2,
+        "cyclomatic": 3,
+        "filePath": "orders.ts",
+        "functionName": "createOrder",
+        "line": 1
+      },
+      {
+        "cognitive": 21,
+        "cyclomatic": 12,
+        "filePath": "orders.ts",
+        "functionName": "routeOrder",
+        "line": 8
+      }
+    ],
+    "problems": []
+  }
+}

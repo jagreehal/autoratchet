@@ -1,0 +1,340 @@
+{
+  "exit": 0,
+  "textExit": 0,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 44,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Passed.** No function got more complex than the ratchet allows.",
+      "<sub>44 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+    ],
+    "regressions": [],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "pass"
+  },
+  "text": [
+    "No complexity regressions detected.",
+    "Quality gate passed."
+  ],
+  "measureBase": {
+    "functions": [],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "dupes.js",
+        "functionName": "first",
+        "line": 2
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "dupes.js",
+        "functionName": "second",
+        "line": 3
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "names.ts",
+        "functionName": "outer",
+        "line": 28
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "names.ts",
+        "functionName": "Service.field",
+        "line": 8
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "view.tsx",
+        "functionName": "List",
+        "line": 1
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "dupes.js",
+        "functionName": "[1, 2].forEach()",
+        "line": 5
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "dupes.js",
+        "functionName": "[1, 2].forEach()#2",
+        "line": 6
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "dupes.js",
+        "functionName": "twice",
+        "line": 1
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "Anon.run",
+        "line": 15
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "arrow",
+        "line": 2
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "BY_ID[\"deny\"].test",
+        "line": 46
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "BY_ID[\"vip\"].test",
+        "line": 45
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "BY_ID[2].test",
+        "line": 47
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "cast.go",
+        "line": 26
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "default",
+        "line": 3
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "dup",
+        "line": 50
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "exportsObj.dynamic",
+        "line": 52
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "handlers.1",
+        "line": 22
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "handlers.nested.deep",
+        "line": 20
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "handlers.onReset",
+        "line": 19
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "handlers.onSubmit",
+        "line": 18
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "handlers.quoted-key",
+        "line": 21
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "Inner.run",
+        "line": 14
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "KEYED[\"first\"]",
+        "line": 41
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "KEYED[\"second\"]",
+        "line": 42
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "Promise()",
+        "line": 54
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "RULES[0]",
+        "line": 36
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "RULES[2]",
+        "line": 38
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "Service.#secret",
+        "line": 6
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "Service.computed",
+        "line": 10
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "Service.make",
+        "line": 9
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "Service.value",
+        "line": 7
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "setTimeout()",
+        "line": 53
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "top",
+        "line": 1
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "typed.go",
+        "line": 25
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 2,
+        "filePath": "dupes.js",
+        "functionName": "first>twice",
+        "line": 2
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 2,
+        "filePath": "dupes.js",
+        "functionName": "second>twice",
+        "line": 3
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "outer>inner",
+        "line": 29
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "outer>items.map().filter()",
+        "line": 30
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "outer>items.map()",
+        "line": 30
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 2,
+        "filePath": "names.ts",
+        "functionName": "outer>Local.m",
+        "line": 31
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 2,
+        "filePath": "view.tsx",
+        "functionName": "List>items.map()",
+        "line": 2
+      },
+      {
+        "cognitive": 3,
+        "cyclomatic": 3,
+        "filePath": "common.cjs",
+        "functionName": "module.exports.run",
+        "line": 1
+      },
+      {
+        "cognitive": 3,
+        "cyclomatic": 3,
+        "filePath": "mod.mjs",
+        "functionName": "m",
+        "line": 1
+      }
+    ],
+    "problems": []
+  }
+}

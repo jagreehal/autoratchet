@@ -1,0 +1,11 @@
+{
+  "rules": {
+    "complexity": [
+      "error",
+      {
+        "max": 0,
+        "variant": "modified"
+      }
+    ]
+  }
+}

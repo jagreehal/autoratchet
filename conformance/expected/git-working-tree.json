@@ -1,0 +1,247 @@
+{
+  "all": {
+    "exit": 1,
+    "report": {
+      "approvals": [],
+      "baseCommit": "a56a56544e263e48ab8aa180bc8e0b2be46943cb",
+      "blockedOverrides": [],
+      "functions": 7,
+      "incomplete": [],
+      "markdown": [
+        "## AutoRatchet",
+        "**Failed.** A function got more complex than the ratchet allows.",
+        "<sub>7 functions measured against `a56a565`. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+        "| Function | Metric | Before | After | Limit |",
+        "| `other/refunds.ts::createRefund` | cognitive | new | 18 | 15 |",
+        "| `other/refunds.ts::createRefund` | cyclomatic | new | 14 | 10 |",
+        "| `src/payments.ts::processPayment` | cognitive | 28 | 38 | 28 |",
+        "| `src/payments.ts::processPayment` | cyclomatic | 19 | 24 | 19 |",
+        "| `src/payments.ts::validateCustomer` | cyclomatic | 12 | 13 | 12 |",
+        "| `src/refunds.ts::createRefund` | cognitive | new | 18 | 15 |",
+        "| `src/refunds.ts::createRefund` | cyclomatic | new | 14 | 10 |",
+        "|---|---|--:|--:|--:|"
+      ],
+      "regressions": [
+        {
+          "current": 13,
+          "filePath": "src/payments.ts",
+          "functionName": "validateCustomer",
+          "kind": "worsened",
+          "line": 63,
+          "metric": "cyclomatic",
+          "previous": 12,
+          "threshold": 10
+        },
+        {
+          "current": 14,
+          "filePath": "other/refunds.ts",
+          "functionName": "createRefund",
+          "kind": "new",
+          "line": 15,
+          "metric": "cyclomatic",
+          "threshold": 10
+        },
+        {
+          "current": 14,
+          "filePath": "src/refunds.ts",
+          "functionName": "createRefund",
+          "kind": "new",
+          "line": 15,
+          "metric": "cyclomatic",
+          "threshold": 10
+        },
+        {
+          "current": 18,
+          "filePath": "other/refunds.ts",
+          "functionName": "createRefund",
+          "kind": "new",
+          "line": 15,
+          "metric": "cognitive",
+          "threshold": 15
+        },
+        {
+          "current": 18,
+          "filePath": "src/refunds.ts",
+          "functionName": "createRefund",
+          "kind": "new",
+          "line": 15,
+          "metric": "cognitive",
+          "threshold": 15
+        },
+        {
+          "current": 24,
+          "filePath": "src/payments.ts",
+          "functionName": "processPayment",
+          "kind": "worsened",
+          "line": 16,
+          "metric": "cyclomatic",
+          "previous": 19,
+          "threshold": 10
+        },
+        {
+          "current": 38,
+          "filePath": "src/payments.ts",
+          "functionName": "processPayment",
+          "kind": "worsened",
+          "line": 16,
+          "metric": "cognitive",
+          "previous": 28,
+          "threshold": 15
+        }
+      ],
+      "unmatchedOverrides": [],
+      "untracked": [],
+      "verdict": "fail"
+    }
+  },
+  "src": {
+    "exit": 1,
+    "report": {
+      "approvals": [],
+      "baseCommit": "a56a56544e263e48ab8aa180bc8e0b2be46943cb",
+      "blockedOverrides": [],
+      "functions": 6,
+      "incomplete": [],
+      "markdown": [
+        "## AutoRatchet",
+        "**Failed.** A function got more complex than the ratchet allows.",
+        "<sub>6 functions measured against `a56a565`. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+        "| Function | Metric | Before | After | Limit |",
+        "| `src/payments.ts::processPayment` | cognitive | 28 | 38 | 28 |",
+        "| `src/payments.ts::processPayment` | cyclomatic | 19 | 24 | 19 |",
+        "| `src/payments.ts::validateCustomer` | cyclomatic | 12 | 13 | 12 |",
+        "| `src/refunds.ts::createRefund` | cognitive | new | 18 | 15 |",
+        "| `src/refunds.ts::createRefund` | cyclomatic | new | 14 | 10 |",
+        "|---|---|--:|--:|--:|"
+      ],
+      "regressions": [
+        {
+          "current": 13,
+          "filePath": "src/payments.ts",
+          "functionName": "validateCustomer",
+          "kind": "worsened",
+          "line": 63,
+          "metric": "cyclomatic",
+          "previous": 12,
+          "threshold": 10
+        },
+        {
+          "current": 14,
+          "filePath": "src/refunds.ts",
+          "functionName": "createRefund",
+          "kind": "new",
+          "line": 15,
+          "metric": "cyclomatic",
+          "threshold": 10
+        },
+        {
+          "current": 18,
+          "filePath": "src/refunds.ts",
+          "functionName": "createRefund",
+          "kind": "new",
+          "line": 15,
+          "metric": "cognitive",
+          "threshold": 15
+        },
+        {
+          "current": 24,
+          "filePath": "src/payments.ts",
+          "functionName": "processPayment",
+          "kind": "worsened",
+          "line": 16,
+          "metric": "cyclomatic",
+          "previous": 19,
+          "threshold": 10
+        },
+        {
+          "current": 38,
+          "filePath": "src/payments.ts",
+          "functionName": "processPayment",
+          "kind": "worsened",
+          "line": 16,
+          "metric": "cognitive",
+          "previous": 28,
+          "threshold": 15
+        }
+      ],
+      "unmatchedOverrides": [],
+      "untracked": [],
+      "verdict": "fail"
+    }
+  },
+  "excluded": {
+    "exit": 1,
+    "report": {
+      "approvals": [],
+      "baseCommit": "a56a56544e263e48ab8aa180bc8e0b2be46943cb",
+      "blockedOverrides": [],
+      "functions": 6,
+      "incomplete": [],
+      "markdown": [
+        "## AutoRatchet",
+        "**Failed.** A function got more complex than the ratchet allows.",
+        "<sub>6 functions measured against `a56a565`. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+        "| Function | Metric | Before | After | Limit |",
+        "| `src/payments.ts::processPayment` | cognitive | 28 | 38 | 28 |",
+        "| `src/payments.ts::processPayment` | cyclomatic | 19 | 24 | 19 |",
+        "| `src/payments.ts::validateCustomer` | cyclomatic | 12 | 13 | 12 |",
+        "| `src/refunds.ts::createRefund` | cognitive | new | 18 | 15 |",
+        "| `src/refunds.ts::createRefund` | cyclomatic | new | 14 | 10 |",
+        "|---|---|--:|--:|--:|"
+      ],
+      "regressions": [
+        {
+          "current": 13,
+          "filePath": "src/payments.ts",
+          "functionName": "validateCustomer",
+          "kind": "worsened",
+          "line": 63,
+          "metric": "cyclomatic",
+          "previous": 12,
+          "threshold": 10
+        },
+        {
+          "current": 14,
+          "filePath": "src/refunds.ts",
+          "functionName": "createRefund",
+          "kind": "new",
+          "line": 15,
+          "metric": "cyclomatic",
+          "threshold": 10
+        },
+        {
+          "current": 18,
+          "filePath": "src/refunds.ts",
+          "functionName": "createRefund",
+          "kind": "new",
+          "line": 15,
+          "metric": "cognitive",
+          "threshold": 15
+        },
+        {
+          "current": 24,
+          "filePath": "src/payments.ts",
+          "functionName": "processPayment",
+          "kind": "worsened",
+          "line": 16,
+          "metric": "cyclomatic",
+          "previous": 19,
+          "threshold": 10
+        },
+        {
+          "current": 38,
+          "filePath": "src/payments.ts",
+          "functionName": "processPayment",
+          "kind": "worsened",
+          "line": 16,
+          "metric": "cognitive",
+          "previous": 28,
+          "threshold": 15
+        }
+      ],
+      "unmatchedOverrides": [],
+      "untracked": [],
+      "verdict": "fail"
+    }
+  }
+}

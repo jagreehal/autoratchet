@@ -10,7 +10,9 @@
     ]
   },
   "ignorePatterns": [
-    "test/fixtures/**",
-    "dist/**"
+    "conformance/cases/**",
+    "target/**",
+    "binaries/**",
+    "node_modules/**"
   ]
 }

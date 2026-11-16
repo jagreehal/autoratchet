@@ -1,0 +1,81 @@
+{
+  "exit": 1,
+  "textExit": 1,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [
+      {
+        "filePath": "charts.ts",
+        "line": 20,
+        "metric": "cyclomatic",
+        "text": "// oxlint-disable-next-line complexity -- options bag: each default is one line, no logic"
+      }
+    ],
+    "functions": 2,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Failed.** A function got more complex than the ratchet allows.",
+      "**New overrides need approval:**",
+      "- `charts.ts:20` // oxlint-disable-next-line complexity -- options bag: each default is one line, no logic",
+      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `charts.ts::createChart` | cyclomatic | new | 12 | 10 |",
+      "|---|---|--:|--:|--:|"
+    ],
+    "regressions": [
+      {
+        "current": 12,
+        "filePath": "charts.ts",
+        "functionName": "createChart",
+        "kind": "new",
+        "line": 21,
+        "metric": "cyclomatic",
+        "threshold": 10
+      }
+    ],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "fail"
+  },
+  "text": [
+    "    cyclomatic: 12 (maximum for new code: 10)",
+    "  charts.ts:20  // oxlint-disable-next-line complexity -- options bag: each default is one line, no logic",
+    "  createChart (new function)",
+    "Complexity regressions detected:",
+    "New overrides need approval (--require-override-approval):",
+    "Quality gate failed.",
+    "charts.ts"
+  ],
+  "measureBase": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "charts.ts",
+        "functionName": "chartTitle",
+        "line": 1
+      }
+    ],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "charts.ts",
+        "functionName": "chartTitle",
+        "line": 1
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 12,
+        "filePath": "charts.ts",
+        "functionName": "createChart",
+        "line": 21
+      }
+    ],
+    "problems": []
+  }
+}

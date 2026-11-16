@@ -1,0 +1,71 @@
+{
+  "exit": 0,
+  "textExit": 0,
+  "report": {
+    "approvals": [
+      {
+        "functionName": "createChart",
+        "override": {
+          "filePath": "charts.ts",
+          "line": 20,
+          "metric": "cyclomatic",
+          "text": "// oxlint-disable-next-line complexity -- options bag: each default is one line, no logic"
+        },
+        "score": 12
+      }
+    ],
+    "blockedOverrides": [],
+    "functions": 2,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Approved by a new override** (a reviewer must accept each reason; still measured):",
+      "**Passed.** No function got more complex than the ratchet allows.",
+      "- `charts.ts::createChart` cyclomatic 12: // oxlint-disable-next-line complexity -- options bag: each default is one line, no logic",
+      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+    ],
+    "regressions": [],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "pass"
+  },
+  "text": [
+    "    line 20: // oxlint-disable-next-line complexity -- options bag: each default is one line, no logic",
+    "  charts.ts::createChart cyclomatic 12",
+    "Approved by a new override. A reviewer must accept each reason:",
+    "No complexity regressions detected.",
+    "Quality gate passed.",
+    "Still measured: if one of these gets worse in a later PR, the gate fails."
+  ],
+  "measureBase": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "charts.ts",
+        "functionName": "chartTitle",
+        "line": 1
+      }
+    ],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "charts.ts",
+        "functionName": "chartTitle",
+        "line": 1
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 12,
+        "filePath": "charts.ts",
+        "functionName": "createChart",
+        "line": 21
+      }
+    ],
+    "problems": []
+  }
+}
