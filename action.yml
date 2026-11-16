@@ -129,15 +129,17 @@ runs:
           review)
             strict=true
             if [ -n "$PR" ]; then
-              # Latest review per reviewer; it must be an approval of this exact commit, from someone
-              # other than the author with write access. A new push makes older approvals not count.
-              approvals=$(gh api "repos/$REPO/pulls/$PR/reviews" --paginate | jq -s --arg author "$AUTHOR" --arg head "$HEAD_SHA" '
+              # Latest review per reviewer; it must approve this exact commit and come from someone
+              # other than the author. A new push makes older approvals not count.
+              reviewers=$(gh api "repos/$REPO/pulls/$PR/reviews" --paginate | jq -rs --arg author "$AUTHOR" --arg head "$HEAD_SHA" '
                 add | map(select(.user.login != $author and .state != "COMMENTED"))
                 | group_by(.user.login) | map(last)
-                | map(select(.state == "APPROVED" and .commit_id == $head
-                    and (.author_association | IN("OWNER", "MEMBER", "COLLABORATOR"))))
-                | length')
-              [ "$approvals" -gt 0 ] && strict=false
+                | map(select(.state == "APPROVED" and .commit_id == $head)) | .[].user.login')
+              # The reviewer's effective permission decides, so an org member with read access does not count.
+              for login in $reviewers; do
+                permission=$(gh api "repos/$REPO/collaborators/$login/permission" --jq .permission 2>/dev/null || true)
+                case "$permission" in admin|write) strict=false; break ;; esac
+              done
             fi ;;
           *) echo "::error::override-approval must be none, strict, review or label, got \"$MODE\""; exit 1 ;;
         esac
