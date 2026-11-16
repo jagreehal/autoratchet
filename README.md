@@ -81,16 +81,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-      - uses: jagreehal/autoratchet@v0.2.0
+      - uses: jagreehal/autoratchet@v0.3.1
         with:
           path: src
           override-approval: review
 ```
 
-The action fails the check on a regression, marks each regressed function in the PR diff,
+The action downloads the AutoRatchet binary for its own version, checked against the release's
+`SHA256SUMS`, and the Oxlint binary when the paths include JavaScript or TypeScript. It needs no
+Node.js. It fails the check on a regression, marks each regressed function in the PR diff,
 writes the report to the job summary, and keeps one comment on the PR updated (it only
 comments once there is something to say).
 

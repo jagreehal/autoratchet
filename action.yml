@@ -42,7 +42,7 @@ inputs:
     description: 'Fail the job on a regression or an incomplete measurement.'
     default: 'true'
   cli:
-    description: 'Command that runs AutoRatchet. Empty installs the npm release matching this action''s version.'
+    description: 'Command that runs AutoRatchet. Empty downloads the release binary matching this action''s version.'
     default: ''
   github-token:
     description: 'Token used to read reviews and post the comment.'
@@ -59,12 +59,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Check Node
-      shell: bash
-      run: |
-        node -e 'process.exit(+process.versions.node.split(".")[0] >= 24 ? 0 : 1)' \
-          || { echo "::error::AutoRatchet needs Node 24+; add actions/setup-node with node-version: 24 before this step"; exit 1; }
-
     - name: Resolve base
       id: refs
       shell: bash
@@ -91,16 +85,53 @@ runs:
       shell: bash
       env:
         CLI: ${{ inputs.cli }}
+        PATHS: ${{ inputs.path }}
+        ACTION_REPO: ${{ github.action_repository }}
       run: |
         set -euo pipefail
-        if [ -z "$CLI" ]; then
-          # The npm release that matches this action's version: the native binary and Oxlint.
-          version=$(node -p 'require(process.env.GITHUB_ACTION_PATH + "/package.json").version')
-          dir="$RUNNER_TEMP/autoratchet-cli"
-          npm install --prefix "$dir" --no-audit --no-fund --loglevel=error "autoratchet@$version" >&2
-          CLI="$dir/node_modules/.bin/autoratchet"
+        if [ -n "$CLI" ]; then
+          echo "cli=$CLI" >> "$GITHUB_OUTPUT"
+          exit 0
         fi
-        echo "cli=$CLI" >> "$GITHUB_OUTPUT"
+        case "$RUNNER_OS-$RUNNER_ARCH" in
+          Linux-X64) platform=linux-x64 target=x86_64-unknown-linux-musl ;;
+          Linux-ARM64) platform=linux-arm64 target=aarch64-unknown-linux-musl ;;
+          macOS-X64) platform=darwin-x64 target=x86_64-apple-darwin ;;
+          macOS-ARM64) platform=darwin-arm64 target=aarch64-apple-darwin ;;
+          Windows-X64) platform=win32-x64 target=x86_64-pc-windows-msvc ;;
+          Windows-ARM64) platform=win32-arm64 target=aarch64-pc-windows-msvc ;;
+          *) echo "::error::AutoRatchet has no binary for $RUNNER_OS $RUNNER_ARCH"; exit 1 ;;
+        esac
+        exe=""; [ "$RUNNER_OS" = Windows ] && exe=.exe
+        dir="$RUNNER_TEMP/autoratchet-cli"
+        mkdir -p "$dir"
+        cd "$dir"
+
+        # The release that matches this action's version, checked against its SHA256SUMS.
+        version=$(jq -r .version "$GITHUB_ACTION_PATH/package.json")
+        releases="https://github.com/${ACTION_REPO:-jagreehal/autoratchet}/releases/download/v$version"
+        curl -fsSL --retry 3 -o "autoratchet-$platform.tar.gz" "$releases/autoratchet-$platform.tar.gz"
+        curl -fsSL --retry 3 -o SHA256SUMS "$releases/SHA256SUMS"
+        sum=sha256sum; command -v sha256sum >/dev/null || sum="shasum -a 256"
+        grep " ./autoratchet-$platform.tar.gz\$" SHA256SUMS | sed 's| \./| |' | $sum -c -
+        tar -xzf "autoratchet-$platform.tar.gz"
+        echo "cli=$dir/autoratchet$exe" >> "$GITHUB_OUTPUT"
+
+        # Oxlint measures cyclomatic complexity in JavaScript and TypeScript; Rust needs none.
+        # shellcheck disable=SC2086 # pathspecs split on purpose
+        js=$(git -C "$GITHUB_WORKSPACE" ls-files -- ${PATHS:-.} | grep -cE '\.[cm]?[jt]sx?$' || true)
+        if [ "$js" -gt 0 ]; then
+          oxlint_version=$(jq -r .dependencies.oxlint "$GITHUB_ACTION_PATH/package.json")
+          oxc="https://github.com/oxc-project/oxc/releases/download/oxlint_v$oxlint_version"
+          if [ "$RUNNER_OS" = Windows ]; then
+            curl -fsSL --retry 3 -o oxlint.zip "$oxc/oxlint-$target.zip"
+            unzip -q oxlint.zip
+          else
+            curl -fsSL --retry 3 -o oxlint.tar.gz "$oxc/oxlint-$target.tar.gz"
+            tar -xzf oxlint.tar.gz
+          fi
+          echo "AUTORATCHET_OXLINT=$dir/oxlint-$target$exe" >> "$GITHUB_ENV"
+        fi
 
     - name: Decide override approval
       id: approval
@@ -161,7 +192,7 @@ runs:
         [ "$STRICT" = "true" ] && strict_flag=(--require-override-approval)
         # shellcheck disable=SC2086
         $CLI check --base "$BASE" --threshold "$THRESHOLD" --cognitive-threshold "$COGNITIVE" \
-          "${strict_flag[@]}" --format json -o "$out/report.json" -- $PATHS
+          ${strict_flag[@]+"${strict_flag[@]}"} --format json -o "$out/report.json" -- $PATHS
         status=$?
         if [ ! -s "$out/report.json" ]; then
           echo "::error::AutoRatchet failed (exit $status) before writing a report; see the log above."
