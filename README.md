@@ -71,6 +71,7 @@ npx autoratchet check --base main src ':!src/generated'
 name: AutoRatchet
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   pull_request_review:
     types: [submitted, dismissed]
 
@@ -93,7 +94,8 @@ The action downloads the AutoRatchet binary for its own version, checked against
 `SHA256SUMS`, and the Oxlint binary when the paths include JavaScript or TypeScript. It needs no
 Node.js. It fails the check on a regression, marks each regressed function in the PR diff,
 writes the report to the job summary, and keeps one comment on the PR updated (it only
-comments once there is something to say).
+comments once there is something to say). The `labeled`, `unlabeled` and `pull_request_review`
+triggers run the check again when someone adds the approval label or approves the PR.
 
 | Input | Default | Meaning |
 |-------|---------|---------|

@@ -151,7 +151,10 @@ runs:
           label)
             # Anyone with write access can add a label, the author included. This keeps out agents
             # whose token cannot label; it does not stop a person approving their own override.
-            echo "$LABELS" | jq -e --arg l "$LABEL" 'index($l)' >/dev/null || strict=true ;;
+            # The PR's labels now, so a rerun after labelling sees them; the event's copy is a fallback.
+            labels=$(gh api "repos/$REPO/issues/$PR/labels" --jq '.[].name' 2>/dev/null) \
+              || labels=$(echo "$LABELS" | jq -r '.[]')
+            grep -qxF -- "$LABEL" <<< "$labels" || strict=true ;;
           review)
             strict=true
             if [ -n "$PR" ]; then
