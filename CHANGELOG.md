@@ -1,5 +1,11 @@
 # autoratchet
 
+## 0.3.0
+
+### Minor Changes
+
+- a2dd937: AutoRatchet measures Rust. It names every function, method, trait method and closure, scores cyclomatic and cognitive complexity itself, and reads `#[expect(clippy::cognitive_complexity)]` and `// autoratchet-disable-next-line complexity` overrides. A Rust project needs only the binary; Oxlint is needed only for JavaScript and TypeScript.
+
 ## 0.2.0
 
 ### Minor Changes
