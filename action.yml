@@ -163,7 +163,7 @@ runs:
                 | map(select(.state == "APPROVED" and .commit_id == $head)) | .[].user.login')
               # The reviewer's effective permission decides, so an org member with read access does not count.
               for login in $reviewers; do
-                permission=$(gh api "repos/$REPO/collaborators/$login/permission" --jq .permission 2>/dev/null || true)
+                permission=$(gh api "repos/$REPO/collaborators/$login/permission" --jq .permission 2>/dev/null) || permission=
                 case "$permission" in admin|write) strict=false; break ;; esac
               done
             fi ;;
@@ -229,10 +229,11 @@ runs:
         body="$RUNNER_TEMP/autoratchet/comment.md"
         { echo "$marker"; jq -r .markdown "$REPORT"; } > "$body"
         # Update only a comment this token posted: anyone can write the marker.
-        # The default token can't read /user; it posts as github-actions[bot].
-        me=$(gh api user --jq .login 2>/dev/null || echo 'github-actions[bot]')
-        existing=$( (gh api "repos/$REPO/issues/$PR/comments" --paginate \
-          --jq "map(select(.user.login == \"$me\" and (.body | startswith(\"$marker\")))) | .[].id" || true) | head -n1)
+        # The default token can't read /user (gh prints the 403 body, so discard it); it posts as github-actions[bot].
+        me=$(gh api user --jq .login 2>/dev/null) || me='github-actions[bot]'
+        existing=$(gh api "repos/$REPO/issues/$PR/comments" --paginate 2>/dev/null \
+          | jq -rs --arg me "$me" --arg marker "$marker" \
+            'add // [] | map(select(.user.login == $me and (.body | startswith($marker)))) | .[0].id // empty') || existing=
         # A clean PR with nothing to say gets no comment, unless one exists to update.
         quiet=$(jq '.verdict == "pass" and (.approvals + .unmatchedOverrides + .untracked | length) == 0' "$REPORT")
         if [ "$quiet" = "true" ] && [ -z "$existing" ]; then exit 0; fi
