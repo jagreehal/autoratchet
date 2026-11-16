@@ -113,3 +113,33 @@ jobs:
           test -n "$VERDICT"
           test "$(jq '.functions' "$REPORT")" -gt 0
           test "$(jq '.incomplete | length' "$REPORT")" -eq 0
+      - name: Add a regression
+        shell: bash
+        run: |
+          mkdir -p ci-regression
+          # Six nested ifs: cognitive 21, over the limit of 15 for a new function.
+          {
+            echo 'def tangled(x):'
+            for depth in 1 2 3 4 5 6; do
+              printf '%*sif x > %d:\n' $((depth * 4)) '' "$depth"
+            done
+            echo '                            return 1'
+            echo '    return 0'
+          } > ci-regression/tangled.py
+      - id: regression
+        uses: ./
+        with:
+          path: ci-regression
+          base: HEAD
+          comment: 'false'
+          annotations: 'false'
+          fail-on-regression: 'false'
+      - name: The action reported the regression
+        shell: bash
+        env:
+          VERDICT: ${{ steps.regression.outputs.verdict }}
+          REPORT: ${{ steps.regression.outputs.report }}
+        run: |
+          echo "verdict: $VERDICT"
+          test "$VERDICT" = fail
+          test "$(jq -r '.regressions[0].functionName' "$REPORT")" = tangled

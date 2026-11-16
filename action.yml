@@ -187,10 +187,11 @@ runs:
         mkdir -p "$out"
         strict_flag=()
         [ "$STRICT" = "true" ] && strict_flag=(--require-override-approval)
+        # The runner adds -e; a regression (exit 1) must still reach the report below.
+        status=0
         # shellcheck disable=SC2086
         $CLI check --base "$BASE" --threshold "$THRESHOLD" --cognitive-threshold "$COGNITIVE" \
-          ${strict_flag[@]+"${strict_flag[@]}"} --format json -o "$out/report.json" -- $PATHS
-        status=$?
+          ${strict_flag[@]+"${strict_flag[@]}"} --format json -o "$out/report.json" -- $PATHS || status=$?
         if [ ! -s "$out/report.json" ]; then
           echo "::error::AutoRatchet failed (exit $status) before writing a report; see the log above."
           exit 1
