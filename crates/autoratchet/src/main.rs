@@ -114,14 +114,14 @@ fn number(value: Option<&String>, flag: &str) -> Result<Option<f64>, Error> {
 
 fn run(argv: &[String]) -> Result<u8, Error> {
     let args = parse_args(argv)?;
-    let Some((command, paths)) = args.positionals.split_first() else {
-        println!("{USAGE}");
-        return Ok(2);
-    };
     if args.flags.iter().any(|f| f == "help") {
         println!("{USAGE}");
         return Ok(0);
     }
+    let Some((command, paths)) = args.positionals.split_first() else {
+        println!("{USAGE}");
+        return Ok(2);
+    };
     let format = args.values.get("format").map_or("text", String::as_str);
     if !matches!(format, "text" | "json" | "markdown") {
         return Err(Error::Usage(format!(

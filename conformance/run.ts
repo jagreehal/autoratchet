@@ -186,6 +186,7 @@ const gitCases: Record<string, (tmp: string) => unknown> = {
     return caseResult(dir, []);
   },
   'usage-errors': (tmp) => ({
+    help: cli(['--help'], tmp).exit,
     noCommand: cli([], tmp).exit,
     unknownCommand: cli(['nope'], tmp).exit,
     badFormat: cli(['compare', '--base', 'a', '--head', 'b', '--format', 'xml'], tmp).exit,
