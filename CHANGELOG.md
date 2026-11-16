@@ -1,5 +1,11 @@
 # autoratchet
 
+## 0.1.2
+
+### Patch Changes
+
+- 2123842: `override-approval: review` now checks each approving reviewer's effective repository permission, and counts approvals from people with write or admin access.
+
 ## 0.1.1
 
 ### Patch Changes
