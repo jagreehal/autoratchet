@@ -1,5 +1,11 @@
 # autoratchet
 
+## 0.4.6
+
+### Patch Changes
+
+- 7f2e9e8: `autoratchet --version` (or `-V`) prints the version.
+
 ## 0.4.5
 
 ### Patch Changes

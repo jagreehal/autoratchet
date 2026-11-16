@@ -1,6 +1,6 @@
 {
   "name": "autoratchet",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "description": "Deterministic complexity checks for AI coding agents and the people who review their code. A ratchet on cyclomatic and cognitive complexity for TypeScript, JavaScript, Rust, Python and Go, on your machine, in agent hooks and in CI.",
   "license": "Apache-2.0",
   "author": "Jag Reehal",
