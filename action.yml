@@ -1,8 +1,5 @@
 name: 'AutoRatchet'
-description: >-
-  Prevent complexity regressions, one pull request at a time. Compares every function's
-  cyclomatic and cognitive complexity with the PR's base, fails the check when a function
-  gets worse than the ratchet allows, annotates the diff, and keeps one sticky PR comment.
+description: 'Stop pull requests from making functions more complex: a ratchet on cyclomatic and cognitive complexity.'
 author: 'Jag Reehal'
 branding:
   icon: 'trending-down'

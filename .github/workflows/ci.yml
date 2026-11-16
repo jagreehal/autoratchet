@@ -63,6 +63,13 @@ jobs:
       - name: Shell scripts
         run: shellcheck agent-hooks/claude-code/complexity-check.sh
 
+      - name: Action metadata meets GitHub Marketplace rules
+        run: |
+          description=$(yq '.description' action.yml)
+          echo "description: ${#description} characters"
+          [ "${#description}" -lt 125 ]
+          yq -e '.branding.icon and .branding.color' action.yml
+
       # The package as users get it: pack, install into a fresh project, run the binary.
       - name: Packed install
         run: |
