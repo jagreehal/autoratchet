@@ -1,5 +1,5 @@
 name: 'AutoRatchet'
-description: 'Cyclomatic and cognitive complexity ratchet for TypeScript, JavaScript, Rust, Python and Go pull requests.'
+description: 'Deterministic complexity gate for AI coding agents and CI: TypeScript, JavaScript, Rust, Python and Go, locally or on PRs.'
 author: 'Jag Reehal'
 branding:
   icon: 'trending-down'

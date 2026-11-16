@@ -1,10 +1,12 @@
 # AutoRatchet
 
-**Prevent code quality regressions, one pull request at a time.**
+**Deterministic complexity checks for AI coding agents and the people who review their code.**
 
 AutoRatchet stops functions in your TypeScript, JavaScript, Rust, Python and Go code from getting
-more complex, without asking you to fix the complex code you already have. Install it on a
-ten-year-old codebase today, and from tomorrow no pull request can make it worse.
+more complex, without asking you to fix the complex code you already have. It gives the same
+verdict on your machine, in your coding agent's hooks and on every pull request, so an agent hears
+about a regression while it still has the code open. Install it on a ten-year-old codebase today,
+and from tomorrow no change can make it worse.
 
 ```bash
 npm install -D autoratchet
