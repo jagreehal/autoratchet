@@ -1,5 +1,12 @@
 # autoratchet
 
+## 0.4.3
+
+### Patch Changes
+
+- f4f987d: The GitHub Action reports a regression in full: it writes the job summary, marks the function in the diff and posts the pull request comment before it fails the check.
+- fb3dcc8: The README's workflow example names the current release, and each release updates it.
+
 ## 0.4.2
 
 ### Patch Changes
