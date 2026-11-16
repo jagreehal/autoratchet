@@ -46,7 +46,7 @@
   "scripts": {
     "build": "cargo build --release && node scripts/stage-binary.mjs",
     "changeset": "changeset",
-    "version-packages": "changeset version && node scripts/sync-cargo-version.mjs && pnpm install --lockfile-only",
+    "version-packages": "changeset version && node scripts/sync-version.mjs && pnpm install --lockfile-only",
     "prepublishOnly": "node scripts/check-binaries.mjs",
     "release": "changeset publish",
     "test": "cargo test --release && pnpm conformance",
