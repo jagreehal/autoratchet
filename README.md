@@ -144,6 +144,9 @@ export function createChart({ width = 640, height = 400 /* … */ } = {}) {
 export function parseUri(input: string) {
 ```
 
+Put `disable-next-line` or `biome-ignore` on the line above the function, or `disable-line` at
+the end of the function's first line.
+
 An override **approves a score; it does not stop measurement.** AutoRatchet measures a copy of
 your code with every disable comment defused, so:
 

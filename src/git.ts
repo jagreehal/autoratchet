@@ -20,8 +20,13 @@ export type CheckResult = CompareResult & {
   baseCommit: string;
 };
 
-function git(cwd: string, args: string[]): string {
-  return execFileSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 });
+function git(cwd: string, args: string[], env?: NodeJS.ProcessEnv): string {
+  return execFileSync('git', args, {
+    cwd,
+    encoding: 'utf8',
+    maxBuffer: 256 * 1024 * 1024,
+    env: env && { ...process.env, ...env },
+  });
 }
 
 function nulList(output: string): string[] {
@@ -42,12 +47,15 @@ export async function check(options: CheckOptions = {}): Promise<CheckResult> {
   const headFiles = nulList(
     git(root, ['ls-files', '-z', '--cached', '--others', '--exclude-standard', ...pathspec]),
   ).filter((f) => isSourceFile(f) && fs.existsSync(path.join(root, f)));
-  const baseFiles = nulList(
-    git(root, ['ls-tree', '-r', '-z', '--name-only', baseCommit, ...pathspec]),
-  ).filter(isSourceFile);
 
   const baseRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'autoratchet-base-'));
   try {
+    // A throwaway index of the base commit lets `ls-files` apply the same pathspecs,
+    // `:!` exclusions included, to both sides.
+    const env = { GIT_INDEX_FILE: path.join(baseRoot, '.autoratchet-index') };
+    git(root, ['read-tree', baseCommit], env);
+    const baseFiles = nulList(git(root, ['ls-files', '-z', ...pathspec], env)).filter(isSourceFile);
+    fs.rmSync(env.GIT_INDEX_FILE);
     if (baseFiles.length > 0) {
       // `git archive` writes the base commit's copies without touching the working tree.
       const archive = spawnSync(

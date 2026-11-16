@@ -78,8 +78,8 @@ export function newOverrides(base: Override[], head: Override[]): Override[] {
 }
 
 /**
- * Match each new override to the function on its line or the next one
- * (`disable-line` / `disable-next-line` / `biome-ignore`). File-wide or misplaced
+ * Match each new override to the function it targets: on its own line (`disable-line`)
+ * or on the next line (`disable-next-line` / `biome-ignore`). File-wide or misplaced
  * overrides match nothing: the gate ignores them, and the report says so.
  */
 // Overrides that target one line. A block `oxlint-disable` comment, `biome-ignore-all` and `-start` cover more.
@@ -97,9 +97,8 @@ export function matchOverrides(
       unmatched.push(o);
       continue;
     }
-    const fn =
-      snaps.find((s) => s.filePath === o.filePath && s.line === o.line + 1) ??
-      snaps.find((s) => s.filePath === o.filePath && s.line === o.line);
+    const line = /-disable-line/.test(o.text) ? o.line : o.line + 1;
+    const fn = snaps.find((s) => s.filePath === o.filePath && s.line === line);
     if (fn) approvals.push({ override: o, functionName: fn.functionName, score: fn[o.metric] });
     else unmatched.push(o);
   }

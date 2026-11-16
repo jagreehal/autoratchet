@@ -68,5 +68,6 @@ describe('check', () => {
     );
     expect(verdict(await check({ cwd: repo, base: 'main', paths: ['src'] }))).toBe('pass');
     expect(verdict(await check({ cwd: repo, base: 'main' }))).toBe('fail'); // other/ is not ignored
+    expect(verdict(await check({ cwd: repo, base: 'main', paths: ['.', ':!other'] }))).toBe('pass');
   });
 });

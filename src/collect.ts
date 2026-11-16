@@ -65,13 +65,22 @@ export async function collectFiles(root: string, files: string[]): Promise<Snaps
       fs.writeFileSync(dest, defuseDirectives(fs.readFileSync(file, 'utf8')));
       copies.push(dest);
     }
-    const snapshots = snapshotsFromDiagnostics(runOxlint([copy]), copy, runBiomeCognitive([copy]));
+    const biomeProblems: string[] = [];
+    const hits = runBiomeCognitive([copy], biomeProblems);
+    const snapshots = snapshotsFromDiagnostics(runOxlint([copy]), copy, hits);
+    const unparsed = new Set<string>();
     for (const file of copies) {
       const { errors } = parsed(file);
       if (errors.length > 0) {
-        snapshots.problems.push(
-          `${normalizePath(path.relative(copy, file))}: does not parse (${errors[0]})`,
-        );
+        const rel = normalizePath(path.relative(copy, file));
+        unparsed.add(rel);
+        snapshots.problems.push(`${rel}: does not parse (${errors[0]})`);
+      }
+    }
+    for (const problem of biomeProblems) {
+      const rel = normalizePath(problem.replaceAll(copy + path.sep, ''));
+      if (![...unparsed].some((b) => rel.startsWith(`${b}:`))) {
+        snapshots.problems.push(`Biome did not measure ${rel}`);
       }
     }
     return snapshots;
@@ -93,9 +102,10 @@ export type FunctionSpan = { file: string; offset: number; length: number };
 
 /**
  * Biome's lowest allowed maximum is 1, so it never reports functions scoring 0 or 1.
- * Callers treat a function with no hit as 1.
+ * Callers treat a function with no hit as 1. Any other diagnostic, such as a skipped file,
+ * goes into `problems`.
  */
-export function runBiomeCognitive(targets: string[]): CognitiveHit[] {
+export function runBiomeCognitive(targets: string[], problems: string[] = []): CognitiveHit[] {
   const bin = path.join(path.dirname(require.resolve('@biomejs/biome/package.json')), 'bin/biome');
   const result = spawnSync(
     process.execPath,
@@ -129,7 +139,10 @@ export function runBiomeCognitive(targets: string[]): CognitiveHit[] {
     const score = d.message.match(/complexity of (\d+)/)?.[1];
     const file = d.location?.path;
     const start = d.location?.start;
-    if (!score || !file || !start) return [];
+    if (!score || !file || !start) {
+      problems.push(`${file ?? 'biome'}: ${d.message.split('\n')[0]}`);
+      return [];
+    }
     return [
       {
         file: path.resolve(repoRoot, file),

@@ -73,6 +73,30 @@ describe('matchOverrides', () => {
   });
 });
 
+describe('matchOverrides line targeting', () => {
+  it('matches disable-line to its own line, never to the function below', () => {
+    const current = new Map([
+      [
+        'a.ts::tiny',
+        { filePath: 'a.ts', functionName: 'tiny', cyclomatic: 1, cognitive: 1, line: 4 },
+      ],
+      [
+        'a.ts::big',
+        { filePath: 'a.ts', functionName: 'big', cyclomatic: 12, cognitive: 1, line: 5 },
+      ],
+    ]);
+    const sameLine: Override = {
+      filePath: 'a.ts',
+      line: 4,
+      text: '// oxlint-disable-line complexity',
+      metric: 'cyclomatic',
+    };
+    expect(matchOverrides([sameLine], current).approvals).toEqual([
+      { override: sameLine, functionName: 'tiny', score: 1 },
+    ]);
+  });
+});
+
 describe('findOverridesIn', () => {
   it('reads real comments only, not directive text inside strings', () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'overrides-'));

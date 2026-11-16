@@ -63,4 +63,15 @@ export class K { m(a: boolean, b: boolean) { if (a) { if (b) return 1; } return 
     expect(snaps.size).toBe(0);
     expect(snaps.problems).toEqual([]);
   });
+
+  it('measures cognitive scores in files over 1 MiB', async () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'collect-big-'));
+    const nested =
+      'export function f(a, b, c) { if (a) { if (b) { if (c) { for (const x of a) { if (x) { while (b) { if (c) return 1; } } } } } } return 0; }\n';
+    fs.writeFileSync(path.join(dir, 'big.ts'), `${nested}// ${'x'.repeat(1_100_000)}\n`);
+    const snaps = await collectFromDirectory(dir);
+    fs.rmSync(dir, { recursive: true, force: true });
+    expect(snaps.problems).toEqual([]);
+    expect(snaps.get(functionKey('big.ts', 'f'))?.cognitive).toBeGreaterThan(15);
+  });
 });
