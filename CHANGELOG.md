@@ -1,5 +1,11 @@
 # autoratchet
 
+## 0.5.0
+
+### Minor Changes
+
+- 10559b7: AutoRatchet takes complexity limits from your linter config: `.oxlintrc.json`, `biome.json`, Ruff, `clippy.toml` and golangci-lint. Each language gets its own limit, and the report names the file that set it. The action's `threshold` and `cognitive-threshold` inputs now default to your config.
+
 ## 0.4.6
 
 ### Patch Changes
