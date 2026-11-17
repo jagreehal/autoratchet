@@ -1,6 +1,6 @@
 [package]
 name = "autoratchet"
-version = "0.5.0"
+version = "0.5.1"
 edition = "2024"
 rust-version = "1.97"
 description = "Deterministic complexity checks for AI coding agents and the people who review their code: a threshold-aware ratchet on cyclomatic and cognitive complexity for TypeScript, JavaScript, Rust, Python and Go."

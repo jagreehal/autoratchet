@@ -1,5 +1,11 @@
 # autoratchet
 
+## 0.5.1
+
+### Patch Changes
+
+- 7b331b3: AutoRatchet reads limits from eslint-plugin-sonarjs rules in `.oxlintrc.json`: `sonarjs/cognitive-complexity` for cognitive and `sonarjs/cyclomatic-complexity` for cyclomatic. Override comments accept `sonarjs/cyclomatic-complexity`.
+
 ## 0.5.0
 
 ### Minor Changes
