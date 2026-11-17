@@ -13,11 +13,11 @@ inputs:
     description: 'Ref to compare against. Defaults to the PR base, or the previous commit on push.'
     default: ''
   threshold:
-    description: 'Maximum cyclomatic complexity for new functions.'
-    default: '10'
+    description: 'Maximum cyclomatic complexity for new functions, every language. Empty uses the repo''s linter config, else 10.'
+    default: ''
   cognitive-threshold:
-    description: 'Maximum cognitive complexity for new functions.'
-    default: '15'
+    description: 'Maximum cognitive complexity for new functions, every language. Empty uses the repo''s linter config, else 15.'
+    default: ''
   override-approval:
     description: >-
       How a new override comment (oxlint-disable / eslint-disable / biome-ignore for a complexity rule)
@@ -188,13 +188,16 @@ runs:
         set -uo pipefail
         out="$RUNNER_TEMP/autoratchet"
         mkdir -p "$out"
-        strict_flag=()
-        [ "$STRICT" = "true" ] && strict_flag=(--require-override-approval)
+        flags=()
+        [ "$STRICT" = "true" ] && flags=(--require-override-approval)
+        # Empty thresholds leave the limits to the repo's linter config.
+        [ -n "$THRESHOLD" ] && flags+=(--threshold "$THRESHOLD")
+        [ -n "$COGNITIVE" ] && flags+=(--cognitive-threshold "$COGNITIVE")
         # The runner adds -e; a regression (exit 1) must still reach the report below.
         status=0
         # shellcheck disable=SC2086
-        $CLI check --base "$BASE" --threshold "$THRESHOLD" --cognitive-threshold "$COGNITIVE" \
-          ${strict_flag[@]+"${strict_flag[@]}"} --format json -o "$out/report.json" -- $PATHS || status=$?
+        $CLI check --base "$BASE" \
+          ${flags[@]+"${flags[@]}"} --format json -o "$out/report.json" -- $PATHS || status=$?
         if [ ! -s "$out/report.json" ]; then
           echo "::error::AutoRatchet failed (exit $status) before writing a report; see the log above."
           exit 1

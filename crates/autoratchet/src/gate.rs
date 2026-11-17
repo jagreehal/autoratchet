@@ -3,6 +3,7 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
+use crate::config::{Lang, Limits};
 use crate::snapshots::Snapshots;
 
 pub const DEFAULT_CYCLOMATIC_THRESHOLD: f64 = 10.0;
@@ -73,24 +74,36 @@ pub struct Regression {
     pub current: u32,
     #[serde(serialize_with = "crate::report::js_number")]
     pub threshold: f64,
+    /// The linter config file the threshold came from, when it came from one.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub threshold_source: Option<String>,
     pub kind: Kind,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub line: Option<u32>,
 }
 
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct GateOptions {
+    /// From the command line: wins over `limits` for every language.
     pub cyclomatic_threshold: Option<f64>,
     pub cognitive_threshold: Option<f64>,
+    /// From the linter configs the repository already has.
+    pub limits: Limits,
     /// A new override approves nothing and fails the gate instead.
     pub require_override_approval: bool,
 }
 
 impl GateOptions {
-    pub fn threshold(&self, metric: Metric) -> f64 {
-        match metric {
-            Metric::Cyclomatic => self.cyclomatic_threshold.unwrap_or(DEFAULT_CYCLOMATIC_THRESHOLD),
-            Metric::Cognitive => self.cognitive_threshold.unwrap_or(DEFAULT_COGNITIVE_THRESHOLD),
+    /// The threshold for a file's language, and the config file it came from, if any.
+    pub fn threshold(&self, file: &str, metric: Metric) -> (f64, Option<&str>) {
+        let (flag, default) = match metric {
+            Metric::Cyclomatic => (self.cyclomatic_threshold, DEFAULT_CYCLOMATIC_THRESHOLD),
+            Metric::Cognitive => (self.cognitive_threshold, DEFAULT_COGNITIVE_THRESHOLD),
+        };
+        match (flag, self.limits.get(Lang::of(file), metric)) {
+            (Some(n), _) => (n, None),
+            (None, Some(limit)) => (limit.value, Some(limit.source.as_str())),
+            (None, None) => (default, None),
         }
     }
 }
@@ -119,7 +132,7 @@ pub fn find_regressions(
             if base.is_some_and(|b| b.score(metric).is_none()) {
                 continue;
             }
-            let threshold = options.threshold(metric);
+            let (threshold, source) = options.threshold(&head.file_path, metric);
             let before = base.and_then(|b| b.score(metric));
             if passes_complexity_gate(before, now, threshold) {
                 continue;
@@ -131,6 +144,7 @@ pub fn find_regressions(
                 previous: before,
                 current: now,
                 threshold,
+                threshold_source: source.map(String::from),
                 kind: if base.is_some() { Kind::Worsened } else { Kind::New },
                 line: head.line,
             });
@@ -142,8 +156,8 @@ pub fn find_regressions(
 /// Functions over either threshold on base that head no longer reports.
 pub fn find_untracked(previous: &Snapshots, current: &Snapshots, options: &GateOptions) -> Vec<FunctionSnapshot> {
     let hot = |s: &FunctionSnapshot| {
-        f64::from(s.cyclomatic) > options.threshold(Metric::Cyclomatic)
-            || f64::from(s.cognitive.unwrap_or(0)) > options.threshold(Metric::Cognitive)
+        f64::from(s.cyclomatic) > options.threshold(&s.file_path, Metric::Cyclomatic).0
+            || f64::from(s.cognitive.unwrap_or(0)) > options.threshold(&s.file_path, Metric::Cognitive).0
     };
     previous
         .iter()

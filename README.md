@@ -64,6 +64,9 @@ npx autoratchet check --base main src ':!src/generated'
 `check` compares your working tree, uncommitted changes included, with
 `git merge-base main HEAD`. Files git ignores are skipped. Pathspecs work as in any git command.
 
+Already set a complexity limit in Oxlint, Biome, Ruff, Clippy or golangci-lint? There is nothing
+to configure: AutoRatchet uses it. See [Limits from your linter config](#limits-from-your-linter-config).
+
 ### In GitHub pull requests
 
 ```yaml
@@ -101,8 +104,8 @@ triggers run the check again when someone adds the approval label or approves th
 |-------|---------|---------|
 | `path` | whole repo | Git pathspecs to measure, space separated |
 | `base` | PR base | Ref to compare against |
-| `threshold` | `10` | Cyclomatic limit for new functions |
-| `cognitive-threshold` | `15` | Cognitive limit for new functions |
+| `threshold` | [linter config](#limits-from-your-linter-config), else `10` | Cyclomatic limit for new functions |
+| `cognitive-threshold` | [linter config](#limits-from-your-linter-config), else `15` | Cognitive limit for new functions |
 | `override-approval` | `none` | `none`, `strict`, `review` or `label` (see [Overrides](#overrides)) |
 | `approval-label` | `complexity-override-approved` | The label `label` mode looks for |
 | `comment` | `true` | Keep one sticky PR comment |
@@ -128,6 +131,58 @@ it checks every changed file. It blocks on regressions, on files that do not par
 new override comment, because an agent may not approve its own exception. The hooks need `git`
 and `jq`. Hooks run on the author's machine, so they are a fast feedback loop; the CI check is
 the enforcement.
+
+## Limits from your linter config
+
+If your repository already sets a complexity limit for a linter, AutoRatchet uses it for new
+code in that language, so you set each limit in one place.
+
+Adding AutoRatchet to a project that already lints for complexity:
+
+1. Install it and run `npx autoratchet check --base main`. No config file and no flags: your
+   linter's limits apply. Say your `.oxlintrc.json` has this:
+
+   ```json
+   { "rules": { "complexity": ["warn", { "max": 8 }] } }
+   ```
+
+   New JavaScript and TypeScript functions must then score 8 or less for cyclomatic complexity,
+   and the report says where the limit came from: `(maximum for new code: 8, from .oxlintrc.json)`.
+   The cognitive limit, which Oxlint does not set, stays at 15.
+2. Leave out `threshold` and `cognitive-threshold` in the workflow, and `--threshold` in
+   `AUTORATCHET_ARGS` for the agent hooks. A flag wins over your config for every language.
+3. Keep the linter's complexity rule switched on, at `warn` if you do not want it failing lint:
+   AutoRatchet reads the number only while the rule is on, and falls back to 10 and 15 if it is
+   `off`. The linter warns about every existing function over the limit; AutoRatchet only fails
+   changes that make a function worse.
+
+It reads these files at the repository root only. In a monorepo, a config inside a package is
+not read: put the limits in the root config, or pass the flags.
+
+| Language | File | Cyclomatic | Cognitive |
+|----------|------|------------|-----------|
+| JS/TS | `.oxlintrc.json` | `rules.complexity` (or `eslint/complexity`) `max` | |
+| JS/TS | `biome.json`, `biome.jsonc` | | `noExcessiveCognitiveComplexity` `maxAllowedComplexity` |
+| Python | `.ruff.toml`, `ruff.toml`, `pyproject.toml` (`[tool.ruff]`) | `lint.mccabe.max-complexity` | |
+| Rust | `clippy.toml`, `.clippy.toml` | | `cognitive-complexity-threshold` |
+| Go | `.golangci.yml`, `.yaml`, `.toml`, `.json` (v1 or v2) | `gocyclo` `min-complexity`, `cyclop` `max-complexity` | `gocognit` `min-complexity` |
+
+```text
+score.py
+  score (new function)
+    cyclomatic: 9 (maximum for new code: 8, from pyproject.toml)
+```
+
+- `--threshold` and `--cognitive-threshold` win over every config, for every language. Anything
+  neither sets stays at 10 and 15.
+- Only explicit numbers count. A rule that is on without a number keeps AutoRatchet's default,
+  and a rule that is `off` (or `allow`) is ignored.
+- A change cannot loosen its own check. `check` uses the stricter of the base commit's config
+  and the working tree's: lowering a limit applies at once, raising one applies once it is merged.
+- AutoRatchet still scores every function its own way, so the scores match on every machine.
+  Ruff's McCabe and Clippy's cognitive scores count slightly differently; the number in their
+  config is taken as the limit you want.
+- A config file that does not parse stops the check (exit 4).
 
 ## Overrides
 
@@ -288,8 +343,8 @@ autoratchet check [--base <ref>] [options] [pathspec...]
 autoratchet compare --base <dir|json> --head <dir|json> [options]
 autoratchet measure <dir>
 
---threshold <n>               cyclomatic limit for new functions (default 10)
---cognitive-threshold <n>     cognitive limit for new functions (default 15)
+--threshold <n>               cyclomatic limit for new functions (default: linter config, else 10)
+--cognitive-threshold <n>     cognitive limit for new functions (default: linter config, else 15)
 --require-override-approval   fail on any new override instead of approving its score
 --format <text|json|markdown> output format (default text)
 -o, --output <file>           write the report to a file

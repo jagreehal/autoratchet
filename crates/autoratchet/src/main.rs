@@ -21,8 +21,10 @@ const USAGE: &str = "Usage:
       Print every function's scores as JSON.
 
 Options:
-  --threshold <n>               maximum cyclomatic score for new functions (default 10)
-  --cognitive-threshold <n>     maximum cognitive score for new functions (default 15)
+  --threshold <n>               maximum cyclomatic score for new functions, every language
+                                (default: the repo's linter config, else 10)
+  --cognitive-threshold <n>     maximum cognitive score for new functions, every language
+                                (default: the repo's linter config, else 15)
   --require-override-approval   fail on any new override instead of treating it as an approval
   --format <text|json|markdown> output format (default text)
   -o, --output <file>           write the report to a file instead of stdout
@@ -149,6 +151,7 @@ fn run(argv: &[String]) -> Result<u8, Error> {
             "--threshold",
         )?,
         cognitive_threshold: number(args.values.get("cognitive-threshold"), "--cognitive-threshold")?,
+        limits: Default::default(),
         require_override_approval: args.flags.iter().any(|f| f == "require-override-approval"),
     };
 

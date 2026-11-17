@@ -175,6 +175,23 @@ const gitCases: Record<string, (tmp: string) => unknown> = {
       strict: checkResult(repo, ['--base', 'main', '--require-override-approval']),
     };
   },
+  'git-config': (tmp) => {
+    // Limits come from the stricter of the base commit's config and the working tree's:
+    // loosening .oxlintrc.json has no effect yet, a new ruff.toml limit applies at once.
+    const repo = newRepo(tmp, 'config', {
+      '.oxlintrc.json': read('config-oxlint/base/.oxlintrc.json'),
+    });
+    write(repo, {
+      '.oxlintrc.json': read('config-oxlint-loosened/head/.oxlintrc.json'),
+      'ruff.toml': '[lint.mccabe]\nmax-complexity = 8\n',
+      'score.ts': read('config-oxlint/head/score.ts'),
+      'score.py': read('config-ruff/head/score.py'),
+    });
+    return {
+      check: checkResult(repo, ['--base', 'main']),
+      flag: checkResult(repo, ['--base', 'main', '--threshold', '10']),
+    };
+  },
   'git-go-vendor': (tmp) => {
     // Vendored Go dependencies are someone else's code: tracked or not, check leaves them out.
     const simple =

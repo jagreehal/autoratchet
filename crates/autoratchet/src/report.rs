@@ -160,21 +160,33 @@ fn format_regressions(regressions: &[Regression]) -> String {
 fn format_metric(reg: &Regression) -> String {
     match reg.kind {
         Kind::New => format!(
-            "{}: {} (maximum for new code: {})",
+            "{}: {} (maximum for new code: {}{})",
             reg.metric.as_str(),
             reg.current,
-            num(reg.threshold)
+            num(reg.threshold),
+            source_suffix(reg)
         ),
         Kind::Worsened => {
             let delta = i64::from(reg.current) - i64::from(reg.previous.unwrap_or(0));
+            let limit = match source_suffix(reg) {
+                from if !from.is_empty() => format!(" (maximum for new code: {}{from})", num(reg.threshold)),
+                _ => String::new(),
+            };
             format!(
-                "{}: {} → {} (+{delta})",
+                "{}: {} → {} (+{delta}){limit}",
                 reg.metric.as_str(),
                 opt(reg.previous),
                 reg.current
             )
         }
     }
+}
+
+/// `, from ruff.toml` when a linter config set the threshold.
+fn source_suffix(reg: &Regression) -> String {
+    reg.threshold_source
+        .as_ref()
+        .map_or(String::new(), |source| format!(", from {source}"))
 }
 
 fn verdict_name(v: Verdict) -> &'static str {
@@ -247,13 +259,20 @@ pub fn format_markdown(r: &CompareResult) -> String {
                 Kind::Worsened => f64::from(reg.previous.unwrap_or(0)).max(reg.threshold),
             };
             lines.push(format!(
-                "| `{}::{}` | {} | {} | {} | {} |",
+                "| `{}::{}` | {} | {} | {} | {}{} |",
                 cell(&reg.file_path),
                 cell(&reg.function_name),
                 reg.metric.as_str(),
                 reg.previous.map_or("new".into(), |p| p.to_string()),
                 reg.current,
-                num(limit)
+                num(limit),
+                match &reg.threshold_source {
+                    None => String::new(),
+                    // Over the config limit already: the limit is its old score, so show both.
+                    Some(source) if limit > reg.threshold =>
+                        format!(" (new code: {} from {source})", num(reg.threshold)),
+                    Some(source) => format!(" from {source}"),
+                }
             ));
         }
         lines.push(String::new());

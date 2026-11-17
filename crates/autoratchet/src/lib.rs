@@ -2,6 +2,7 @@
 
 pub mod collect;
 pub mod compare;
+pub mod config;
 pub mod functions;
 pub mod gate;
 pub mod git;

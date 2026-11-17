@@ -1,0 +1,6 @@
+{
+  // the limit the team already lints with
+  "rules": {
+    "complexity": ["warn", { "max": 20, "variant": "modified" }],
+  },
+}

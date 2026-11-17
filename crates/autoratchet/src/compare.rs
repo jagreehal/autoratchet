@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 use std::thread;
 
 use crate::collect::collect_files;
+use crate::config::{Limits, read_limits};
 use crate::gate::{FunctionSnapshot, GateOptions, METRICS, Regression, find_regressions, find_untracked};
 use crate::overrides::{
     Approval, Override, approval_key, find_overrides_in, match_overrides, new_overrides, source_files,
@@ -134,7 +135,17 @@ pub fn compare_sources(
 }
 
 pub fn compare_paths(base: &Path, head: &Path, options: &GateOptions, tools: &Tools) -> Result<CompareResult, String> {
-    compare_sources(&source_for(base)?, &source_for(head)?, options, tools)
+    let mut options = options.clone();
+    options.limits = options.limits.stricter(limits_in(base)?).stricter(limits_in(head)?);
+    compare_sources(&source_for(base)?, &source_for(head)?, &options, tools)
+}
+
+/// Limits from the linter configs at the root of a directory. A JSON snapshot has none.
+fn limits_in(dir: &Path) -> Result<Limits, String> {
+    if !dir.is_dir() {
+        return Ok(Limits::default());
+    }
+    read_limits(|name| std::fs::read_to_string(dir.join(name)).ok())
 }
 
 /// File, then function, then metric, so every report comes out the same on every run.

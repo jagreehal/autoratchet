@@ -1,0 +1,65 @@
+{
+  "check": {
+    "exit": 1,
+    "report": {
+      "approvals": [],
+      "baseCommit": "bd75afc7991a10b0c308e299ad986cf91f0ca63d",
+      "blockedOverrides": [],
+      "functions": 2,
+      "incomplete": [],
+      "markdown": [
+        "## AutoRatchet",
+        "**Failed.** A function got more complex than the ratchet allows.",
+        "<sub>2 functions measured against `bd75afc`. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+        "| Function | Metric | Before | After | Limit |",
+        "| `score.py::score` | cyclomatic | new | 9 | 8 from ruff.toml |",
+        "| `score.ts::score` | cyclomatic | new | 9 | 8 from .oxlintrc.json |",
+        "|---|---|--:|--:|--:|"
+      ],
+      "regressions": [
+        {
+          "current": 9,
+          "filePath": "score.py",
+          "functionName": "score",
+          "kind": "new",
+          "line": 1,
+          "metric": "cyclomatic",
+          "threshold": 8,
+          "thresholdSource": "ruff.toml"
+        },
+        {
+          "current": 9,
+          "filePath": "score.ts",
+          "functionName": "score",
+          "kind": "new",
+          "line": 1,
+          "metric": "cyclomatic",
+          "threshold": 8,
+          "thresholdSource": ".oxlintrc.json"
+        }
+      ],
+      "unmatchedOverrides": [],
+      "untracked": [],
+      "verdict": "fail"
+    }
+  },
+  "flag": {
+    "exit": 0,
+    "report": {
+      "approvals": [],
+      "baseCommit": "bd75afc7991a10b0c308e299ad986cf91f0ca63d",
+      "blockedOverrides": [],
+      "functions": 2,
+      "incomplete": [],
+      "markdown": [
+        "## AutoRatchet",
+        "**Passed.** No function got more complex than the ratchet allows.",
+        "<sub>2 functions measured against `bd75afc`. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+      ],
+      "regressions": [],
+      "unmatchedOverrides": [],
+      "untracked": [],
+      "verdict": "pass"
+    }
+  }
+}

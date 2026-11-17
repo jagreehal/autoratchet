@@ -1,0 +1,56 @@
+{
+  "exit": 1,
+  "textExit": 1,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 1,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Failed.** A function got more complex than the ratchet allows.",
+      "<sub>1 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `score.rs::score` | cognitive | new | 8 | 5 from clippy.toml |",
+      "|---|---|--:|--:|--:|"
+    ],
+    "regressions": [
+      {
+        "current": 8,
+        "filePath": "score.rs",
+        "functionName": "score",
+        "kind": "new",
+        "line": 1,
+        "metric": "cognitive",
+        "threshold": 5,
+        "thresholdSource": "clippy.toml"
+      }
+    ],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "fail"
+  },
+  "text": [
+    "    cognitive: 8 (maximum for new code: 5, from clippy.toml)",
+    "  score (new function)",
+    "Complexity regressions detected:",
+    "Quality gate failed.",
+    "score.rs"
+  ],
+  "measureBase": {
+    "functions": [],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 8,
+        "cyclomatic": 9,
+        "filePath": "score.rs",
+        "functionName": "score",
+        "line": 1
+      }
+    ],
+    "problems": []
+  }
+}

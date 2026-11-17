@@ -6,6 +6,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
 use crate::compare::{CompareResult, Source, compare_sources};
+use crate::config::read_limits;
 use crate::gate::GateOptions;
 use crate::overrides::is_source_file;
 use crate::tools::Tools;
@@ -133,7 +134,12 @@ pub fn check(options: &CheckOptions, tools: &Tools) -> Result<CompareResult, Str
         root: root.clone(),
         files: head_files,
     };
-    let mut result = compare_sources(&base, &head, &options.gate, tools)?;
+    // The stricter of base and working tree: a change cannot loosen the limit it is checked against.
+    let mut gate = options.gate.clone();
+    let base_limits = read_limits(|name| git(&root, &["show", &format!("{base_commit}:{name}")], None).ok())?;
+    let head_limits = read_limits(|name| std::fs::read_to_string(root.join(name)).ok())?;
+    gate.limits = gate.limits.stricter(base_limits).stricter(head_limits);
+    let mut result = compare_sources(&base, &head, &gate, tools)?;
     result.base_commit = Some(base_commit);
     Ok(result)
 }

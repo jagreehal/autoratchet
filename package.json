@@ -52,7 +52,7 @@
     "test": "cargo test --release && pnpm conformance",
     "conformance": "tsx conformance/run.ts --cli target/release/autoratchet",
     "bench": "tsx conformance/bench.ts",
-    "lint": "cargo clippy --release --all-targets -- -D warnings && oxlint",
+    "lint": "cargo clippy --release --all-targets -- -D warnings && oxlint --disable-nested-config",
     "format": "cargo fmt && oxfmt bin scripts conformance/run.ts conformance/bench.ts",
     "format:check": "cargo fmt --check && oxfmt --check bin scripts conformance/run.ts conformance/bench.ts",
     "quality": "pnpm lint && pnpm format:check && pnpm build && pnpm test"

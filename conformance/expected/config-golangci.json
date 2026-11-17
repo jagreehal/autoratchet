@@ -1,0 +1,68 @@
+{
+  "exit": 1,
+  "textExit": 1,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 1,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Failed.** A function got more complex than the ratchet allows.",
+      "<sub>1 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `score.go::Score` | cognitive | new | 8 | 5 from .golangci.yml |",
+      "| `score.go::Score` | cyclomatic | new | 9 | 8 from .golangci.yml |",
+      "|---|---|--:|--:|--:|"
+    ],
+    "regressions": [
+      {
+        "current": 8,
+        "filePath": "score.go",
+        "functionName": "Score",
+        "kind": "new",
+        "line": 3,
+        "metric": "cognitive",
+        "threshold": 5,
+        "thresholdSource": ".golangci.yml"
+      },
+      {
+        "current": 9,
+        "filePath": "score.go",
+        "functionName": "Score",
+        "kind": "new",
+        "line": 3,
+        "metric": "cyclomatic",
+        "threshold": 8,
+        "thresholdSource": ".golangci.yml"
+      }
+    ],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "fail"
+  },
+  "text": [
+    "    cognitive: 8 (maximum for new code: 5, from .golangci.yml)",
+    "    cyclomatic: 9 (maximum for new code: 8, from .golangci.yml)",
+    "  Score (new function)",
+    "Complexity regressions detected:",
+    "Quality gate failed.",
+    "score.go"
+  ],
+  "measureBase": {
+    "functions": [],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 8,
+        "cyclomatic": 9,
+        "filePath": "score.go",
+        "functionName": "Score",
+        "line": 3
+      }
+    ],
+    "problems": []
+  }
+}
