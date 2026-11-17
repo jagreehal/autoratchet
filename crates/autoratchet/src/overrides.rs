@@ -16,8 +16,8 @@ use crate::snapshots::{Snapshots, function_key, normalize_path};
 static DISABLE_RE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(?:oxlint|eslint)-disable[A-Za-z0-9-]*[ \t]+([^\n]*)").unwrap());
 
-/// The metrics a comment switches off: `complexity` covers cyclomatic, `sonarjs/cognitive-complexity`
-/// and Biome's `noExcessiveCognitiveComplexity` cover cognitive.
+/// The metrics a comment switches off: `complexity` and `sonarjs/cyclomatic-complexity` cover
+/// cyclomatic, `sonarjs/cognitive-complexity` and Biome's `noExcessiveCognitiveComplexity` cover cognitive.
 fn override_metrics(comment: &str) -> Vec<Metric> {
     let mut metrics = Vec::new();
     if let Some(caps) = DISABLE_RE.captures(comment) {
@@ -27,7 +27,10 @@ fn override_metrics(comment: &str) -> Vec<Metric> {
             .map(str::trim)
             .filter(|r| !r.is_empty())
             .collect();
-        if names.iter().any(|r| matches!(*r, "complexity" | "eslint/complexity")) {
+        if names
+            .iter()
+            .any(|r| matches!(*r, "complexity" | "eslint/complexity") || r.ends_with("/cyclomatic-complexity"))
+        {
             metrics.push(Metric::Cyclomatic);
         }
         if names.iter().any(|r| r.ends_with("/cognitive-complexity")) {
@@ -268,6 +271,10 @@ mod tests {
         assert_eq!(
             override_metrics("// eslint-disable-next-line no-console -- complexity is fine"),
             []
+        );
+        assert_eq!(
+            override_metrics("// eslint-disable-next-line sonarjs/cyclomatic-complexity -- spec"),
+            [Cyclomatic]
         );
         assert_eq!(override_metrics("// oxlint-disable-next-line no-console"), []);
         assert_eq!(override_metrics("// biome-ignore lint/complexity/noForEach: fine"), []);

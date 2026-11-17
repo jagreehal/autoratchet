@@ -148,7 +148,8 @@ Adding AutoRatchet to a project that already lints for complexity:
 
    New JavaScript and TypeScript functions must then score 8 or less for cyclomatic complexity,
    and the report says where the limit came from: `(maximum for new code: 8, from .oxlintrc.json)`.
-   The cognitive limit, which Oxlint does not set, stays at 15.
+   The cognitive limit stays at 15. To set it in the same file, add eslint-plugin-sonarjs
+   through `jsPlugins` and its rule: `"sonarjs/cognitive-complexity": ["warn", 12]`.
 2. Leave out `threshold` and `cognitive-threshold` in the workflow, and `--threshold` in
    `AUTORATCHET_ARGS` for the agent hooks. A flag wins over your config for every language.
 3. Keep the linter's complexity rule switched on, at `warn` if you do not want it failing lint:
@@ -161,7 +162,7 @@ not read: put the limits in the root config, or pass the flags.
 
 | Language | File | Cyclomatic | Cognitive |
 |----------|------|------------|-----------|
-| JS/TS | `.oxlintrc.json` | `rules.complexity` (or `eslint/complexity`) `max` | |
+| JS/TS | `.oxlintrc.json` | `complexity` (or `eslint/complexity`) `max`, `sonarjs/cyclomatic-complexity` `threshold` | `sonarjs/cognitive-complexity` |
 | JS/TS | `biome.json`, `biome.jsonc` | | `noExcessiveCognitiveComplexity` `maxAllowedComplexity` |
 | Python | `.ruff.toml`, `ruff.toml`, `pyproject.toml` (`[tool.ruff]`) | `lint.mccabe.max-complexity` | |
 | Rust | `clippy.toml`, `.clippy.toml` | | `cognitive-complexity-threshold` |
@@ -199,10 +200,10 @@ export function createChart({ width = 640, height = 400 /* … */ } = {}) {
 export function parseUri(input: string) {
 ```
 
-`complexity` covers the cyclomatic score and `sonarjs/cognitive-complexity` the cognitive one;
-name both, comma-separated, to cover both. `oxlint-` and `eslint-` spellings both work, and so
-does Biome's `biome-ignore lint/complexity/noExcessiveCognitiveComplexity`. Put a
-`disable-next-line` comment on the line above the function, or `disable-line` at the end of the
+`complexity` (or `sonarjs/cyclomatic-complexity`) covers the cyclomatic score and
+`sonarjs/cognitive-complexity` the cognitive one; name both, comma-separated, to cover both.
+`oxlint-` and `eslint-` spellings both work, and so does Biome's
+`biome-ignore lint/complexity/noExcessiveCognitiveComplexity`. Put a `disable-next-line` comment on the line above the function, or `disable-line` at the end of the
 function's first line.
 
 An override **approves a score; it does not stop measurement.** AutoRatchet measures a copy of

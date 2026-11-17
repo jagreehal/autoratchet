@@ -101,9 +101,19 @@ pub fn read_limits(read: impl Fn(&str) -> Option<String>) -> Result<Limits, Stri
 
 fn oxlint(v: &Value, name: &str, limits: &mut Limits) {
     for rule in ["complexity", "eslint/complexity"] {
-        if let Some(n) = rule_option(&v["rules"][rule], "max") {
+        if let Some(n) = rule_option(&v["rules"][rule]).and_then(|o| number(&o["max"])) {
             limits.set(Lang::Js, Metric::Cyclomatic, n, name);
         }
+    }
+    // eslint-plugin-sonarjs through `jsPlugins`. `silence-issues` reports scores without a limit.
+    if let Some(n) = rule_option(&v["rules"]["sonarjs/cyclomatic-complexity"]).and_then(|o| number(&o["threshold"])) {
+        limits.set(Lang::Js, Metric::Cyclomatic, n, name);
+    }
+    let cognitive = &v["rules"]["sonarjs/cognitive-complexity"];
+    if cognitive[2] != "silence-issues"
+        && let Some(n) = rule_option(cognitive).and_then(number)
+    {
+        limits.set(Lang::Js, Metric::Cognitive, n, name);
     }
 }
 
@@ -161,10 +171,10 @@ fn parse(name: &str, text: &str) -> Result<Value, String> {
     parsed.map_err(|e| format!("could not read the complexity limit in {name}: {e}"))
 }
 
-/// An ESLint-style rule's option, when the rule is on: `["warn", { "max": 8 }]`.
-fn rule_option(rule: &Value, key: &str) -> Option<f64> {
+/// An ESLint-style rule's option, when the rule is on: `{ "max": 8 }` in `["warn", { "max": 8 }]`.
+fn rule_option(rule: &Value) -> Option<&Value> {
     let on = !matches!(&rule[0], Value::String(s) if s == "off" || s == "allow") && rule[0] != 0;
-    on.then(|| number(&rule[1][key])).flatten()
+    on.then_some(&rule[1])
 }
 
 fn number(v: &Value) -> Option<f64> {
@@ -212,7 +222,7 @@ mod tests {
         let l = limits(&[
             (
                 ".oxlintrc.json",
-                "{ // comment\n \"rules\": { \"complexity\": [\"warn\", { \"max\": 8, }], /* x */ },\n}",
+                "{ // comment\n \"rules\": { \"complexity\": [\"warn\", { \"max\": 8, }], \"sonarjs/cognitive-complexity\": [\"error\", 11], \"sonarjs/cyclomatic-complexity\": [\"error\", { \"threshold\": 7 }], /* x */ },\n}",
             ),
             (
                 "biome.json",
@@ -225,8 +235,10 @@ mod tests {
                 "version: \"2\"\nlinters:\n  settings:\n    gocyclo:\n      min-complexity: 12\n    cyclop:\n      max-complexity: 9\n    gocognit:\n      min-complexity: 14\n",
             ),
         ]);
-        assert_eq!(value(&l, Lang::Js, Metric::Cyclomatic), Some((8.0, ".oxlintrc.json")));
-        assert_eq!(value(&l, Lang::Js, Metric::Cognitive), Some((12.0, "biome.json")));
+        // sonarjs/cyclomatic-complexity (7) is stricter than complexity (8).
+        assert_eq!(value(&l, Lang::Js, Metric::Cyclomatic), Some((7.0, ".oxlintrc.json")));
+        // SonarJS in .oxlintrc.json (11) is stricter than biome.json (12).
+        assert_eq!(value(&l, Lang::Js, Metric::Cognitive), Some((11.0, ".oxlintrc.json")));
         assert_eq!(
             value(&l, Lang::Python, Metric::Cyclomatic),
             Some((7.0, "pyproject.toml"))
@@ -240,7 +252,10 @@ mod tests {
     #[test]
     fn ignores_rules_that_are_off_or_have_no_number() {
         let l = limits(&[
-            (".oxlintrc.json", r#"{"rules":{"complexity":["off",{"max":3}]}}"#),
+            (
+                ".oxlintrc.json",
+                r#"{"rules":{"complexity":["off",{"max":3}],"sonarjs/cognitive-complexity":["error",3,"silence-issues"]}}"#,
+            ),
             ("ruff.toml", "[lint]\nselect = [\"C901\"]\n"),
             (
                 ".golangci.yml",
@@ -248,6 +263,7 @@ mod tests {
             ),
         ]);
         assert_eq!(value(&l, Lang::Js, Metric::Cyclomatic), None);
+        assert_eq!(value(&l, Lang::Js, Metric::Cognitive), None);
         assert_eq!(value(&l, Lang::Python, Metric::Cyclomatic), None);
         assert_eq!(value(&l, Lang::Go, Metric::Cyclomatic), Some((6.0, ".golangci.yml")));
     }

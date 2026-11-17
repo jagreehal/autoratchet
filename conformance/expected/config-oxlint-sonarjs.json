@@ -1,0 +1,68 @@
+{
+  "exit": 1,
+  "textExit": 1,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 1,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Failed.** A function got more complex than the ratchet allows.",
+      "<sub>1 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `score.ts::score` | cognitive | new | 8 | 5 from .oxlintrc.json |",
+      "| `score.ts::score` | cyclomatic | new | 9 | 8 from .oxlintrc.json |",
+      "|---|---|--:|--:|--:|"
+    ],
+    "regressions": [
+      {
+        "current": 8,
+        "filePath": "score.ts",
+        "functionName": "score",
+        "kind": "new",
+        "line": 1,
+        "metric": "cognitive",
+        "threshold": 5,
+        "thresholdSource": ".oxlintrc.json"
+      },
+      {
+        "current": 9,
+        "filePath": "score.ts",
+        "functionName": "score",
+        "kind": "new",
+        "line": 1,
+        "metric": "cyclomatic",
+        "threshold": 8,
+        "thresholdSource": ".oxlintrc.json"
+      }
+    ],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "fail"
+  },
+  "text": [
+    "    cognitive: 8 (maximum for new code: 5, from .oxlintrc.json)",
+    "    cyclomatic: 9 (maximum for new code: 8, from .oxlintrc.json)",
+    "  score (new function)",
+    "Complexity regressions detected:",
+    "Quality gate failed.",
+    "score.ts"
+  ],
+  "measureBase": {
+    "functions": [],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 8,
+        "cyclomatic": 9,
+        "filePath": "score.ts",
+        "functionName": "score",
+        "line": 1
+      }
+    ],
+    "problems": []
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "jsPlugins": ["eslint-plugin-sonarjs"],
+  "rules": {
+    "sonarjs/cyclomatic-complexity": ["warn", { "threshold": 8 }],
+    "sonarjs/cognitive-complexity": ["warn", 5]
+  }
+}
