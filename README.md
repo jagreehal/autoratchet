@@ -89,7 +89,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: jagreehal/autoratchet@v0.5.1
+      - uses: jagreehal/autoratchet@v0.6.0
         with:
           path: src
           override-approval: review
