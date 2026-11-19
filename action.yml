@@ -116,7 +116,9 @@ runs:
 
         # Oxlint measures cyclomatic complexity in JavaScript and TypeScript; Rust, Python and Go need none.
         # shellcheck disable=SC2086 # pathspecs split on purpose
-        js=$(git -C "$GITHUB_WORKSPACE" ls-files -- ${PATHS:-.} | grep -cE '\.[cm]?[jt]sx?$' || true)
+        # set -f: `path` holds git pathspecs; the shell must not expand src/*.go against the disk.
+        # -z: raw names, as the CLI reads them (without it git quotes src/café.ts and the suffix test misses it).
+        js=$(set -f; git -C "$GITHUB_WORKSPACE" ls-files -z -- ${PATHS:-.} | tr '\0' '\n' | grep -cE '\.[cm]?[jt]sx?$' || true)
         if [ "$js" -gt 0 ]; then
           oxlint_version=$(jq -r .dependencies.oxlint "$GITHUB_ACTION_PATH/package.json")
           oxc="https://github.com/oxc-project/oxc/releases/download/oxlint_v$oxlint_version"
@@ -195,9 +197,12 @@ runs:
         [ -n "$COGNITIVE" ] && flags+=(--cognitive-threshold "$COGNITIVE")
         # The runner adds -e; a regression (exit 1) must still reach the report below.
         status=0
+        # Split `path` on spaces but do not glob it: git reads src/*.go as a pathspec, as the hook does.
+        set -f
         # shellcheck disable=SC2086
         $CLI check --base "$BASE" \
           ${flags[@]+"${flags[@]}"} --format json -o "$out/report.json" -- $PATHS || status=$?
+        set +f
         if [ ! -s "$out/report.json" ]; then
           echo "::error::AutoRatchet failed (exit $status) before writing a report; see the log above."
           exit 1

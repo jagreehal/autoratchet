@@ -39,6 +39,7 @@
     "bin",
     "binaries",
     "agent-hooks",
+    "skills",
     "README.md",
     "LICENSE",
     "NOTICE"

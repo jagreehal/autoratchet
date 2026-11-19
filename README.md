@@ -62,7 +62,9 @@ npx autoratchet check --base main src ':!src/generated'
 ```
 
 `check` compares your working tree, uncommitted changes included, with
-`git merge-base main HEAD`. Files git ignores are skipped. Pathspecs work as in any git command.
+`git merge-base main HEAD`. It measures what git lists, so files git ignores are skipped; exclude
+anything else, such as committed generated code, with a pathspec. Pathspecs work as in any git
+command.
 
 Already set a complexity limit in Oxlint, Biome, Ruff, Clippy or golangci-lint? There is nothing
 to configure: AutoRatchet uses it. See [Limits from your linter config](#limits-from-your-linter-config).
@@ -131,6 +133,43 @@ it checks every changed file. It blocks on regressions, on files that do not par
 new override comment, because an agent may not approve its own exception. The hooks need `git`
 and `jq`. Hooks run on the author's machine, so they are a fast feedback loop; the CI check is
 the enforcement.
+
+Set the same limits and paths as CI through the environment, e.g. in the `env` block of
+`.claude/settings.json`:
+
+| Variable | Holds | Example |
+|----------|-------|---------|
+| `AUTORATCHET_ARGS` | Flags only | `--threshold 12 --cognitive-threshold 18` |
+| `AUTORATCHET_PATHS` | The workflow's `path` pathspecs | `src :!src/generated` |
+
+With `AUTORATCHET_PATHS` set, the hook checks exactly the changed files it selects, as CI does.
+Without it, the hook skips changed files under `node_modules`, `dist`, `build`, `coverage`,
+`target`, `vendor`, virtualenvs and `generated` directories. Put pathspecs there,
+not in `AUTORATCHET_ARGS`: git combines pathspecs, so `src` there would add all of `src` to every
+check and still include changed files outside it.
+
+`skills/` has agent skills. One per language (`autoratchet-typescript`, `-rust`, `-python`,
+`-go`) teaches the agent to write code that passes in the first place: each function's budget,
+what each construct costs in that language, the shapes that score low, and why overrides are left
+to a person. `autoratchet-setup` walks an agent through adding AutoRatchet to a repository:
+install, first run, workflow, hooks, skills and limits.
+
+Install them with the [skills CLI](https://github.com/vercel-labs/skills), which works with
+Claude Code, Cursor, Codex, GitHub Copilot and other agents:
+
+```bash
+npx skills add jagreehal/autoratchet                                  # pick from the list
+npx skills add jagreehal/autoratchet --skill autoratchet-setup        # set up a repo
+npx skills add jagreehal/autoratchet --skill autoratchet-typescript -a claude-code
+```
+
+Skills install into the current project; add `-g` to install them for every project. Or copy
+them from the npm package:
+
+```bash
+mkdir -p .claude/skills
+cp -r node_modules/autoratchet/skills/autoratchet-typescript .claude/skills/
+```
 
 ## Limits from your linter config
 
@@ -246,7 +285,8 @@ fine.
 AutoRatchet measures `.rs` files itself, so a Rust project needs only the binary: download it
 from a GitHub release (below), or use the npm package if the project already has one. `check`,
 the GitHub Action and the agent hooks work the same way; the hook finds `autoratchet` on your
-`PATH` when there is no `node_modules`. Cargo's `target/` directory is skipped.
+`PATH` when there is no `node_modules`. `check` measures what git lists, so it skips `target/`
+when `.gitignore` lists it, as `cargo new` sets up; `measure` always skips it.
 
 - **Cyclomatic**, the modified variant: 1, plus each `if` and `if let`, `while` and `while let`,
   `for`, `match` (one per match), match guard, `let … else`, `&&` and `||`. `?` does not count.
@@ -288,8 +328,9 @@ complexipy's on over 99.9% of functions.
 
 The functions are the ones complexipy reports: top-level functions and class methods, named
 `parse`, `Order.total`, `Order.total.setter` (or `.deleter`) and `Outer.Inner.method`. A function
-nested inside another one counts as part of it. AutoRatchet skips `@overload` signatures and
-virtual environments (directories holding `pyvenv.cfg`).
+nested inside another one counts as part of it. AutoRatchet skips `@overload` signatures.
+`check` skips virtual environments when `.gitignore` lists them; `measure` always skips
+directories holding `pyvenv.cfg`.
 
 Overrides use the comments Python developers write today, on the `def` line or on the comment
 lines above it:

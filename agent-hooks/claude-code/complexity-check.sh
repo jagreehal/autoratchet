@@ -18,8 +18,15 @@ ratchet=${AUTORATCHET:-node_modules/.bin/autoratchet}
 git rev-parse --verify -q HEAD >/dev/null || exit 0 # no commit to compare with yet
 
 is_source() {
+  # Default scope skips build output and dependencies. With AUTORATCHET_PATHS set, its pathspecs
+  # decide instead, as `path` does in CI: selecting src/generated must check src/generated.
+  if [ -z "${AUTORATCHET_PATHS:-}" ]; then
+    case "$1" in
+      node_modules/* | dist/* | build/* | coverage/* | target/* | */target/* | vendor/* | */vendor/* | .venv/* | venv/* | */generated/*) return 1 ;;
+    esac
+  fi
   case "$1" in
-    node_modules/* | dist/* | build/* | coverage/* | target/* | */target/* | vendor/* | */vendor/* | .venv/* | venv/* | */generated/* | *.d.ts) return 1 ;;
+    *.d.ts) return 1 ;;
     *.ts | *.tsx | *.js | *.jsx | *.mts | *.cts | *.mjs | *.cjs | *.rs | *.py | *.go) return 0 ;;
     *) return 1 ;;
   esac
@@ -29,9 +36,13 @@ files=()
 if [ "$mode" = "stop" ]; then
   # A problem Claude could not fix must not trap it in a loop: report, don't block twice.
   active=$(printf '%s' "$input" | jq -r '.stop_hook_active // false')
-  while IFS= read -r f; do
+  # NUL-separated, so paths come raw: without -z git quotes non-ASCII names ("caf\303\251.go").
+  # Each entry is "XY path"; a rename or copy (R or C in either column) is followed by its old path, skipped.
+  while IFS= read -r -d '' entry; do
+    f=${entry:3}
+    case "${entry:0:2}" in *R* | *C*) IFS= read -r -d '' _ ;; esac # either column: staged or not
     [ -f "$f" ] && is_source "$f" && files+=("$f")
-  done < <(git status --porcelain --untracked-files=all | sed -E 's/^.{3}//; s/.* -> //')
+  done < <(git status --porcelain -z --untracked-files=all)
 else
   active=false
   f=$(printf '%s' "$input" | jq -r '.tool_input.file_path // .tool_response.filePath // empty')
@@ -40,8 +51,28 @@ else
 fi
 [ ${#files[@]} -gt 0 ] || exit 0
 
+# AUTORATCHET_PATHS holds the workflow's `path` pathspecs: keep only the changed files CI would check.
+# They filter the list here; passed to check they would be added to it (git pathspecs are a union).
+if [ -n "${AUTORATCHET_PATHS:-}" ]; then
+  kept=()
+  set -f # pathspecs, not shell globs
+  # Both lists are unique (--deduplicate: git lists an unmerged path once per stage), so after one
+  # sort a changed file CI also checks appears twice in a row.
+  # NUL-separated raw paths throughout; linear after the sort, however many files the paths select.
+  prev=""
+  # shellcheck disable=SC2086 # split on purpose, e.g. "src :!src/generated"
+  while IFS= read -r -d '' f; do
+    [ "$f" = "$prev" ] && kept+=("$f")
+    prev=$f
+  done < <({ printf '%s\0' "${files[@]}"; git ls-files -z --deduplicate --cached --others --exclude-standard -- ${AUTORATCHET_PATHS}; } | LC_ALL=C sort -z)
+  set +f
+  files=(${kept[@]+"${kept[@]}"})
+  [ ${#files[@]} -gt 0 ] || exit 0
+fi
+
+# :(literal): these are file names, not patterns; src/[id].go must not also match src/i.go.
 # shellcheck disable=SC2086 # split on purpose, e.g. "--threshold 12 --cognitive-threshold 18"
-report=$("$ratchet" check --base HEAD ${AUTORATCHET_ARGS:-} -- "${files[@]}" 2>&1)
+report=$("$ratchet" check --base HEAD ${AUTORATCHET_ARGS:-} -- "${files[@]/#/:(literal)}" 2>&1)
 status=$?
 # 1 = regression, 3 = something could not be measured (often a file that does not parse yet).
 # Both go back to Claude. 2 and 4 mean the tool itself failed: say so, but never block on it.
