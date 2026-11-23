@@ -8,8 +8,8 @@
     "incomplete": [],
     "markdown": [
       "## AutoRatchet",
-      "**Passed.** No function got more complex than the ratchet allows.",
-      "<sub>3 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+      "**Passed.** No function got worse than the ratchet allows.",
+      "<sub>3 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>"
     ],
     "regressions": [],
     "unmatchedOverrides": [],
@@ -17,7 +17,7 @@
     "verdict": "pass"
   },
   "text": [
-    "No complexity regressions detected.",
+    "No regressions detected.",
     "Quality gate passed."
   ],
   "measureBase": {
@@ -27,7 +27,8 @@
         "cyclomatic": 2,
         "filePath": "text.ts",
         "functionName": "greet",
-        "line": 2
+        "line": 2,
+        "lint": []
       }
     ],
     "problems": []
@@ -39,21 +40,24 @@
         "cyclomatic": 5,
         "filePath": "text.ts",
         "functionName": "Ü.méthode",
-        "line": 16
+        "line": 16,
+        "lint": []
       },
       {
         "cognitive": 10,
         "cyclomatic": 5,
         "filePath": "text.ts",
         "functionName": "箭头",
-        "line": 15
+        "line": 15,
+        "lint": []
       },
       {
         "cognitive": 9,
         "cyclomatic": 6,
         "filePath": "text.ts",
         "functionName": "greet",
-        "line": 3
+        "line": 3,
+        "lint": []
       }
     ],
     "problems": []

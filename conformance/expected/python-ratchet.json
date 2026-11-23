@@ -30,10 +30,10 @@
     "markdown": [
       "## AutoRatchet",
       "**Approved by a new override** (a reviewer must accept each reason; still measured):",
-      "**Failed.** A function got more complex than the ratchet allows.",
+      "**Failed.** A function got worse than the ratchet allows.",
       "- `orders.py::parse` cognitive 17: # complexipy: ignore -- follows the parsing steps of the spec in order",
       "- `orders.py::status` cyclomatic 11: # noqa: C901 -- one branch per status code, no logic",
-      "<sub>8 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "<sub>8 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
       "| Function | Metric | Before | After | Limit |",
       "| `orders.py::route` | cognitive | 2 | 17 | 15 |",
       "| `orders.py::route` | cyclomatic | 3 | 12 | 10 |",
@@ -86,28 +86,32 @@
         "cyclomatic": 1,
         "filePath": "orders.py",
         "functionName": "Order.__init__",
-        "line": 2
+        "line": 2,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "orders.py",
         "functionName": "Order.total.setter",
-        "line": 11
+        "line": 11,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "orders.py",
         "functionName": "Order.total",
-        "line": 7
+        "line": 7,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 3,
         "filePath": "orders.py",
         "functionName": "route",
-        "line": 15
+        "line": 15,
+        "lint": []
       }
     ],
     "problems": []
@@ -119,56 +123,64 @@
         "cyclomatic": 1,
         "filePath": "orders.py",
         "functionName": "Order.__init__",
-        "line": 5
+        "line": 5,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "orders.py",
         "functionName": "Order.total.setter",
-        "line": 14
+        "line": 14,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "orders.py",
         "functionName": "Order.total",
-        "line": 10
+        "line": 10,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "orders.py",
         "functionName": "first",
-        "line": 69
+        "line": 69,
+        "lint": []
       },
       {
         "cognitive": 10,
         "cyclomatic": 11,
         "filePath": "orders.py",
         "functionName": "status",
-        "line": 39
+        "line": 39,
+        "lint": []
       },
       {
         "cognitive": 17,
         "cyclomatic": 12,
         "filePath": "orders.py",
         "functionName": "route",
-        "line": 18
+        "line": 18,
+        "lint": []
       },
       {
         "cognitive": 17,
         "cyclomatic": 8,
         "filePath": "orders.py",
         "functionName": "parse",
-        "line": 54
+        "line": 54,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 3,
         "filePath": "orders.py",
         "functionName": "walk",
-        "line": 73
+        "line": 73,
+        "lint": []
       }
     ],
     "problems": []

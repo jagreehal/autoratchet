@@ -9,9 +9,9 @@
     "markdown": [
       "## AutoRatchet",
       "**Overrides on no single function** (ignored by the gate):",
-      "**Passed.** No function got more complex than the ratchet allows.",
+      "**Passed.** No function got worse than the ratchet allows.",
       "- `lib.rs:1` #![allow(clippy::cognitive_complexity)]",
-      "<sub>17 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+      "<sub>17 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>"
     ],
     "regressions": [],
     "unmatchedOverrides": [
@@ -27,7 +27,7 @@
   },
   "text": [
     "  lib.rs:1  #![allow(clippy::cognitive_complexity)]",
-    "No complexity regressions detected.",
+    "No regressions detected.",
     "Quality gate passed.",
     "Warning: new overrides that sit on no single function (file-wide or misplaced). The gate ignores them:"
   ],
@@ -42,119 +42,136 @@
         "cyclomatic": 1,
         "filePath": "lib.rs",
         "functionName": "again::twice",
-        "line": 39
+        "line": 39,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "lib.rs",
         "functionName": "billing::charge",
-        "line": 28
+        "line": 28,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "lib.rs",
         "functionName": "billing::charge>amounts.iter().map().filter()",
-        "line": 31
+        "line": 31,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "lib.rs",
         "functionName": "billing::charge>amounts.iter().map()",
-        "line": 31
+        "line": 31,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "lib.rs",
         "functionName": "billing::charge>round",
-        "line": 29
+        "line": 29,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "lib.rs",
         "functionName": "callbacks",
-        "line": 42
+        "line": 42,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "lib.rs",
         "functionName": "callbacks>std::thread::spawn()",
-        "line": 45
+        "line": 45,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "lib.rs",
         "functionName": "callbacks>v.iter().filter()",
-        "line": 43
+        "line": 43,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "lib.rs",
         "functionName": "callbacks>v.iter().filter()#2",
-        "line": 44
+        "line": 44,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "lib.rs",
         "functionName": "tests::it_works",
-        "line": 51
+        "line": 51,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "lib.rs",
         "functionName": "twice",
-        "line": 36
+        "line": 36,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "lib.rs",
         "functionName": "Wrapper::map",
-        "line": 14
+        "line": 14,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "lib.rs",
         "functionName": "Wrapper::new",
-        "line": 13
+        "line": 13,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 2,
         "filePath": "lib.rs",
         "functionName": "<Wrapper as Display>::fmt",
-        "line": 7
+        "line": 7,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 2,
         "filePath": "lib.rs",
         "functionName": "billing::tax::rate",
-        "line": 26
+        "line": 26,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 2,
         "filePath": "lib.rs",
         "functionName": "Shape::describe",
-        "line": 19
+        "line": 19,
+        "lint": []
       },
       {
         "cognitive": 3,
         "cyclomatic": 2,
         "filePath": "lib.rs",
         "functionName": "billing::charge>on_error",
-        "line": 30
+        "line": 30,
+        "lint": []
       }
     ],
     "problems": []

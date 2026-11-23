@@ -13,7 +13,7 @@
       "**Could not measure:**",
       "**Failed.** AutoRatchet could not measure every function, so it cannot vouch for this change.",
       "- head: broken.go: does not parse (missing ) (line 3))",
-      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>"
     ],
     "regressions": [],
     "unmatchedOverrides": [],
@@ -32,14 +32,16 @@
         "cyclomatic": 2,
         "filePath": "orders.go",
         "functionName": "(*Order).Total",
-        "line": 8
+        "line": 8,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 3,
         "filePath": "orders.go",
         "functionName": "Route",
-        "line": 16
+        "line": 16,
+        "lint": []
       }
     ],
     "problems": []
@@ -51,14 +53,16 @@
         "cyclomatic": 2,
         "filePath": "orders.go",
         "functionName": "(*Order).Total",
-        "line": 8
+        "line": 8,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 3,
         "filePath": "orders.go",
         "functionName": "Route",
-        "line": 16
+        "line": 16,
+        "lint": []
       }
     ],
     "problems": [

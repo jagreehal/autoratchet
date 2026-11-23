@@ -1,0 +1,386 @@
+{
+  "check": {
+    "exit": 1,
+    "report": {
+      "approvals": [
+        {
+          "functionName": "added",
+          "override": {
+            "filePath": "a.ts",
+            "line": 15,
+            "metric": "lint",
+            "text": "// oxlint-disable-next-line anti-slop/no-reflect-get -- proxied SDK object"
+          },
+          "score": 1
+        },
+        {
+          "functionName": "hook",
+          "override": {
+            "filePath": "b.py",
+            "line": 8,
+            "metric": "lint",
+            "text": "# autoratchet-disable-next-line anti-slop-python/no-any-parameters -- plugin hook"
+          },
+          "score": 1
+        },
+        {
+          "functionName": "legacy",
+          "override": {
+            "filePath": "a.ts",
+            "line": 10,
+            "metric": "lint",
+            "text": "// oxlint-disable-next-line quality/no-reflect-get -- proxied SDK object"
+          },
+          "score": 1
+        },
+        {
+          "functionName": "Must",
+          "override": {
+            "filePath": "c.go",
+            "line": 8,
+            "metric": "lint",
+            "text": "// autoratchet-disable-next-line anti-slop-go/no-unchecked-type-assertion -- set by init"
+          },
+          "score": 2
+        }
+      ],
+      "baseCommit": "85976376ed3730ddf87c8461ec71de8485dba71c",
+      "blockedOverrides": [],
+      "functions": 8,
+      "incomplete": [],
+      "markdown": [
+        "## AutoRatchet",
+        "**Approved by a new override** (a reviewer must accept each reason; still measured):",
+        "**Failed.** A function got worse than the ratchet allows.",
+        "**Lint findings in those functions:**",
+        "- `a.ts:1` anti-slop(no-unsafe-dictionary-type): This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+        "- `a.ts:3` anti-slop(no-unsafe-dictionary-type): This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+        "- `a.ts:6` anti-slop(no-reflect-get): Replace `Reflect.get` with typed property access. Parse dynamic input into a named domain type before reading it.",
+        "- `a.ts::added` lint 1: // oxlint-disable-next-line anti-slop/no-reflect-get -- proxied SDK object",
+        "- `a.ts::legacy` lint 1: // oxlint-disable-next-line quality/no-reflect-get -- proxied SDK object",
+        "- `b.py:3` anti-slop-python(no-unsafe-dictionary-type): This dictionary's `Any`/`object` value type gives callers no contract. Use a TypedDict, dataclass or a concrete value type.",
+        "- `b.py:5` anti-slop-python(no-unsafe-dictionary-type): This dictionary's `Any`/`object` value type gives callers no contract. Use a TypedDict, dataclass or a concrete value type.",
+        "- `b.py::hook` lint 1: # autoratchet-disable-next-line anti-slop-python/no-any-parameters -- plugin hook",
+        "- `c.go:3` anti-slop-go(no-any-parameters): Parameter typed `any` leaves input unparsed. Accept a named type, a generic constraint or a small interface.",
+        "- `c.go:7` anti-slop-go(no-any-parameters): Parameter typed `any` leaves input unparsed. Accept a named type, a generic constraint or a small interface.",
+        "- `c.go::Must` lint 2: // autoratchet-disable-next-line anti-slop-go/no-unchecked-type-assertion -- set by init",
+        "<sub>8 functions measured against `8597637`. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
+        "| Function | Metric | Before | After | Limit |",
+        "| `a.ts::(top level)` | lint | 1 | 2 | 1 |",
+        "| `a.ts::newName` | lint | new | 1 | 0 |",
+        "| `b.py::(top level)` | lint | 1 | 2 | 1 |",
+        "| `c.go::Must` | lint | new | 1 | 0 |",
+        "| `c.go::Name` | lint | 1 | 2 | 1 |",
+        "|---|---|--:|--:|--:|"
+      ],
+      "regressions": [
+        {
+          "current": 1,
+          "filePath": "a.ts",
+          "findings": [
+            {
+              "line": 6,
+              "message": "Replace `Reflect.get` with typed property access. Parse dynamic input into a named domain type before reading it.",
+              "rule": "anti-slop(no-reflect-get)"
+            }
+          ],
+          "functionName": "newName",
+          "kind": "new",
+          "line": 5,
+          "metric": "lint",
+          "threshold": 0
+        },
+        {
+          "current": 1,
+          "filePath": "c.go",
+          "findings": [
+            {
+              "line": 7,
+              "message": "Parameter typed `any` leaves input unparsed. Accept a named type, a generic constraint or a small interface.",
+              "rule": "anti-slop-go(no-any-parameters)"
+            }
+          ],
+          "functionName": "Must",
+          "kind": "new",
+          "line": 7,
+          "metric": "lint",
+          "threshold": 0
+        },
+        {
+          "current": 2,
+          "filePath": "a.ts",
+          "findings": [
+            {
+              "line": 1,
+              "message": "This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+              "rule": "anti-slop(no-unsafe-dictionary-type)"
+            },
+            {
+              "line": 3,
+              "message": "This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+              "rule": "anti-slop(no-unsafe-dictionary-type)"
+            }
+          ],
+          "functionName": "(top level)",
+          "kind": "worsened",
+          "line": 1,
+          "metric": "lint",
+          "previous": 1,
+          "threshold": 0
+        },
+        {
+          "current": 2,
+          "filePath": "b.py",
+          "findings": [
+            {
+              "line": 3,
+              "message": "This dictionary's `Any`/`object` value type gives callers no contract. Use a TypedDict, dataclass or a concrete value type.",
+              "rule": "anti-slop-python(no-unsafe-dictionary-type)"
+            },
+            {
+              "line": 5,
+              "message": "This dictionary's `Any`/`object` value type gives callers no contract. Use a TypedDict, dataclass or a concrete value type.",
+              "rule": "anti-slop-python(no-unsafe-dictionary-type)"
+            }
+          ],
+          "functionName": "(top level)",
+          "kind": "worsened",
+          "line": 5,
+          "metric": "lint",
+          "previous": 1,
+          "threshold": 0
+        },
+        {
+          "current": 2,
+          "filePath": "c.go",
+          "findings": [
+            {
+              "line": 3,
+              "message": "Parameter typed `any` leaves input unparsed. Accept a named type, a generic constraint or a small interface.",
+              "rule": "anti-slop-go(no-any-parameters)"
+            },
+            {
+              "line": 3,
+              "message": "Parameter typed `any` leaves input unparsed. Accept a named type, a generic constraint or a small interface.",
+              "rule": "anti-slop-go(no-any-parameters)"
+            }
+          ],
+          "functionName": "Name",
+          "kind": "worsened",
+          "line": 3,
+          "metric": "lint",
+          "previous": 1,
+          "threshold": 0
+        }
+      ],
+      "unmatchedOverrides": [],
+      "untracked": [],
+      "verdict": "fail"
+    }
+  },
+  "strict": {
+    "exit": 1,
+    "report": {
+      "approvals": [],
+      "baseCommit": "85976376ed3730ddf87c8461ec71de8485dba71c",
+      "blockedOverrides": [
+        {
+          "filePath": "a.ts",
+          "line": 10,
+          "metric": "lint",
+          "text": "// oxlint-disable-next-line quality/no-reflect-get -- proxied SDK object"
+        },
+        {
+          "filePath": "a.ts",
+          "line": 15,
+          "metric": "lint",
+          "text": "// oxlint-disable-next-line anti-slop/no-reflect-get -- proxied SDK object"
+        },
+        {
+          "filePath": "b.py",
+          "line": 8,
+          "metric": "lint",
+          "text": "# autoratchet-disable-next-line anti-slop-python/no-any-parameters -- plugin hook"
+        },
+        {
+          "filePath": "c.go",
+          "line": 8,
+          "metric": "lint",
+          "text": "// autoratchet-disable-next-line anti-slop-go/no-unchecked-type-assertion -- set by init"
+        }
+      ],
+      "functions": 8,
+      "incomplete": [],
+      "markdown": [
+        "## AutoRatchet",
+        "**Failed.** A function got worse than the ratchet allows.",
+        "**Lint findings in those functions:**",
+        "**New overrides need approval:**",
+        "- `a.ts:10` // oxlint-disable-next-line quality/no-reflect-get -- proxied SDK object",
+        "- `a.ts:15` // oxlint-disable-next-line anti-slop/no-reflect-get -- proxied SDK object",
+        "- `a.ts:16` anti-slop(no-reflect-get): Replace `Reflect.get` with typed property access. Parse dynamic input into a named domain type before reading it.",
+        "- `a.ts:1` anti-slop(no-unsafe-dictionary-type): This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+        "- `a.ts:3` anti-slop(no-unsafe-dictionary-type): This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+        "- `a.ts:6` anti-slop(no-reflect-get): Replace `Reflect.get` with typed property access. Parse dynamic input into a named domain type before reading it.",
+        "- `b.py:3` anti-slop-python(no-unsafe-dictionary-type): This dictionary's `Any`/`object` value type gives callers no contract. Use a TypedDict, dataclass or a concrete value type.",
+        "- `b.py:5` anti-slop-python(no-unsafe-dictionary-type): This dictionary's `Any`/`object` value type gives callers no contract. Use a TypedDict, dataclass or a concrete value type.",
+        "- `b.py:8` # autoratchet-disable-next-line anti-slop-python/no-any-parameters -- plugin hook",
+        "- `b.py:9` anti-slop-python(no-any-parameters): Parameter typed `Any` leaves input unparsed. Accept a named domain type; parse at the I/O boundary before calling this function.",
+        "- `c.go:3` anti-slop-go(no-any-parameters): Parameter typed `any` leaves input unparsed. Accept a named type, a generic constraint or a small interface.",
+        "- `c.go:7` anti-slop-go(no-any-parameters): Parameter typed `any` leaves input unparsed. Accept a named type, a generic constraint or a small interface.",
+        "- `c.go:8` // autoratchet-disable-next-line anti-slop-go/no-unchecked-type-assertion -- set by init",
+        "- `c.go:9` anti-slop-go(no-unchecked-type-assertion): A single-value type assertion panics when it is wrong. Use `v, ok := x.(T)` or a type switch.",
+        "<sub>8 functions measured against `8597637`. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
+        "| Function | Metric | Before | After | Limit |",
+        "| `a.ts::(top level)` | lint | 1 | 2 | 1 |",
+        "| `a.ts::added` | lint | new | 1 | 0 |",
+        "| `a.ts::newName` | lint | new | 1 | 0 |",
+        "| `b.py::(top level)` | lint | 1 | 2 | 1 |",
+        "| `b.py::hook` | lint | new | 1 | 0 |",
+        "| `c.go::Must` | lint | new | 2 | 0 |",
+        "| `c.go::Name` | lint | 1 | 2 | 1 |",
+        "|---|---|--:|--:|--:|"
+      ],
+      "regressions": [
+        {
+          "current": 1,
+          "filePath": "a.ts",
+          "findings": [
+            {
+              "line": 16,
+              "message": "Replace `Reflect.get` with typed property access. Parse dynamic input into a named domain type before reading it.",
+              "rule": "anti-slop(no-reflect-get)"
+            }
+          ],
+          "functionName": "added",
+          "kind": "new",
+          "line": 14,
+          "metric": "lint",
+          "threshold": 0
+        },
+        {
+          "current": 1,
+          "filePath": "a.ts",
+          "findings": [
+            {
+              "line": 6,
+              "message": "Replace `Reflect.get` with typed property access. Parse dynamic input into a named domain type before reading it.",
+              "rule": "anti-slop(no-reflect-get)"
+            }
+          ],
+          "functionName": "newName",
+          "kind": "new",
+          "line": 5,
+          "metric": "lint",
+          "threshold": 0
+        },
+        {
+          "current": 1,
+          "filePath": "b.py",
+          "findings": [
+            {
+              "line": 9,
+              "message": "Parameter typed `Any` leaves input unparsed. Accept a named domain type; parse at the I/O boundary before calling this function.",
+              "rule": "anti-slop-python(no-any-parameters)"
+            }
+          ],
+          "functionName": "hook",
+          "kind": "new",
+          "line": 9,
+          "metric": "lint",
+          "threshold": 0
+        },
+        {
+          "current": 2,
+          "filePath": "a.ts",
+          "findings": [
+            {
+              "line": 1,
+              "message": "This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+              "rule": "anti-slop(no-unsafe-dictionary-type)"
+            },
+            {
+              "line": 3,
+              "message": "This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+              "rule": "anti-slop(no-unsafe-dictionary-type)"
+            }
+          ],
+          "functionName": "(top level)",
+          "kind": "worsened",
+          "line": 1,
+          "metric": "lint",
+          "previous": 1,
+          "threshold": 0
+        },
+        {
+          "current": 2,
+          "filePath": "b.py",
+          "findings": [
+            {
+              "line": 3,
+              "message": "This dictionary's `Any`/`object` value type gives callers no contract. Use a TypedDict, dataclass or a concrete value type.",
+              "rule": "anti-slop-python(no-unsafe-dictionary-type)"
+            },
+            {
+              "line": 5,
+              "message": "This dictionary's `Any`/`object` value type gives callers no contract. Use a TypedDict, dataclass or a concrete value type.",
+              "rule": "anti-slop-python(no-unsafe-dictionary-type)"
+            }
+          ],
+          "functionName": "(top level)",
+          "kind": "worsened",
+          "line": 5,
+          "metric": "lint",
+          "previous": 1,
+          "threshold": 0
+        },
+        {
+          "current": 2,
+          "filePath": "c.go",
+          "findings": [
+            {
+              "line": 3,
+              "message": "Parameter typed `any` leaves input unparsed. Accept a named type, a generic constraint or a small interface.",
+              "rule": "anti-slop-go(no-any-parameters)"
+            },
+            {
+              "line": 3,
+              "message": "Parameter typed `any` leaves input unparsed. Accept a named type, a generic constraint or a small interface.",
+              "rule": "anti-slop-go(no-any-parameters)"
+            }
+          ],
+          "functionName": "Name",
+          "kind": "worsened",
+          "line": 3,
+          "metric": "lint",
+          "previous": 1,
+          "threshold": 0
+        },
+        {
+          "current": 2,
+          "filePath": "c.go",
+          "findings": [
+            {
+              "line": 7,
+              "message": "Parameter typed `any` leaves input unparsed. Accept a named type, a generic constraint or a small interface.",
+              "rule": "anti-slop-go(no-any-parameters)"
+            },
+            {
+              "line": 9,
+              "message": "A single-value type assertion panics when it is wrong. Use `v, ok := x.(T)` or a type switch.",
+              "rule": "anti-slop-go(no-unchecked-type-assertion)"
+            }
+          ],
+          "functionName": "Must",
+          "kind": "new",
+          "line": 7,
+          "metric": "lint",
+          "threshold": 0
+        }
+      ],
+      "unmatchedOverrides": [],
+      "untracked": [],
+      "verdict": "fail"
+    }
+  }
+}

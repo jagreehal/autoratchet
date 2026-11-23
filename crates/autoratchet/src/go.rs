@@ -20,6 +20,27 @@ use crate::lang::{
     tree_sitter_error,
 };
 
+/// A file's syntax, for lining up revisions; empty when it does not parse.
+pub fn syntax(source: &str) -> crate::lang::Syntax {
+    let mut parser = Parser::new();
+    parser
+        .set_language(&tree_sitter_go::LANGUAGE.into())
+        .expect("Go grammar");
+    parser.parse(source, None).map_or_else(Default::default, |tree| {
+        crate::lang::tree_syntax(
+            tree.root_node(),
+            &[
+                "interpreted_string_literal",
+                "raw_string_literal",
+                "rune_literal",
+                "int_literal",
+                "float_literal",
+                "imaginary_literal",
+            ],
+        )
+    })
+}
+
 pub fn analyse_go(source: &str) -> NativeAnalysis {
     let mut parser = Parser::new();
     parser
@@ -51,7 +72,7 @@ pub fn analyse_go(source: &str) -> NativeAnalysis {
     }
     let comments = crate::lang::comments(tree.root_node(), source);
     let mut out = NativeAnalysis::default();
-    let mut seen = std::collections::HashMap::new();
+    let mut names = crate::lang::Names::default();
     let package = named_children(tree.root_node())
         .into_iter()
         .find(|c| c.kind() == "package_clause")
@@ -67,9 +88,7 @@ pub fn analyse_go(source: &str) -> NativeAnalysis {
             Some((_, typ)) => format!("({typ}).{}", f.name),
             None => f.name.to_string(),
         };
-        let count = seen.entry(base.clone()).or_insert(0u32);
-        *count += 1;
-        let name = if *count == 1 { base } else { format!("{base}#{count}") };
+        let name = names.add(base, None);
         let line = f.node.start_position().row as u32 + 1;
         let mut cognitive = Cognitive {
             source,
@@ -80,10 +99,12 @@ pub fn analyse_go(source: &str) -> NativeAnalysis {
         };
         cognitive.visit(f.body);
         out.functions.push(MeasuredFunction {
+            origin: names.origin(&name),
             name: name.clone(),
             line,
             cyclomatic: 1 + gocyclo(f.body, source),
             cognitive: cognitive.score,
+            span: f.node.byte_range(),
         });
         let receiver_name = f.receiver.as_ref().and_then(|(r, _)| r.as_deref());
         let (functions, methods) = callees(f.body, receiver_name, source);
@@ -97,6 +118,8 @@ pub fn analyse_go(source: &str) -> NativeAnalysis {
             .extend(attached_overrides(&comments, line, line, &name, comment_metrics));
     }
     out.calls = Some(calls);
+    out.findings = crate::slop::go(tree.root_node(), source, &comments);
+    out.overrides.extend(crate::slop::tree_lint_overrides(&comments));
     out
 }
 

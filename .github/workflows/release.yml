@@ -161,6 +161,8 @@ jobs:
           mkdir -p archives
           for dir in binaries/*/; do
             platform=$(basename "$dir")
+            # The binary embeds the anti-slop rules: NOTICE carries their MIT licence.
+            cp LICENSE NOTICE "$dir"
             tar -czf "archives/autoratchet-$platform.tar.gz" -C "$dir" .
           done
           (cd archives && sha256sum ./*.tar.gz > SHA256SUMS)

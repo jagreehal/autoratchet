@@ -9,8 +9,8 @@
       "incomplete": [],
       "markdown": [
         "## AutoRatchet",
-        "**Failed.** A function got more complex than the ratchet allows.",
-        "<sub>7 functions measured against `a56a565`. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+        "**Failed.** A function got worse than the ratchet allows.",
+        "<sub>7 functions measured against `a56a565`. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
         "| Function | Metric | Before | After | Limit |",
         "| `other/refunds.ts::createRefund` | cognitive | new | 18 | 15 |",
         "| `other/refunds.ts::createRefund` | cyclomatic | new | 14 | 10 |",
@@ -104,8 +104,8 @@
       "incomplete": [],
       "markdown": [
         "## AutoRatchet",
-        "**Failed.** A function got more complex than the ratchet allows.",
-        "<sub>6 functions measured against `a56a565`. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+        "**Failed.** A function got worse than the ratchet allows.",
+        "<sub>6 functions measured against `a56a565`. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
         "| Function | Metric | Before | After | Limit |",
         "| `src/payments.ts::processPayment` | cognitive | 28 | 38 | 28 |",
         "| `src/payments.ts::processPayment` | cyclomatic | 19 | 24 | 19 |",
@@ -179,8 +179,8 @@
       "incomplete": [],
       "markdown": [
         "## AutoRatchet",
-        "**Failed.** A function got more complex than the ratchet allows.",
-        "<sub>6 functions measured against `a56a565`. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+        "**Failed.** A function got worse than the ratchet allows.",
+        "<sub>6 functions measured against `a56a565`. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
         "| Function | Metric | Before | After | Limit |",
         "| `src/payments.ts::processPayment` | cognitive | 28 | 38 | 28 |",
         "| `src/payments.ts::processPayment` | cyclomatic | 19 | 24 | 19 |",

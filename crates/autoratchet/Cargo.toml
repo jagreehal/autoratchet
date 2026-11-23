@@ -3,7 +3,7 @@ name = "autoratchet"
 version = "0.6.0"
 edition = "2024"
 rust-version = "1.97"
-description = "Deterministic complexity checks for AI coding agents and the people who review their code: a threshold-aware ratchet on cyclomatic and cognitive complexity for TypeScript, JavaScript, Rust, Python and Go."
+description = "Deterministic complexity and lint checks for AI coding agents and the people who review their code: a threshold-aware ratchet on cyclomatic complexity, cognitive complexity and lint findings for TypeScript, JavaScript, Rust, Python and Go."
 license = "Apache-2.0"
 repository = "https://github.com/jagreehal/autoratchet"
 homepage = "https://github.com/jagreehal/autoratchet"
@@ -19,6 +19,7 @@ regex = "1.13.1"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = { version = "1.0.154", features = ["preserve_order", "unbounded_depth"] }
 serde_norway = "0.9.42"
+similar = { version = "3.2.1", default-features = false, features = ["std"] }
 syn = { version = "3.0.10", features = ["full", "visit"] }
 tempfile = "3.27.0"
 toml = "1"

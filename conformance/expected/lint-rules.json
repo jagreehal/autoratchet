@@ -1,0 +1,2288 @@
+{
+  "exit": 1,
+  "textExit": 1,
+  "report": {
+    "approvals": [],
+    "blockedOverrides": [],
+    "functions": 85,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Failed.** A function got worse than the ratchet allows.",
+      "**Lint findings in those functions:**",
+      "- `anti-slop/no-array-filter-map.ts:4` anti-slop(no-array-filter-map): Avoid consecutive array `filter` and `map` passes. Prefer `.values().filter(...).map(...).toArray()` where iterator helpers are supported, or a single `flatMap`/mutating reducer. Preserve callback ordering, indexes, and filtering semantics.",
+      "- `anti-slop/no-chained-type-assertions.ts:7` anti-slop(no-chained-type-assertions): This assertion chain discards type evidence. Keep the original precise type, or parse untrusted input at its boundary before narrowing it.",
+      "- `anti-slop/no-conditional-empty-object-spread.ts:2` anti-slop(no-conditional-empty-object-spread): This conditional spread hides property omission behind an empty object. Build the object in separate statements and add the property only when present.",
+      "- `anti-slop/no-known-value-widening.ts:6` anti-slop(no-known-value-widening): The explicit open dictionary type on binding `handlers` discards known type evidence. Keep inference, validate with `satisfies`, or use a named owner contract.",
+      "- `anti-slop/no-module-mocking.test.ts:4` anti-slop(no-module-mocking): Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
+      "- `anti-slop/no-object-parameters.ts:1` anti-slop(no-object-parameters): Parameter `value` uses the broad `object` type. Accept a named owner type; parse external input at its boundary before calling this function.",
+      "- `anti-slop/no-reduce-accumulator-copy.ts:2` anti-slop(no-reduce-accumulator-copy): Do not copy the reducer accumulator on every iteration; growing copies can cause quadratic work. Mutate a fresh, locally owned accumulator and return it, or use an iterator pipeline/flatMap.",
+      "- `anti-slop/no-reflect-apply.ts:2` anti-slop(no-reflect-apply): Replace `Reflect.apply` with a typed function call. Model dynamic dispatch behind a named interface.",
+      "- `anti-slop/no-reflect-get.ts:2` anti-slop(no-reflect-get): Replace `Reflect.get` with typed property access. Parse dynamic input into a named domain type before reading it.",
+      "- `anti-slop/no-runtime-typeof.ts:2` anti-slop(no-runtime-typeof): A `typeof` check narrows a representation without establishing its contract. Parse input at its I/O boundary, then branch on the domain value.",
+      "- `anti-slop/no-shape-in-symbol-names.ts:1` anti-slop(no-shape-in-symbol-names): Rename symbol \"userShape\" for its domain role; \"shape\" describes structure rather than ownership.",
+      "- `anti-slop/no-unknown-parameters.ts:1` anti-slop(no-unknown-parameters): Parameter `input` leaves input unparsed. Accept a named domain type; run the expected schema or parser at the I/O boundary before calling this function.",
+      "- `anti-slop/no-unknown-returns.ts:3` anti-slop(no-unknown-returns): This function exposes `unknown` to its caller. Parse the value at its boundary and return a named domain type.",
+      "- `anti-slop/no-unknown-type-aliases.ts:2` anti-slop(no-unknown-type-aliases): Type alias `External` hides `unknown`. Keep `unknown` explicit at the parsing boundary or on an allowed `cause` field; otherwise use the parsed owner type.",
+      "- `anti-slop/no-unknown-type-aliases.ts:4` anti-slop(no-known-value-widening): The explicit unknown type on binding `value` discards known type evidence. Keep inference, validate with `satisfies`, or use a named owner contract.",
+      "- `anti-slop/no-unsafe-dictionary-type.ts:1` anti-slop(no-unsafe-dictionary-type): This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+      "- `anti-slop/no-widen-then-assert.ts:12` anti-slop(no-widen-then-assert): Binding \"stored\" discards type evidence and later recreates it with an assertion. Keep the precise type from initialization through use; parse boundary input once.",
+      "- `anti-slop/require-safety-comment-for-type-assertion.ts:4` anti-slop(require-safety-comment-for-type-assertion): This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
+      "- `go/no-any-parameters.go:5` anti-slop-go(no-any-parameters): Parameter typed `any` leaves input unparsed. Accept a named type, a generic constraint or a small interface.",
+      "- `go/no-any-returns.go:11` anti-slop-go(no-any-returns): Returning `any` exposes an unknown value to callers. Return a named type.",
+      "- `go/no-any-returns.go:15` anti-slop-go(no-any-returns): Returning `any` exposes an unknown value to callers. Return a named type.",
+      "- `go/no-any-returns.go:19` anti-slop-go(no-any-returns): Returning `any` exposes an unknown value to callers. Return a named type.",
+      "- `go/no-any-returns.go:22` anti-slop-go(no-any-returns): Returning `any` exposes an unknown value to callers. Return a named type.",
+      "- `go/no-any-returns.go:3` anti-slop-go(no-any-returns): Returning `any` exposes an unknown value to callers. Return a named type.",
+      "- `go/no-any-returns.go:7` anti-slop-go(no-any-returns): Returning `any` exposes an unknown value to callers. Return a named type.",
+      "- `go/no-unchecked-type-assertion.go:23` anti-slop-go(no-unchecked-type-assertion): A single-value type assertion panics when it is wrong. Use `v, ok := x.(T)` or a type switch.",
+      "- `go/no-unchecked-type-assertion.go:6` anti-slop-go(no-unchecked-type-assertion): A single-value type assertion panics when it is wrong. Use `v, ok := x.(T)` or a type switch.",
+      "- `go/no-unsafe-dictionary-type.go:3` anti-slop-go(no-unsafe-dictionary-type): This map's `any` value type gives callers no contract. Use a struct or a concrete value type.",
+      "- `go/require-safety-comment-for-unsafe.go:6` anti-slop-go(require-safety-comment-for-unsafe): This use of package `unsafe` has no `// SAFETY:` justification. State the invariant that makes it sound on the line above.",
+      "- `native/eslint.eqeqeq.ts:2` eslint(eqeqeq): Expected === and instead saw ==",
+      "- `native/eslint.no-eval.ts:2` eslint(no-eval): eval can be harmful.",
+      "- `native/eslint.no-fallthrough.ts:7` eslint(no-fallthrough): Expected a `break` statement before `case`.",
+      "- `native/eslint.no-self-compare.jsx:2` eslint(no-self-compare): Both sides of this comparison are exactly the same",
+      "- `native/eslint.no-throw-literal.js:2` eslint(no-throw-literal): Expected an error object to be thrown",
+      "- `native/eslint.no-unreachable.ts:3` eslint(no-unreachable): Unreachable code.",
+      "- `native/import.no-self-import.ts:1` import(no-self-import): A module importing itself is not allowed",
+      "- `native/oxc.missing-throw.ts:3` oxc(missing-throw): Missing throw",
+      "- `native/promise.no-multiple-resolved.ts:7` promise(no-multiple-resolved): Promise should not be resolved multiple times. Promise is potentially resolved on line 4.",
+      "- `native/typescript.no-explicit-any.ts:1` typescript(no-explicit-any): Unexpected `any`. Specify a different type.",
+      "- `native/typescript.no-non-null-assertion.ts:2` typescript(no-non-null-assertion): Forbidden non-null assertion.",
+      "- `native/unicorn.no-invalid-fetch-options.ts:2` unicorn(no-invalid-fetch-options): \"body\" is not allowed when method is \"GET\"",
+      "- `python/no-any-parameters.py:20` anti-slop-python(no-any-parameters): Parameter typed `Any` leaves input unparsed. Accept a named domain type; parse at the I/O boundary before calling this function.",
+      "- `python/no-any-parameters.py:8` anti-slop-python(no-any-parameters): Parameter typed `Any` leaves input unparsed. Accept a named domain type; parse at the I/O boundary before calling this function.",
+      "- `python/no-any-returns.py:4` anti-slop-python(no-any-returns): Returning `Any` exposes an unknown value to callers. Parse it at its boundary and return a named domain type.",
+      "- `python/no-object-parameters.py:1` anti-slop-python(no-object-parameters): Parameter typed `object` accepts anything and proves nothing. Accept a named type or a Protocol.",
+      "- `python/no-object-parameters.py:26` anti-slop-python(no-object-parameters): Parameter typed `object` accepts anything and proves nothing. Accept a named type or a Protocol.",
+      "- `python/no-unsafe-dictionary-type.py:4` anti-slop-python(no-unsafe-dictionary-type): This dictionary's `Any`/`object` value type gives callers no contract. Use a TypedDict, dataclass or a concrete value type.",
+      "- `python/no-unsafe-dictionary-type.py:8` anti-slop-python(no-unsafe-dictionary-type): This dictionary's `Any`/`object` value type gives callers no contract. Use a TypedDict, dataclass or a concrete value type.",
+      "- `python/require-safety-comment-for-cast.py:9` anti-slop-python(require-safety-comment-for-cast): This `cast` has no `# SAFETY:` justification. State the checked invariant on the line above.",
+      "- `rust/no-dyn-any.rs:11` anti-slop-rust(no-dyn-any): `dyn Any` in a signature leaves the value's type unknown to callers. Take and return a named type or an enum of the cases.",
+      "- `rust/no-dyn-any.rs:3` anti-slop-rust(no-dyn-any): `dyn Any` in a signature leaves the value's type unknown to callers. Take and return a named type or an enum of the cases.",
+      "- `rust/no-transmute.rs:5` anti-slop-rust(no-transmute): `transmute` fabricates a type without evidence. Convert with `from_*` constructors, `bytemuck` or a parser.",
+      "- `rust/no-unwrap.rs:19` anti-slop-rust(no-unwrap): `unwrap()` asserts without evidence and panics with no context. Propagate with `?`, handle the case, or use `expect(\"<the invariant>\")`.",
+      "- `rust/no-unwrap.rs:24` anti-slop-rust(no-unwrap): `unwrap()` asserts without evidence and panics with no context. Propagate with `?`, handle the case, or use `expect(\"<the invariant>\")`.",
+      "- `rust/no-unwrap.rs:2` anti-slop-rust(no-unwrap): `unwrap()` asserts without evidence and panics with no context. Propagate with `?`, handle the case, or use `expect(\"<the invariant>\")`.",
+      "- `rust/no-unwrap.rs:33` anti-slop-rust(no-unwrap): `unwrap()` asserts without evidence and panics with no context. Propagate with `?`, handle the case, or use `expect(\"<the invariant>\")`.",
+      "- `rust/require-safety-comment-for-unsafe.rs:2` anti-slop-rust(require-safety-comment-for-unsafe): This `unsafe` has no `// SAFETY:` justification. State the invariant that makes it sound on the line above.",
+      "<sub>85 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `anti-slop/no-array-filter-map.ts::f` | lint | new | 1 | 0 |",
+      "| `anti-slop/no-chained-type-assertions.ts::f` | lint | new | 1 | 0 |",
+      "| `anti-slop/no-conditional-empty-object-spread.ts::f` | lint | new | 1 | 0 |",
+      "| `anti-slop/no-known-value-widening.ts::f` | lint | new | 1 | 0 |",
+      "| `anti-slop/no-module-mocking.test.ts::f` | lint | new | 1 | 0 |",
+      "| `anti-slop/no-object-parameters.ts::f` | lint | new | 1 | 0 |",
+      "| `anti-slop/no-reduce-accumulator-copy.ts::f>items.reduce()` | lint | new | 1 | 0 |",
+      "| `anti-slop/no-reflect-apply.ts::f` | lint | new | 1 | 0 |",
+      "| `anti-slop/no-reflect-get.ts::f` | lint | new | 1 | 0 |",
+      "| `anti-slop/no-runtime-typeof.ts::f` | lint | new | 1 | 0 |",
+      "| `anti-slop/no-shape-in-symbol-names.ts::userShape` | lint | new | 1 | 0 |",
+      "| `anti-slop/no-unknown-parameters.ts::f` | lint | new | 1 | 0 |",
+      "| `anti-slop/no-unknown-returns.ts::f` | lint | new | 1 | 0 |",
+      "| `anti-slop/no-unknown-type-aliases.ts::f` | lint | new | 2 | 0 |",
+      "| `anti-slop/no-unsafe-dictionary-type.ts::f` | lint | new | 1 | 0 |",
+      "| `anti-slop/no-widen-then-assert.ts::f` | lint | new | 1 | 0 |",
+      "| `anti-slop/require-safety-comment-for-type-assertion.ts::f` | lint | new | 1 | 0 |",
+      "| `go/no-any-parameters.go::Handle` | lint | new | 1 | 0 |",
+      "| `go/no-any-returns.go::(top level)` | lint | new | 2 | 0 |",
+      "| `go/no-any-returns.go::Both` | lint | new | 2 | 0 |",
+      "| `go/no-any-returns.go::Grouped` | lint | new | 2 | 0 |",
+      "| `go/no-any-returns.go::Load` | lint | new | 1 | 0 |",
+      "| `go/no-any-returns.go::Named` | lint | new | 1 | 0 |",
+      "| `go/no-unchecked-type-assertion.go::Message` | lint | new | 1 | 0 |",
+      "| `go/no-unchecked-type-assertion.go::Paired` | lint | new | 1 | 0 |",
+      "| `go/no-unsafe-dictionary-type.go::Meta` | lint | new | 1 | 0 |",
+      "| `go/require-safety-comment-for-unsafe.go::Size` | lint | new | 1 | 0 |",
+      "| `native/eslint.eqeqeq.ts::f` | lint | new | 1 | 0 |",
+      "| `native/eslint.no-eval.ts::f` | lint | new | 1 | 0 |",
+      "| `native/eslint.no-fallthrough.ts::f` | lint | new | 1 | 0 |",
+      "| `native/eslint.no-self-compare.jsx::F` | lint | new | 1 | 0 |",
+      "| `native/eslint.no-throw-literal.js::f` | lint | new | 1 | 0 |",
+      "| `native/eslint.no-unreachable.ts::f` | lint | new | 1 | 0 |",
+      "| `native/import.no-self-import.ts::(top level)` | lint | new | 1 | 0 |",
+      "| `native/oxc.missing-throw.ts::f` | lint | new | 1 | 0 |",
+      "| `native/promise.no-multiple-resolved.ts::f>Promise()` | lint | new | 1 | 0 |",
+      "| `native/typescript.no-explicit-any.ts::f` | lint | new | 1 | 0 |",
+      "| `native/typescript.no-non-null-assertion.ts::f` | lint | new | 1 | 0 |",
+      "| `native/unicorn.no-invalid-fetch-options.ts::f` | lint | new | 1 | 0 |",
+      "| `python/no-any-parameters.py::check` | lint | new | 1 | 0 |",
+      "| `python/no-any-parameters.py::handle` | lint | new | 1 | 0 |",
+      "| `python/no-any-returns.py::load` | lint | new | 1 | 0 |",
+      "| `python/no-object-parameters.py::field` | lint | new | 1 | 0 |",
+      "| `python/no-object-parameters.py::save` | lint | new | 1 | 0 |",
+      "| `python/no-unsafe-dictionary-type.py::metadata` | lint | new | 1 | 0 |",
+      "| `python/no-unsafe-dictionary-type.py::trailing` | lint | new | 1 | 0 |",
+      "| `python/require-safety-comment-for-cast.py::as_user` | lint | new | 1 | 0 |",
+      "| `rust/no-dyn-any.rs::shared` | lint | new | 1 | 0 |",
+      "| `rust/no-dyn-any.rs::size` | lint | new | 1 | 0 |",
+      "| `rust/no-transmute.rs::bits` | lint | new | 1 | 0 |",
+      "| `rust/no-unwrap.rs::also_production` | lint | new | 1 | 0 |",
+      "| `rust/no-unwrap.rs::first` | lint | new | 1 | 0 |",
+      "| `rust/no-unwrap.rs::locked` | lint | new | 1 | 0 |",
+      "| `rust/no-unwrap.rs::production_only` | lint | new | 1 | 0 |",
+      "| `rust/require-safety-comment-for-unsafe.rs::read` | lint | new | 1 | 0 |",
+      "|---|---|--:|--:|--:|"
+    ],
+    "regressions": [
+      {
+        "current": 1,
+        "filePath": "anti-slop/no-array-filter-map.ts",
+        "findings": [
+          {
+            "line": 4,
+            "message": "Avoid consecutive array `filter` and `map` passes. Prefer `.values().filter(...).map(...).toArray()` where iterator helpers are supported, or a single `flatMap`/mutating reducer. Preserve callback ordering, indexes, and filtering semantics.",
+            "rule": "anti-slop(no-array-filter-map)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "anti-slop/no-chained-type-assertions.ts",
+        "findings": [
+          {
+            "line": 7,
+            "message": "This assertion chain discards type evidence. Keep the original precise type, or parse untrusted input at its boundary before narrowing it.",
+            "rule": "anti-slop(no-chained-type-assertions)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 5,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "anti-slop/no-conditional-empty-object-spread.ts",
+        "findings": [
+          {
+            "line": 2,
+            "message": "This conditional spread hides property omission behind an empty object. Build the object in separate statements and add the property only when present.",
+            "rule": "anti-slop(no-conditional-empty-object-spread)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "anti-slop/no-known-value-widening.ts",
+        "findings": [
+          {
+            "line": 6,
+            "message": "The explicit open dictionary type on binding `handlers` discards known type evidence. Keep inference, validate with `satisfies`, or use a named owner contract.",
+            "rule": "anti-slop(no-known-value-widening)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 5,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "anti-slop/no-module-mocking.test.ts",
+        "findings": [
+          {
+            "line": 4,
+            "message": "Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
+            "rule": "anti-slop(no-module-mocking)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 3,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "anti-slop/no-object-parameters.ts",
+        "findings": [
+          {
+            "line": 1,
+            "message": "Parameter `value` uses the broad `object` type. Accept a named owner type; parse external input at its boundary before calling this function.",
+            "rule": "anti-slop(no-object-parameters)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "anti-slop/no-reduce-accumulator-copy.ts",
+        "findings": [
+          {
+            "line": 2,
+            "message": "Do not copy the reducer accumulator on every iteration; growing copies can cause quadratic work. Mutate a fresh, locally owned accumulator and return it, or use an iterator pipeline/flatMap.",
+            "rule": "anti-slop(no-reduce-accumulator-copy)"
+          }
+        ],
+        "functionName": "f>items.reduce()",
+        "kind": "new",
+        "line": 2,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "anti-slop/no-reflect-apply.ts",
+        "findings": [
+          {
+            "line": 2,
+            "message": "Replace `Reflect.apply` with a typed function call. Model dynamic dispatch behind a named interface.",
+            "rule": "anti-slop(no-reflect-apply)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "anti-slop/no-reflect-get.ts",
+        "findings": [
+          {
+            "line": 2,
+            "message": "Replace `Reflect.get` with typed property access. Parse dynamic input into a named domain type before reading it.",
+            "rule": "anti-slop(no-reflect-get)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "anti-slop/no-runtime-typeof.ts",
+        "findings": [
+          {
+            "line": 2,
+            "message": "A `typeof` check narrows a representation without establishing its contract. Parse input at its I/O boundary, then branch on the domain value.",
+            "rule": "anti-slop(no-runtime-typeof)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "anti-slop/no-shape-in-symbol-names.ts",
+        "findings": [
+          {
+            "line": 1,
+            "message": "Rename symbol \"userShape\" for its domain role; \"shape\" describes structure rather than ownership.",
+            "rule": "anti-slop(no-shape-in-symbol-names)"
+          }
+        ],
+        "functionName": "userShape",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "anti-slop/no-unknown-parameters.ts",
+        "findings": [
+          {
+            "line": 1,
+            "message": "Parameter `input` leaves input unparsed. Accept a named domain type; run the expected schema or parser at the I/O boundary before calling this function.",
+            "rule": "anti-slop(no-unknown-parameters)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "anti-slop/no-unknown-returns.ts",
+        "findings": [
+          {
+            "line": 3,
+            "message": "This function exposes `unknown` to its caller. Parse the value at its boundary and return a named domain type.",
+            "rule": "anti-slop(no-unknown-returns)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 3,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "anti-slop/no-unsafe-dictionary-type.ts",
+        "findings": [
+          {
+            "line": 1,
+            "message": "This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+            "rule": "anti-slop(no-unsafe-dictionary-type)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "anti-slop/no-widen-then-assert.ts",
+        "findings": [
+          {
+            "line": 12,
+            "message": "Binding \"stored\" discards type evidence and later recreates it with an assertion. Keep the precise type from initialization through use; parse boundary input once.",
+            "rule": "anti-slop(no-widen-then-assert)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 7,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "anti-slop/require-safety-comment-for-type-assertion.ts",
+        "findings": [
+          {
+            "line": 4,
+            "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
+            "rule": "anti-slop(require-safety-comment-for-type-assertion)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 3,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "go/no-any-parameters.go",
+        "findings": [
+          {
+            "line": 5,
+            "message": "Parameter typed `any` leaves input unparsed. Accept a named type, a generic constraint or a small interface.",
+            "rule": "anti-slop-go(no-any-parameters)"
+          }
+        ],
+        "functionName": "Handle",
+        "kind": "new",
+        "line": 5,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "go/no-any-returns.go",
+        "findings": [
+          {
+            "line": 3,
+            "message": "Returning `any` exposes an unknown value to callers. Return a named type.",
+            "rule": "anti-slop-go(no-any-returns)"
+          }
+        ],
+        "functionName": "Load",
+        "kind": "new",
+        "line": 3,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "go/no-any-returns.go",
+        "findings": [
+          {
+            "line": 7,
+            "message": "Returning `any` exposes an unknown value to callers. Return a named type.",
+            "rule": "anti-slop-go(no-any-returns)"
+          }
+        ],
+        "functionName": "Named",
+        "kind": "new",
+        "line": 7,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "go/no-unchecked-type-assertion.go",
+        "findings": [
+          {
+            "line": 23,
+            "message": "A single-value type assertion panics when it is wrong. Use `v, ok := x.(T)` or a type switch.",
+            "rule": "anti-slop-go(no-unchecked-type-assertion)"
+          }
+        ],
+        "functionName": "Paired",
+        "kind": "new",
+        "line": 22,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "go/no-unchecked-type-assertion.go",
+        "findings": [
+          {
+            "line": 6,
+            "message": "A single-value type assertion panics when it is wrong. Use `v, ok := x.(T)` or a type switch.",
+            "rule": "anti-slop-go(no-unchecked-type-assertion)"
+          }
+        ],
+        "functionName": "Message",
+        "kind": "new",
+        "line": 5,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "go/no-unsafe-dictionary-type.go",
+        "findings": [
+          {
+            "line": 3,
+            "message": "This map's `any` value type gives callers no contract. Use a struct or a concrete value type.",
+            "rule": "anti-slop-go(no-unsafe-dictionary-type)"
+          }
+        ],
+        "functionName": "Meta",
+        "kind": "new",
+        "line": 3,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "go/require-safety-comment-for-unsafe.go",
+        "findings": [
+          {
+            "line": 6,
+            "message": "This use of package `unsafe` has no `// SAFETY:` justification. State the invariant that makes it sound on the line above.",
+            "rule": "anti-slop-go(require-safety-comment-for-unsafe)"
+          }
+        ],
+        "functionName": "Size",
+        "kind": "new",
+        "line": 5,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "native/eslint.eqeqeq.ts",
+        "findings": [
+          {
+            "line": 2,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "native/eslint.no-eval.ts",
+        "findings": [
+          {
+            "line": 2,
+            "message": "eval can be harmful.",
+            "rule": "eslint(no-eval)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "native/eslint.no-fallthrough.ts",
+        "findings": [
+          {
+            "line": 7,
+            "message": "Expected a `break` statement before `case`.",
+            "rule": "eslint(no-fallthrough)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "native/eslint.no-self-compare.jsx",
+        "findings": [
+          {
+            "line": 2,
+            "message": "Both sides of this comparison are exactly the same",
+            "rule": "eslint(no-self-compare)"
+          }
+        ],
+        "functionName": "F",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "native/eslint.no-throw-literal.js",
+        "findings": [
+          {
+            "line": 2,
+            "message": "Expected an error object to be thrown",
+            "rule": "eslint(no-throw-literal)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "native/eslint.no-unreachable.ts",
+        "findings": [
+          {
+            "line": 3,
+            "message": "Unreachable code.",
+            "rule": "eslint(no-unreachable)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "native/import.no-self-import.ts",
+        "findings": [
+          {
+            "line": 1,
+            "message": "A module importing itself is not allowed",
+            "rule": "import(no-self-import)"
+          }
+        ],
+        "functionName": "(top level)",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "native/oxc.missing-throw.ts",
+        "findings": [
+          {
+            "line": 3,
+            "message": "Missing throw",
+            "rule": "oxc(missing-throw)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "native/promise.no-multiple-resolved.ts",
+        "findings": [
+          {
+            "line": 7,
+            "message": "Promise should not be resolved multiple times. Promise is potentially resolved on line 4.",
+            "rule": "promise(no-multiple-resolved)"
+          }
+        ],
+        "functionName": "f>Promise()",
+        "kind": "new",
+        "line": 2,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "native/typescript.no-explicit-any.ts",
+        "findings": [
+          {
+            "line": 1,
+            "message": "Unexpected `any`. Specify a different type.",
+            "rule": "typescript(no-explicit-any)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "native/typescript.no-non-null-assertion.ts",
+        "findings": [
+          {
+            "line": 2,
+            "message": "Forbidden non-null assertion.",
+            "rule": "typescript(no-non-null-assertion)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "native/unicorn.no-invalid-fetch-options.ts",
+        "findings": [
+          {
+            "line": 2,
+            "message": "\"body\" is not allowed when method is \"GET\"",
+            "rule": "unicorn(no-invalid-fetch-options)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "python/no-any-parameters.py",
+        "findings": [
+          {
+            "line": 20,
+            "message": "Parameter typed `Any` leaves input unparsed. Accept a named domain type; parse at the I/O boundary before calling this function.",
+            "rule": "anti-slop-python(no-any-parameters)"
+          }
+        ],
+        "functionName": "check",
+        "kind": "new",
+        "line": 20,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "python/no-any-parameters.py",
+        "findings": [
+          {
+            "line": 8,
+            "message": "Parameter typed `Any` leaves input unparsed. Accept a named domain type; parse at the I/O boundary before calling this function.",
+            "rule": "anti-slop-python(no-any-parameters)"
+          }
+        ],
+        "functionName": "handle",
+        "kind": "new",
+        "line": 8,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "python/no-any-returns.py",
+        "findings": [
+          {
+            "line": 4,
+            "message": "Returning `Any` exposes an unknown value to callers. Parse it at its boundary and return a named domain type.",
+            "rule": "anti-slop-python(no-any-returns)"
+          }
+        ],
+        "functionName": "load",
+        "kind": "new",
+        "line": 4,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "python/no-object-parameters.py",
+        "findings": [
+          {
+            "line": 1,
+            "message": "Parameter typed `object` accepts anything and proves nothing. Accept a named type or a Protocol.",
+            "rule": "anti-slop-python(no-object-parameters)"
+          }
+        ],
+        "functionName": "save",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "python/no-object-parameters.py",
+        "findings": [
+          {
+            "line": 26,
+            "message": "Parameter typed `object` accepts anything and proves nothing. Accept a named type or a Protocol.",
+            "rule": "anti-slop-python(no-object-parameters)"
+          }
+        ],
+        "functionName": "field",
+        "kind": "new",
+        "line": 26,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "python/no-unsafe-dictionary-type.py",
+        "findings": [
+          {
+            "line": 4,
+            "message": "This dictionary's `Any`/`object` value type gives callers no contract. Use a TypedDict, dataclass or a concrete value type.",
+            "rule": "anti-slop-python(no-unsafe-dictionary-type)"
+          }
+        ],
+        "functionName": "metadata",
+        "kind": "new",
+        "line": 4,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "python/no-unsafe-dictionary-type.py",
+        "findings": [
+          {
+            "line": 8,
+            "message": "This dictionary's `Any`/`object` value type gives callers no contract. Use a TypedDict, dataclass or a concrete value type.",
+            "rule": "anti-slop-python(no-unsafe-dictionary-type)"
+          }
+        ],
+        "functionName": "trailing",
+        "kind": "new",
+        "line": 8,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "python/require-safety-comment-for-cast.py",
+        "findings": [
+          {
+            "line": 9,
+            "message": "This `cast` has no `# SAFETY:` justification. State the checked invariant on the line above.",
+            "rule": "anti-slop-python(require-safety-comment-for-cast)"
+          }
+        ],
+        "functionName": "as_user",
+        "kind": "new",
+        "line": 8,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "rust/no-dyn-any.rs",
+        "findings": [
+          {
+            "line": 11,
+            "message": "`dyn Any` in a signature leaves the value's type unknown to callers. Take and return a named type or an enum of the cases.",
+            "rule": "anti-slop-rust(no-dyn-any)"
+          }
+        ],
+        "functionName": "shared",
+        "kind": "new",
+        "line": 11,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "rust/no-dyn-any.rs",
+        "findings": [
+          {
+            "line": 3,
+            "message": "`dyn Any` in a signature leaves the value's type unknown to callers. Take and return a named type or an enum of the cases.",
+            "rule": "anti-slop-rust(no-dyn-any)"
+          }
+        ],
+        "functionName": "size",
+        "kind": "new",
+        "line": 3,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "rust/no-transmute.rs",
+        "findings": [
+          {
+            "line": 5,
+            "message": "`transmute` fabricates a type without evidence. Convert with `from_*` constructors, `bytemuck` or a parser.",
+            "rule": "anti-slop-rust(no-transmute)"
+          }
+        ],
+        "functionName": "bits",
+        "kind": "new",
+        "line": 3,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "rust/no-unwrap.rs",
+        "findings": [
+          {
+            "line": 19,
+            "message": "`unwrap()` asserts without evidence and panics with no context. Propagate with `?`, handle the case, or use `expect(\"<the invariant>\")`.",
+            "rule": "anti-slop-rust(no-unwrap)"
+          }
+        ],
+        "functionName": "production_only",
+        "kind": "new",
+        "line": 18,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "rust/no-unwrap.rs",
+        "findings": [
+          {
+            "line": 2,
+            "message": "`unwrap()` asserts without evidence and panics with no context. Propagate with `?`, handle the case, or use `expect(\"<the invariant>\")`.",
+            "rule": "anti-slop-rust(no-unwrap)"
+          }
+        ],
+        "functionName": "first",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "rust/no-unwrap.rs",
+        "findings": [
+          {
+            "line": 24,
+            "message": "`unwrap()` asserts without evidence and panics with no context. Propagate with `?`, handle the case, or use `expect(\"<the invariant>\")`.",
+            "rule": "anti-slop-rust(no-unwrap)"
+          }
+        ],
+        "functionName": "also_production",
+        "kind": "new",
+        "line": 23,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "rust/no-unwrap.rs",
+        "findings": [
+          {
+            "line": 33,
+            "message": "`unwrap()` asserts without evidence and panics with no context. Propagate with `?`, handle the case, or use `expect(\"<the invariant>\")`.",
+            "rule": "anti-slop-rust(no-unwrap)"
+          }
+        ],
+        "functionName": "locked",
+        "kind": "new",
+        "line": 32,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "rust/require-safety-comment-for-unsafe.rs",
+        "findings": [
+          {
+            "line": 2,
+            "message": "This `unsafe` has no `// SAFETY:` justification. State the invariant that makes it sound on the line above.",
+            "rule": "anti-slop-rust(require-safety-comment-for-unsafe)"
+          }
+        ],
+        "functionName": "read",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 2,
+        "filePath": "anti-slop/no-unknown-type-aliases.ts",
+        "findings": [
+          {
+            "line": 2,
+            "message": "Type alias `External` hides `unknown`. Keep `unknown` explicit at the parsing boundary or on an allowed `cause` field; otherwise use the parsed owner type.",
+            "rule": "anti-slop(no-unknown-type-aliases)"
+          },
+          {
+            "line": 4,
+            "message": "The explicit unknown type on binding `value` discards known type evidence. Keep inference, validate with `satisfies`, or use a named owner contract.",
+            "rule": "anti-slop(no-known-value-widening)"
+          }
+        ],
+        "functionName": "f",
+        "kind": "new",
+        "line": 1,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 2,
+        "filePath": "go/no-any-returns.go",
+        "findings": [
+          {
+            "line": 11,
+            "message": "Returning `any` exposes an unknown value to callers. Return a named type.",
+            "rule": "anti-slop-go(no-any-returns)"
+          },
+          {
+            "line": 11,
+            "message": "Returning `any` exposes an unknown value to callers. Return a named type.",
+            "rule": "anti-slop-go(no-any-returns)"
+          }
+        ],
+        "functionName": "Both",
+        "kind": "new",
+        "line": 11,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 2,
+        "filePath": "go/no-any-returns.go",
+        "findings": [
+          {
+            "line": 15,
+            "message": "Returning `any` exposes an unknown value to callers. Return a named type.",
+            "rule": "anti-slop-go(no-any-returns)"
+          },
+          {
+            "line": 15,
+            "message": "Returning `any` exposes an unknown value to callers. Return a named type.",
+            "rule": "anti-slop-go(no-any-returns)"
+          }
+        ],
+        "functionName": "Grouped",
+        "kind": "new",
+        "line": 15,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 2,
+        "filePath": "go/no-any-returns.go",
+        "findings": [
+          {
+            "line": 19,
+            "message": "Returning `any` exposes an unknown value to callers. Return a named type.",
+            "rule": "anti-slop-go(no-any-returns)"
+          },
+          {
+            "line": 22,
+            "message": "Returning `any` exposes an unknown value to callers. Return a named type.",
+            "rule": "anti-slop-go(no-any-returns)"
+          }
+        ],
+        "functionName": "(top level)",
+        "kind": "new",
+        "line": 22,
+        "metric": "lint",
+        "threshold": 0
+      }
+    ],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "fail"
+  },
+  "text": [
+    "      line 1 anti-slop(no-object-parameters): Parameter `value` uses the broad `object` type. Accept a named owner type; parse external input at its boundary before calling this function.",
+    "      line 1 anti-slop(no-shape-in-symbol-names): Rename symbol \"userShape\" for its domain role; \"shape\" describes structure rather than ownership.",
+    "      line 1 anti-slop(no-unknown-parameters): Parameter `input` leaves input unparsed. Accept a named domain type; run the expected schema or parser at the I/O boundary before calling this function.",
+    "      line 1 anti-slop(no-unsafe-dictionary-type): This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+    "      line 1 anti-slop-python(no-object-parameters): Parameter typed `object` accepts anything and proves nothing. Accept a named type or a Protocol.",
+    "      line 1 import(no-self-import): A module importing itself is not allowed",
+    "      line 1 typescript(no-explicit-any): Unexpected `any`. Specify a different type.",
+    "      line 11 anti-slop-go(no-any-returns): Returning `any` exposes an unknown value to callers. Return a named type.",
+    "      line 11 anti-slop-go(no-any-returns): Returning `any` exposes an unknown value to callers. Return a named type.",
+    "      line 11 anti-slop-rust(no-dyn-any): `dyn Any` in a signature leaves the value's type unknown to callers. Take and return a named type or an enum of the cases.",
+    "      line 12 anti-slop(no-widen-then-assert): Binding \"stored\" discards type evidence and later recreates it with an assertion. Keep the precise type from initialization through use; parse boundary input once.",
+    "      line 15 anti-slop-go(no-any-returns): Returning `any` exposes an unknown value to callers. Return a named type.",
+    "      line 15 anti-slop-go(no-any-returns): Returning `any` exposes an unknown value to callers. Return a named type.",
+    "      line 19 anti-slop-go(no-any-returns): Returning `any` exposes an unknown value to callers. Return a named type.",
+    "      line 19 anti-slop-rust(no-unwrap): `unwrap()` asserts without evidence and panics with no context. Propagate with `?`, handle the case, or use `expect(\"<the invariant>\")`.",
+    "      line 2 anti-slop(no-conditional-empty-object-spread): This conditional spread hides property omission behind an empty object. Build the object in separate statements and add the property only when present.",
+    "      line 2 anti-slop(no-reduce-accumulator-copy): Do not copy the reducer accumulator on every iteration; growing copies can cause quadratic work. Mutate a fresh, locally owned accumulator and return it, or use an iterator pipeline/flatMap.",
+    "      line 2 anti-slop(no-reflect-apply): Replace `Reflect.apply` with a typed function call. Model dynamic dispatch behind a named interface.",
+    "      line 2 anti-slop(no-reflect-get): Replace `Reflect.get` with typed property access. Parse dynamic input into a named domain type before reading it.",
+    "      line 2 anti-slop(no-runtime-typeof): A `typeof` check narrows a representation without establishing its contract. Parse input at its I/O boundary, then branch on the domain value.",
+    "      line 2 anti-slop(no-unknown-type-aliases): Type alias `External` hides `unknown`. Keep `unknown` explicit at the parsing boundary or on an allowed `cause` field; otherwise use the parsed owner type.",
+    "      line 2 anti-slop-rust(no-unwrap): `unwrap()` asserts without evidence and panics with no context. Propagate with `?`, handle the case, or use `expect(\"<the invariant>\")`.",
+    "      line 2 anti-slop-rust(require-safety-comment-for-unsafe): This `unsafe` has no `// SAFETY:` justification. State the invariant that makes it sound on the line above.",
+    "      line 2 eslint(eqeqeq): Expected === and instead saw ==",
+    "      line 2 eslint(no-eval): eval can be harmful.",
+    "      line 2 eslint(no-self-compare): Both sides of this comparison are exactly the same",
+    "      line 2 eslint(no-throw-literal): Expected an error object to be thrown",
+    "      line 2 typescript(no-non-null-assertion): Forbidden non-null assertion.",
+    "      line 2 unicorn(no-invalid-fetch-options): \"body\" is not allowed when method is \"GET\"",
+    "      line 20 anti-slop-python(no-any-parameters): Parameter typed `Any` leaves input unparsed. Accept a named domain type; parse at the I/O boundary before calling this function.",
+    "      line 22 anti-slop-go(no-any-returns): Returning `any` exposes an unknown value to callers. Return a named type.",
+    "      line 23 anti-slop-go(no-unchecked-type-assertion): A single-value type assertion panics when it is wrong. Use `v, ok := x.(T)` or a type switch.",
+    "      line 24 anti-slop-rust(no-unwrap): `unwrap()` asserts without evidence and panics with no context. Propagate with `?`, handle the case, or use `expect(\"<the invariant>\")`.",
+    "      line 26 anti-slop-python(no-object-parameters): Parameter typed `object` accepts anything and proves nothing. Accept a named type or a Protocol.",
+    "      line 3 anti-slop(no-unknown-returns): This function exposes `unknown` to its caller. Parse the value at its boundary and return a named domain type.",
+    "      line 3 anti-slop-go(no-any-returns): Returning `any` exposes an unknown value to callers. Return a named type.",
+    "      line 3 anti-slop-go(no-unsafe-dictionary-type): This map's `any` value type gives callers no contract. Use a struct or a concrete value type.",
+    "      line 3 anti-slop-rust(no-dyn-any): `dyn Any` in a signature leaves the value's type unknown to callers. Take and return a named type or an enum of the cases.",
+    "      line 3 eslint(no-unreachable): Unreachable code.",
+    "      line 3 oxc(missing-throw): Missing throw",
+    "      line 33 anti-slop-rust(no-unwrap): `unwrap()` asserts without evidence and panics with no context. Propagate with `?`, handle the case, or use `expect(\"<the invariant>\")`.",
+    "      line 4 anti-slop(no-array-filter-map): Avoid consecutive array `filter` and `map` passes. Prefer `.values().filter(...).map(...).toArray()` where iterator helpers are supported, or a single `flatMap`/mutating reducer. Preserve callback ordering, indexes, and filtering semantics.",
+    "      line 4 anti-slop(no-known-value-widening): The explicit unknown type on binding `value` discards known type evidence. Keep inference, validate with `satisfies`, or use a named owner contract.",
+    "      line 4 anti-slop(no-module-mocking): Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
+    "      line 4 anti-slop(require-safety-comment-for-type-assertion): This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
+    "      line 4 anti-slop-python(no-any-returns): Returning `Any` exposes an unknown value to callers. Parse it at its boundary and return a named domain type.",
+    "      line 4 anti-slop-python(no-unsafe-dictionary-type): This dictionary's `Any`/`object` value type gives callers no contract. Use a TypedDict, dataclass or a concrete value type.",
+    "      line 5 anti-slop-go(no-any-parameters): Parameter typed `any` leaves input unparsed. Accept a named type, a generic constraint or a small interface.",
+    "      line 5 anti-slop-rust(no-transmute): `transmute` fabricates a type without evidence. Convert with `from_*` constructors, `bytemuck` or a parser.",
+    "      line 6 anti-slop(no-known-value-widening): The explicit open dictionary type on binding `handlers` discards known type evidence. Keep inference, validate with `satisfies`, or use a named owner contract.",
+    "      line 6 anti-slop-go(no-unchecked-type-assertion): A single-value type assertion panics when it is wrong. Use `v, ok := x.(T)` or a type switch.",
+    "      line 6 anti-slop-go(require-safety-comment-for-unsafe): This use of package `unsafe` has no `// SAFETY:` justification. State the invariant that makes it sound on the line above.",
+    "      line 7 anti-slop(no-chained-type-assertions): This assertion chain discards type evidence. Keep the original precise type, or parse untrusted input at its boundary before narrowing it.",
+    "      line 7 anti-slop-go(no-any-returns): Returning `any` exposes an unknown value to callers. Return a named type.",
+    "      line 7 eslint(no-fallthrough): Expected a `break` statement before `case`.",
+    "      line 7 promise(no-multiple-resolved): Promise should not be resolved multiple times. Promise is potentially resolved on line 4.",
+    "      line 8 anti-slop-python(no-any-parameters): Parameter typed `Any` leaves input unparsed. Accept a named domain type; parse at the I/O boundary before calling this function.",
+    "      line 8 anti-slop-python(no-unsafe-dictionary-type): This dictionary's `Any`/`object` value type gives callers no contract. Use a TypedDict, dataclass or a concrete value type.",
+    "      line 9 anti-slop-python(require-safety-comment-for-cast): This `cast` has no `# SAFETY:` justification. State the checked invariant on the line above.",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 2 (maximum for new code: 0)",
+    "    lint: 2 (maximum for new code: 0)",
+    "    lint: 2 (maximum for new code: 0)",
+    "    lint: 2 (maximum for new code: 0)",
+    "  (top level) (new function)",
+    "  (top level) (new function)",
+    "  Both (new function)",
+    "  F (new function)",
+    "  Grouped (new function)",
+    "  Handle (new function)",
+    "  Load (new function)",
+    "  Message (new function)",
+    "  Meta (new function)",
+    "  Named (new function)",
+    "  Paired (new function)",
+    "  Size (new function)",
+    "  also_production (new function)",
+    "  as_user (new function)",
+    "  bits (new function)",
+    "  check (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f (new function)",
+    "  f>Promise() (new function)",
+    "  f>items.reduce() (new function)",
+    "  field (new function)",
+    "  first (new function)",
+    "  handle (new function)",
+    "  load (new function)",
+    "  locked (new function)",
+    "  metadata (new function)",
+    "  production_only (new function)",
+    "  read (new function)",
+    "  save (new function)",
+    "  shared (new function)",
+    "  size (new function)",
+    "  trailing (new function)",
+    "  userShape (new function)",
+    "Lint regressions detected:",
+    "Quality gate failed.",
+    "anti-slop/no-array-filter-map.ts",
+    "anti-slop/no-chained-type-assertions.ts",
+    "anti-slop/no-conditional-empty-object-spread.ts",
+    "anti-slop/no-known-value-widening.ts",
+    "anti-slop/no-module-mocking.test.ts",
+    "anti-slop/no-object-parameters.ts",
+    "anti-slop/no-reduce-accumulator-copy.ts",
+    "anti-slop/no-reflect-apply.ts",
+    "anti-slop/no-reflect-get.ts",
+    "anti-slop/no-runtime-typeof.ts",
+    "anti-slop/no-shape-in-symbol-names.ts",
+    "anti-slop/no-unknown-parameters.ts",
+    "anti-slop/no-unknown-returns.ts",
+    "anti-slop/no-unknown-type-aliases.ts",
+    "anti-slop/no-unsafe-dictionary-type.ts",
+    "anti-slop/no-widen-then-assert.ts",
+    "anti-slop/require-safety-comment-for-type-assertion.ts",
+    "go/no-any-parameters.go",
+    "go/no-any-returns.go",
+    "go/no-unchecked-type-assertion.go",
+    "go/no-unsafe-dictionary-type.go",
+    "go/require-safety-comment-for-unsafe.go",
+    "native/eslint.eqeqeq.ts",
+    "native/eslint.no-eval.ts",
+    "native/eslint.no-fallthrough.ts",
+    "native/eslint.no-self-compare.jsx",
+    "native/eslint.no-throw-literal.js",
+    "native/eslint.no-unreachable.ts",
+    "native/import.no-self-import.ts",
+    "native/oxc.missing-throw.ts",
+    "native/promise.no-multiple-resolved.ts",
+    "native/typescript.no-explicit-any.ts",
+    "native/typescript.no-non-null-assertion.ts",
+    "native/unicorn.no-invalid-fetch-options.ts",
+    "python/no-any-parameters.py",
+    "python/no-any-returns.py",
+    "python/no-object-parameters.py",
+    "python/no-unsafe-dictionary-type.py",
+    "python/require-safety-comment-for-cast.py",
+    "rust/no-dyn-any.rs",
+    "rust/no-transmute.rs",
+    "rust/no-unwrap.rs",
+    "rust/require-safety-comment-for-unsafe.rs"
+  ],
+  "measureBase": {
+    "functions": [],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-array-filter-map.ts",
+        "functionName": "f",
+        "line": 1,
+        "lint": [
+          {
+            "line": 4,
+            "message": "Avoid consecutive array `filter` and `map` passes. Prefer `.values().filter(...).map(...).toArray()` where iterator helpers are supported, or a single `flatMap`/mutating reducer. Preserve callback ordering, indexes, and filtering semantics.",
+            "rule": "anti-slop(no-array-filter-map)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-array-filter-map.ts",
+        "functionName": "f>xs.filter().map()",
+        "line": 4,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-array-filter-map.ts",
+        "functionName": "f>xs.filter()",
+        "line": 4,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-chained-type-assertions.ts",
+        "functionName": "f",
+        "line": 5,
+        "lint": [
+          {
+            "line": 7,
+            "message": "This assertion chain discards type evidence. Keep the original precise type, or parse untrusted input at its boundary before narrowing it.",
+            "rule": "anti-slop(no-chained-type-assertions)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-known-value-widening.ts",
+        "functionName": "f",
+        "line": 5,
+        "lint": [
+          {
+            "line": 6,
+            "message": "The explicit open dictionary type on binding `handlers` discards known type evidence. Keep inference, validate with `satisfies`, or use a named owner contract.",
+            "rule": "anti-slop(no-known-value-widening)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-module-mocking.test.ts",
+        "functionName": "f",
+        "line": 3,
+        "lint": [
+          {
+            "line": 4,
+            "message": "Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.",
+            "rule": "anti-slop(no-module-mocking)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-object-parameters.ts",
+        "functionName": "f",
+        "line": 1,
+        "lint": [
+          {
+            "line": 1,
+            "message": "Parameter `value` uses the broad `object` type. Accept a named owner type; parse external input at its boundary before calling this function.",
+            "rule": "anti-slop(no-object-parameters)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-reduce-accumulator-copy.ts",
+        "functionName": "f",
+        "line": 1,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-reduce-accumulator-copy.ts",
+        "functionName": "f>items.reduce()",
+        "line": 2,
+        "lint": [
+          {
+            "line": 2,
+            "message": "Do not copy the reducer accumulator on every iteration; growing copies can cause quadratic work. Mutate a fresh, locally owned accumulator and return it, or use an iterator pipeline/flatMap.",
+            "rule": "anti-slop(no-reduce-accumulator-copy)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-reflect-apply.ts",
+        "functionName": "f",
+        "line": 1,
+        "lint": [
+          {
+            "line": 2,
+            "message": "Replace `Reflect.apply` with a typed function call. Model dynamic dispatch behind a named interface.",
+            "rule": "anti-slop(no-reflect-apply)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-reflect-get.ts",
+        "functionName": "f",
+        "line": 1,
+        "lint": [
+          {
+            "line": 2,
+            "message": "Replace `Reflect.get` with typed property access. Parse dynamic input into a named domain type before reading it.",
+            "rule": "anti-slop(no-reflect-get)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-shape-in-symbol-names.ts",
+        "functionName": "userShape",
+        "line": 1,
+        "lint": [
+          {
+            "line": 1,
+            "message": "Rename symbol \"userShape\" for its domain role; \"shape\" describes structure rather than ownership.",
+            "rule": "anti-slop(no-shape-in-symbol-names)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-unknown-parameters.ts",
+        "functionName": "f",
+        "line": 1,
+        "lint": [
+          {
+            "line": 1,
+            "message": "Parameter `input` leaves input unparsed. Accept a named domain type; run the expected schema or parser at the I/O boundary before calling this function.",
+            "rule": "anti-slop(no-unknown-parameters)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-unknown-parameters.ts",
+        "functionName": "load",
+        "line": 5,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-unknown-parameters.ts",
+        "functionName": "load>p.catch().then()",
+        "line": 6,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-unknown-parameters.ts",
+        "functionName": "load>p.catch()",
+        "line": 6,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-unknown-returns.ts",
+        "functionName": "f",
+        "line": 3,
+        "lint": [
+          {
+            "line": 3,
+            "message": "This function exposes `unknown` to its caller. Parse the value at its boundary and return a named domain type.",
+            "rule": "anti-slop(no-unknown-returns)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-unknown-type-aliases.ts",
+        "functionName": "f",
+        "line": 1,
+        "lint": [
+          {
+            "line": 2,
+            "message": "Type alias `External` hides `unknown`. Keep `unknown` explicit at the parsing boundary or on an allowed `cause` field; otherwise use the parsed owner type.",
+            "rule": "anti-slop(no-unknown-type-aliases)"
+          },
+          {
+            "line": 4,
+            "message": "The explicit unknown type on binding `value` discards known type evidence. Keep inference, validate with `satisfies`, or use a named owner contract.",
+            "rule": "anti-slop(no-known-value-widening)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-unsafe-dictionary-type.ts",
+        "functionName": "f",
+        "line": 1,
+        "lint": [
+          {
+            "line": 1,
+            "message": "This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+            "rule": "anti-slop(no-unsafe-dictionary-type)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/no-widen-then-assert.ts",
+        "functionName": "f",
+        "line": 7,
+        "lint": [
+          {
+            "line": 12,
+            "message": "Binding \"stored\" discards type evidence and later recreates it with an assertion. Keep the precise type from initialization through use; parse boundary input once.",
+            "rule": "anti-slop(no-widen-then-assert)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "anti-slop/require-safety-comment-for-type-assertion.ts",
+        "functionName": "f",
+        "line": 3,
+        "lint": [
+          {
+            "line": 4,
+            "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
+            "rule": "anti-slop(require-safety-comment-for-type-assertion)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "go/no-any-parameters.go",
+        "functionName": "Handle",
+        "line": 5,
+        "lint": [
+          {
+            "line": 5,
+            "message": "Parameter typed `any` leaves input unparsed. Accept a named type, a generic constraint or a small interface.",
+            "rule": "anti-slop-go(no-any-parameters)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "go/no-any-parameters.go",
+        "functionName": "Logf",
+        "line": 9,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "go/no-any-returns.go",
+        "functionName": "Both",
+        "line": 11,
+        "lint": [
+          {
+            "line": 11,
+            "message": "Returning `any` exposes an unknown value to callers. Return a named type.",
+            "rule": "anti-slop-go(no-any-returns)"
+          },
+          {
+            "line": 11,
+            "message": "Returning `any` exposes an unknown value to callers. Return a named type.",
+            "rule": "anti-slop-go(no-any-returns)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "go/no-any-returns.go",
+        "functionName": "Grouped",
+        "line": 15,
+        "lint": [
+          {
+            "line": 15,
+            "message": "Returning `any` exposes an unknown value to callers. Return a named type.",
+            "rule": "anti-slop-go(no-any-returns)"
+          },
+          {
+            "line": 15,
+            "message": "Returning `any` exposes an unknown value to callers. Return a named type.",
+            "rule": "anti-slop-go(no-any-returns)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "go/no-any-returns.go",
+        "functionName": "Load",
+        "line": 3,
+        "lint": [
+          {
+            "line": 3,
+            "message": "Returning `any` exposes an unknown value to callers. Return a named type.",
+            "rule": "anti-slop-go(no-any-returns)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "go/no-any-returns.go",
+        "functionName": "Named",
+        "line": 7,
+        "lint": [
+          {
+            "line": 7,
+            "message": "Returning `any` exposes an unknown value to callers. Return a named type.",
+            "rule": "anti-slop-go(no-any-returns)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "go/no-unchecked-type-assertion.go",
+        "functionName": "Paired",
+        "line": 22,
+        "lint": [
+          {
+            "line": 23,
+            "message": "A single-value type assertion panics when it is wrong. Use `v, ok := x.(T)` or a type switch.",
+            "rule": "anti-slop-go(no-unchecked-type-assertion)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "go/no-unchecked-type-assertion.go",
+        "functionName": "Parenthesized",
+        "line": 17,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "go/no-unsafe-dictionary-type.go",
+        "functionName": "Meta",
+        "line": 3,
+        "lint": [
+          {
+            "line": 3,
+            "message": "This map's `any` value type gives callers no contract. Use a struct or a concrete value type.",
+            "rule": "anti-slop-go(no-unsafe-dictionary-type)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "go/require-safety-comment-for-unsafe.go",
+        "functionName": "Size",
+        "line": 5,
+        "lint": [
+          {
+            "line": 6,
+            "message": "This use of package `unsafe` has no `// SAFETY:` justification. State the invariant that makes it sound on the line above.",
+            "rule": "anti-slop-go(require-safety-comment-for-unsafe)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "go/require-safety-comment-for-unsafe.go",
+        "functionName": "SizeChecked",
+        "line": 9,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "native/eslint.eqeqeq.ts",
+        "functionName": "f",
+        "line": 1,
+        "lint": [
+          {
+            "line": 2,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "native/eslint.no-eval.ts",
+        "functionName": "f",
+        "line": 1,
+        "lint": [
+          {
+            "line": 2,
+            "message": "eval can be harmful.",
+            "rule": "eslint(no-eval)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "native/eslint.no-throw-literal.js",
+        "functionName": "f",
+        "line": 1,
+        "lint": [
+          {
+            "line": 2,
+            "message": "Expected an error object to be thrown",
+            "rule": "eslint(no-throw-literal)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "native/eslint.no-unreachable.ts",
+        "functionName": "f",
+        "line": 1,
+        "lint": [
+          {
+            "line": 3,
+            "message": "Unreachable code.",
+            "rule": "eslint(no-unreachable)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "native/import.no-self-import.ts",
+        "functionName": "f",
+        "line": 5,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "native/promise.no-multiple-resolved.ts",
+        "functionName": "f",
+        "line": 1,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "native/typescript.no-explicit-any.ts",
+        "functionName": "f",
+        "line": 1,
+        "lint": [
+          {
+            "line": 1,
+            "message": "Unexpected `any`. Specify a different type.",
+            "rule": "typescript(no-explicit-any)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "native/typescript.no-non-null-assertion.ts",
+        "functionName": "f",
+        "line": 1,
+        "lint": [
+          {
+            "line": 2,
+            "message": "Forbidden non-null assertion.",
+            "rule": "typescript(no-non-null-assertion)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "native/unicorn.no-invalid-fetch-options.ts",
+        "functionName": "f",
+        "line": 1,
+        "lint": [
+          {
+            "line": 2,
+            "message": "\"body\" is not allowed when method is \"GET\"",
+            "rule": "unicorn(no-invalid-fetch-options)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "python/no-any-parameters.py",
+        "functionName": "check",
+        "line": 20,
+        "lint": [
+          {
+            "line": 20,
+            "message": "Parameter typed `Any` leaves input unparsed. Accept a named domain type; parse at the I/O boundary before calling this function.",
+            "rule": "anti-slop-python(no-any-parameters)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "python/no-any-parameters.py",
+        "functionName": "handle",
+        "line": 8,
+        "lint": [
+          {
+            "line": 8,
+            "message": "Parameter typed `Any` leaves input unparsed. Accept a named domain type; parse at the I/O boundary before calling this function.",
+            "rule": "anti-slop-python(no-any-parameters)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "python/no-any-parameters.py",
+        "functionName": "is_user",
+        "line": 12,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "python/no-any-returns.py",
+        "functionName": "cast",
+        "line": 8,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "python/no-any-returns.py",
+        "functionName": "doubled",
+        "line": 12,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "python/no-any-returns.py",
+        "functionName": "load",
+        "line": 4,
+        "lint": [
+          {
+            "line": 4,
+            "message": "Returning `Any` exposes an unknown value to callers. Parse it at its boundary and return a named domain type.",
+            "rule": "anti-slop-python(no-any-returns)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "python/no-object-parameters.py",
+        "functionName": "elsewhere",
+        "line": 12,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "python/no-object-parameters.py",
+        "functionName": "local_import",
+        "line": 5,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "python/no-object-parameters.py",
+        "functionName": "save",
+        "line": 1,
+        "lint": [
+          {
+            "line": 1,
+            "message": "Parameter typed `object` accepts anything and proves nothing. Accept a named type or a Protocol.",
+            "rule": "anti-slop-python(no-object-parameters)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "python/no-unsafe-dictionary-type.py",
+        "functionName": "metadata",
+        "line": 4,
+        "lint": [
+          {
+            "line": 4,
+            "message": "This dictionary's `Any`/`object` value type gives callers no contract. Use a TypedDict, dataclass or a concrete value type.",
+            "rule": "anti-slop-python(no-unsafe-dictionary-type)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "python/no-unsafe-dictionary-type.py",
+        "functionName": "trailing",
+        "line": 8,
+        "lint": [
+          {
+            "line": 8,
+            "message": "This dictionary's `Any`/`object` value type gives callers no contract. Use a TypedDict, dataclass or a concrete value type.",
+            "rule": "anti-slop-python(no-unsafe-dictionary-type)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "python/require-safety-comment-for-cast.py",
+        "functionName": "apply",
+        "line": 27,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "python/require-safety-comment-for-cast.py",
+        "functionName": "as_user",
+        "line": 8,
+        "lint": [
+          {
+            "line": 9,
+            "message": "This `cast` has no `# SAFETY:` justification. State the checked invariant on the line above.",
+            "rule": "anti-slop-python(require-safety-comment-for-cast)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "python/require-safety-comment-for-cast.py",
+        "functionName": "in_pounds",
+        "line": 23,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "python/require-safety-comment-for-cast.py",
+        "functionName": "Money.cast",
+        "line": 19,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "rust/no-dyn-any.rs",
+        "functionName": "panic_message",
+        "line": 7,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "rust/no-dyn-any.rs",
+        "functionName": "shared",
+        "line": 11,
+        "lint": [
+          {
+            "line": 11,
+            "message": "`dyn Any` in a signature leaves the value's type unknown to callers. Take and return a named type or an enum of the cases.",
+            "rule": "anti-slop-rust(no-dyn-any)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "rust/no-dyn-any.rs",
+        "functionName": "size",
+        "line": 3,
+        "lint": [
+          {
+            "line": 3,
+            "message": "`dyn Any` in a signature leaves the value's type unknown to callers. Take and return a named type or an enum of the cases.",
+            "rule": "anti-slop-rust(no-dyn-any)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "rust/no-transmute.rs",
+        "functionName": "bits",
+        "line": 3,
+        "lint": [
+          {
+            "line": 5,
+            "message": "`transmute` fabricates a type without evidence. Convert with `from_*` constructors, `bytemuck` or a parser.",
+            "rule": "anti-slop-rust(no-transmute)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "rust/no-transmute.rs",
+        "functionName": "local",
+        "line": 12,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "rust/no-transmute.rs",
+        "functionName": "mem::transmute",
+        "line": 17,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "rust/no-transmute.rs",
+        "functionName": "project_mem",
+        "line": 22,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "rust/no-transmute.rs",
+        "functionName": "transmute",
+        "line": 8,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "rust/no-unwrap.rs",
+        "functionName": "also_production",
+        "line": 23,
+        "lint": [
+          {
+            "line": 24,
+            "message": "`unwrap()` asserts without evidence and panics with no context. Propagate with `?`, handle the case, or use `expect(\"<the invariant>\")`.",
+            "rule": "anti-slop-rust(no-unwrap)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "rust/no-unwrap.rs",
+        "functionName": "first_or",
+        "line": 5,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "rust/no-unwrap.rs",
+        "functionName": "first",
+        "line": 1,
+        "lint": [
+          {
+            "line": 2,
+            "message": "`unwrap()` asserts without evidence and panics with no context. Propagate with `?`, handle the case, or use `expect(\"<the invariant>\")`.",
+            "rule": "anti-slop-rust(no-unwrap)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "rust/no-unwrap.rs",
+        "functionName": "locked",
+        "line": 32,
+        "lint": [
+          {
+            "line": 33,
+            "message": "`unwrap()` asserts without evidence and panics with no context. Propagate with `?`, handle the case, or use `expect(\"<the invariant>\")`.",
+            "rule": "anti-slop-rust(no-unwrap)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "rust/no-unwrap.rs",
+        "functionName": "production_only",
+        "line": 18,
+        "lint": [
+          {
+            "line": 19,
+            "message": "`unwrap()` asserts without evidence and panics with no context. Propagate with `?`, handle the case, or use `expect(\"<the invariant>\")`.",
+            "rule": "anti-slop-rust(no-unwrap)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "rust/no-unwrap.rs",
+        "functionName": "test_only",
+        "line": 28,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "rust/no-unwrap.rs",
+        "functionName": "tests::first_works",
+        "line": 12,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "rust/require-safety-comment-for-unsafe.rs",
+        "functionName": "read_checked",
+        "line": 5,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "rust/require-safety-comment-for-unsafe.rs",
+        "functionName": "read",
+        "line": 1,
+        "lint": [
+          {
+            "line": 2,
+            "message": "This `unsafe` has no `// SAFETY:` justification. State the invariant that makes it sound on the line above.",
+            "rule": "anti-slop-rust(require-safety-comment-for-unsafe)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "anti-slop/no-conditional-empty-object-spread.ts",
+        "functionName": "f",
+        "line": 1,
+        "lint": [
+          {
+            "line": 2,
+            "message": "This conditional spread hides property omission behind an empty object. Build the object in separate statements and add the property only when present.",
+            "rule": "anti-slop(no-conditional-empty-object-spread)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "anti-slop/no-runtime-typeof.ts",
+        "functionName": "f",
+        "line": 1,
+        "lint": [
+          {
+            "line": 2,
+            "message": "A `typeof` check narrows a representation without establishing its contract. Parse input at its I/O boundary, then branch on the domain value.",
+            "rule": "anti-slop(no-runtime-typeof)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "native/eslint.no-fallthrough.ts",
+        "functionName": "f",
+        "line": 1,
+        "lint": [
+          {
+            "line": 7,
+            "message": "Expected a `break` statement before `case`.",
+            "rule": "eslint(no-fallthrough)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "native/eslint.no-self-compare.jsx",
+        "functionName": "F",
+        "line": 1,
+        "lint": [
+          {
+            "line": 2,
+            "message": "Both sides of this comparison are exactly the same",
+            "rule": "eslint(no-self-compare)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "native/oxc.missing-throw.ts",
+        "functionName": "f",
+        "line": 1,
+        "lint": [
+          {
+            "line": 3,
+            "message": "Missing throw",
+            "rule": "oxc(missing-throw)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "python/no-object-parameters.py",
+        "functionName": "field",
+        "line": 26,
+        "lint": [
+          {
+            "line": 26,
+            "message": "Parameter typed `object` accepts anything and proves nothing. Accept a named type or a Protocol.",
+            "rule": "anti-slop-python(no-object-parameters)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "python/no-object-parameters.py",
+        "functionName": "Point.__eq__",
+        "line": 19,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "python/require-safety-comment-for-cast.py",
+        "functionName": "as_user_checked",
+        "line": 12,
+        "lint": []
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 2,
+        "filePath": "native/promise.no-multiple-resolved.ts",
+        "functionName": "f>Promise()",
+        "line": 2,
+        "lint": [
+          {
+            "line": 7,
+            "message": "Promise should not be resolved multiple times. Promise is potentially resolved on line 4.",
+            "rule": "promise(no-multiple-resolved)"
+          }
+        ]
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 3,
+        "filePath": "go/no-unchecked-type-assertion.go",
+        "functionName": "Message",
+        "line": 5,
+        "lint": [
+          {
+            "line": 6,
+            "message": "A single-value type assertion panics when it is wrong. Use `v, ok := x.(T)` or a type switch.",
+            "rule": "anti-slop-go(no-unchecked-type-assertion)"
+          }
+        ]
+      },
+      {
+        "cyclomatic": 0,
+        "filePath": "go/no-any-returns.go",
+        "functionName": "(top level)",
+        "line": 22,
+        "lint": [
+          {
+            "line": 19,
+            "message": "Returning `any` exposes an unknown value to callers. Return a named type.",
+            "rule": "anti-slop-go(no-any-returns)"
+          },
+          {
+            "line": 22,
+            "message": "Returning `any` exposes an unknown value to callers. Return a named type.",
+            "rule": "anti-slop-go(no-any-returns)"
+          }
+        ]
+      },
+      {
+        "cyclomatic": 0,
+        "filePath": "native/import.no-self-import.ts",
+        "functionName": "(top level)",
+        "line": 1,
+        "lint": [
+          {
+            "line": 1,
+            "message": "A module importing itself is not allowed",
+            "rule": "import(no-self-import)"
+          }
+        ]
+      }
+    ],
+    "problems": []
+  }
+}

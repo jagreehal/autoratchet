@@ -4,7 +4,7 @@ use serde::Serializer;
 use serde_json::json;
 
 use crate::compare::{CompareResult, Verdict, locale_order};
-use crate::gate::{Kind, Regression};
+use crate::gate::{Kind, LintFinding, Metric, Regression};
 use crate::overrides::Override;
 
 /// Serialize a number the way JavaScript prints it: `10`, not `10.0`.
@@ -112,7 +112,7 @@ pub fn format_text(r: &CompareResult) -> String {
     let verdict = if failed {
         "Quality gate failed."
     } else {
-        "No complexity regressions detected.\nQuality gate passed."
+        "No regressions detected.\nQuality gate passed."
     };
     let mut parts: Vec<String> = failures.iter().map(|b| format!("{}\n", b.join("\n"))).collect();
     parts.push(verdict.to_string());
@@ -122,6 +122,16 @@ pub fn format_text(r: &CompareResult) -> String {
 
 /// A file's regressions, grouped by function.
 type FileGroup<'a> = (&'a str, Vec<(&'a str, Vec<&'a Regression>)>);
+
+/// Names what failed, so a lint-only failure does not read as a complexity one.
+fn heading(regressions: &[Regression]) -> &'static str {
+    let lint = regressions.iter().filter(|r| r.metric == Metric::Lint).count();
+    match (lint, regressions.len() - lint) {
+        (0, _) => "Complexity regressions detected:",
+        (_, 0) => "Lint regressions detected:",
+        _ => "Complexity and lint regressions detected:",
+    }
+}
 
 fn format_regressions(regressions: &[Regression]) -> String {
     // file → function → that function's failing metrics, in first-seen order
@@ -138,7 +148,7 @@ fn format_regressions(regressions: &[Regression]) -> String {
             None => fns.push((&reg.function_name, vec![reg])),
         }
     }
-    let mut lines = vec!["Complexity regressions detected:".to_string(), String::new()];
+    let mut lines = vec![heading(regressions).to_string(), String::new()];
     for (file, fns) in files {
         lines.push(file.to_string());
         for (name, regs) in fns {
@@ -150,6 +160,7 @@ fn format_regressions(regressions: &[Regression]) -> String {
             lines.push(format!("  {name}{new}"));
             for reg in regs {
                 lines.push(format!("    {}", format_metric(reg)));
+                lines.extend(reg.findings.iter().map(|f| format!("      {}", finding(f))));
             }
         }
         lines.push(String::new());
@@ -180,6 +191,11 @@ fn format_metric(reg: &Regression) -> String {
             )
         }
     }
+}
+
+/// `line 3 anti-slop(no-reflect-get): Replace …`
+fn finding(f: &LintFinding) -> String {
+    format!("line {} {}: {}", opt(f.line), f.rule, f.message)
 }
 
 /// `, from ruff.toml` when a linter config set the threshold.
@@ -238,8 +254,8 @@ fn at(o: &Override) -> String {
 /// A pull request comment: verdict first, then one table or list per kind of finding.
 pub fn format_markdown(r: &CompareResult) -> String {
     let verdict = match r.verdict() {
-        Verdict::Pass => "**Passed.** No function got more complex than the ratchet allows.",
-        Verdict::Fail => "**Failed.** A function got more complex than the ratchet allows.",
+        Verdict::Pass => "**Passed.** No function got worse than the ratchet allows.",
+        Verdict::Fail => "**Failed.** A function got worse than the ratchet allows.",
         Verdict::Incomplete => {
             "**Failed.** AutoRatchet could not measure every function, so it cannot vouch for this change."
         }
@@ -277,6 +293,24 @@ pub fn format_markdown(r: &CompareResult) -> String {
         }
         lines.push(String::new());
     }
+    let findings: Vec<(&Regression, &LintFinding)> = r
+        .regressions
+        .iter()
+        .flat_map(|reg| reg.findings.iter().map(move |f| (reg, f)))
+        .collect();
+    lines.extend(section(
+        "**Lint findings in those functions:**",
+        &findings,
+        |(reg, f)| {
+            format!(
+                "`{}:{}` {}: {}",
+                cell(&reg.file_path),
+                opt(f.line),
+                f.rule,
+                cell(&f.message)
+            )
+        },
+    ));
     lines.extend(section("**New overrides need approval:**", &r.blocked_overrides, at));
     lines.extend(section("**Could not measure:**", &r.incomplete, |p| p.clone()));
     lines.extend(section(
@@ -308,7 +342,7 @@ pub fn format_markdown(r: &CompareResult) -> String {
         .as_ref()
         .map_or(String::new(), |c| format!(" against `{}`", &c[..c.len().min(7)]));
     lines.push(format!(
-        "<sub>{} functions measured{base}. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+        "<sub>{} functions measured{base}. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
         r.current.len()
     ));
     lines.join("\n")

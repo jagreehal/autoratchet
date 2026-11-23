@@ -13,7 +13,7 @@
       "**Could not measure:**",
       "**Failed.** AutoRatchet could not measure every function, so it cannot vouch for this change.",
       "- head: broken.py: does not parse (missing ) (line 1))",
-      "<sub>4 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+      "<sub>4 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>"
     ],
     "regressions": [],
     "unmatchedOverrides": [],
@@ -32,28 +32,32 @@
         "cyclomatic": 1,
         "filePath": "orders.py",
         "functionName": "Order.__init__",
-        "line": 2
+        "line": 2,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "orders.py",
         "functionName": "Order.total.setter",
-        "line": 11
+        "line": 11,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "orders.py",
         "functionName": "Order.total",
-        "line": 7
+        "line": 7,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 3,
         "filePath": "orders.py",
         "functionName": "route",
-        "line": 15
+        "line": 15,
+        "lint": []
       }
     ],
     "problems": []
@@ -65,28 +69,32 @@
         "cyclomatic": 1,
         "filePath": "orders.py",
         "functionName": "Order.__init__",
-        "line": 2
+        "line": 2,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "orders.py",
         "functionName": "Order.total.setter",
-        "line": 11
+        "line": 11,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "orders.py",
         "functionName": "Order.total",
-        "line": 7
+        "line": 7,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 3,
         "filePath": "orders.py",
         "functionName": "route",
-        "line": 15
+        "line": 15,
+        "lint": []
       }
     ],
     "problems": [

@@ -62,7 +62,15 @@ pub fn analyse_rust(source: &str) -> NativeAnalysis {
         }
     }
     analyser.visit_file(&file);
+    let mut comment_lines: Vec<u32> = analyser.comment_lines.iter().copied().collect();
+    comment_lines.sort_unstable();
+    analyser.overrides.extend(crate::slop::lint_overrides(
+        comment_lines
+            .into_iter()
+            .map(|n| (n, analyser.lines[n as usize - 1].trim())),
+    ));
     NativeAnalysis {
+        findings: crate::slop::rust(&file, source, &analyser.comment_lines),
         functions: analyser.functions,
         overrides: analyser.overrides,
         ..Default::default()
@@ -105,12 +113,28 @@ fn attribute_override(attr: &Attribute, source: &str) -> Option<(Metric, String)
 /// strings included), character literals and nested block comments are skipped, so directive
 /// text inside them is never mistaken for a comment.
 fn comment_lines(source: &str) -> HashSet<u32> {
+    lex(source).lines
+}
+
+/// A file's comments and string and character literals, for lining up revisions.
+pub fn syntax(source: &str) -> crate::lang::Syntax {
+    let lexer = lex(source);
+    crate::lang::Syntax {
+        comments: lexer.spans,
+        literals: lexer.literals,
+        ..Default::default()
+    }
+}
+
+fn lex(source: &str) -> Lexer<'_> {
     let mut lexer = Lexer {
         source,
         b: source.as_bytes(),
         i: 0,
         line: 1,
         lines: HashSet::new(),
+        spans: Vec::new(),
+        literals: Vec::new(),
     };
     let mut blank = true;
     while lexer.i < lexer.b.len() {
@@ -123,7 +147,7 @@ fn comment_lines(source: &str) -> HashSet<u32> {
         lexer.token(c, blank);
         blank = false;
     }
-    lexer.lines
+    lexer
 }
 
 struct Lexer<'s> {
@@ -132,6 +156,8 @@ struct Lexer<'s> {
     i: usize,
     line: u32,
     lines: HashSet<u32>,
+    spans: Vec<std::ops::Range<usize>>,
+    literals: Vec<std::ops::Range<usize>>,
 }
 
 impl Lexer<'_> {
@@ -152,25 +178,46 @@ impl Lexer<'_> {
         match c {
             b'/' if self.at(b"//") => self.line_comment(first),
             b'/' if self.at(b"/*") => self.block_comment(),
-            b'"' => self.string(),
+            b'"' => self.literal(Self::string),
             b'\'' => self.char_or_lifetime(),
-            b'r' | b'b' | b'c' if !self.raw_string() => self.i += 1,
-            b'r' | b'b' | b'c' => {}
+            b'r' | b'b' | b'c' => {
+                let start = self.i;
+                if self.raw_string() {
+                    self.literals.push(start..self.i.min(self.b.len()));
+                } else {
+                    self.i += 1;
+                }
+            }
             _ => self.i += 1,
         }
+    }
+
+    /// Skip a literal with `skip`, recording where it was.
+    fn literal(&mut self, skip: fn(&mut Self)) {
+        let start = self.i;
+        skip(self);
+        self.literals.push(start..self.i.min(self.b.len()));
     }
 
     fn line_comment(&mut self, first: bool) {
         if first {
             self.lines.insert(self.line);
         }
+        let start = self.i;
         while self.i < self.b.len() && self.b[self.i] != b'\n' {
             self.i += 1;
         }
+        self.spans.push(start..self.i);
     }
 
     /// Block comments nest in Rust.
     fn block_comment(&mut self) {
+        let start = self.i;
+        self.block_comment_body();
+        self.spans.push(start..self.i.min(self.b.len()));
+    }
+
+    fn block_comment_body(&mut self) {
         let mut depth = 0;
         while self.i < self.b.len() {
             if self.at(b"/*") {
@@ -223,20 +270,23 @@ impl Lexer<'_> {
 
     /// A character literal (`'x'`, `'\n'`, `'\u{1F600}'`, `'日'`), or a lifetime or label.
     fn char_or_lifetime(&mut self) {
+        let start = self.i;
         if self.b.get(self.i + 1) == Some(&b'\\') {
             self.i += 3;
             while self.i < self.b.len() && self.b[self.i] != b'\'' {
                 self.i += 1;
             }
             self.i += 1;
+            self.literals.push(start..self.i.min(self.b.len()));
             return;
         }
         let width = self.source[self.i + 1..].chars().next().map_or(1, char::len_utf8);
-        self.i += if self.b.get(self.i + 1 + width) == Some(&b'\'') {
-            width + 2
+        if self.b.get(self.i + 1 + width) == Some(&b'\'') {
+            self.i += width + 2;
+            self.literals.push(start..self.i);
         } else {
-            1
-        };
+            self.i += 1;
+        }
     }
 }
 
@@ -246,6 +296,7 @@ struct FnState {
     cyclomatic: u32,
     cognitive: u32,
     nesting: u32,
+    span: std::ops::Range<usize>,
     /// Scope entries (modules, impls, traits) opened inside this function.
     scope_base: usize,
 }
@@ -258,7 +309,7 @@ struct Analyser<'s> {
     comment_lines: HashSet<u32>,
     scope: Vec<String>,
     stack: Vec<FnState>,
-    seen: HashMap<String, u32>,
+    names: crate::lang::Names,
     functions: Vec<MeasuredFunction>,
     overrides: Vec<NativeOverride>,
     /// Names for closures, decided by the expression around them before they are visited.
@@ -279,17 +330,16 @@ impl Analyser<'_> {
         }
     }
 
-    fn enter(&mut self, own: &str, line: u32, nesting: u32) -> String {
+    fn enter(&mut self, own: &str, line: u32, nesting: u32, span: std::ops::Range<usize>) -> String {
         let base = self.qualified(own);
-        let count = self.seen.entry(base.clone()).or_insert(0);
-        *count += 1;
-        let name = if *count == 1 { base } else { format!("{base}#{count}") };
+        let name = self.names.add(base, self.stack.last().map(|f| f.name.as_str()));
         self.stack.push(FnState {
             name: name.clone(),
             line,
             cyclomatic: 1,
             cognitive: 0,
             nesting,
+            span,
             scope_base: self.scope.len(),
         });
         name
@@ -298,10 +348,12 @@ impl Analyser<'_> {
     fn leave(&mut self) {
         let f = self.stack.pop().expect("entered");
         self.functions.push(MeasuredFunction {
+            origin: self.names.origin(&f.name),
             name: f.name,
             line: f.line,
             cyclomatic: f.cyclomatic,
             cognitive: f.cognitive,
+            span: f.span,
         });
     }
 
@@ -331,7 +383,8 @@ impl Analyser<'_> {
     /// A named function: record overrides on it, then measure its body.
     fn function(&mut self, attrs: &[Attribute], ident: &syn::Ident, body: &Block) {
         let line = line_of(ident.span());
-        let name = self.enter(&ident.to_string(), line, 0);
+        let span = ident.span().byte_range().start..body.span().byte_range().end;
+        let name = self.enter(&ident.to_string(), line, 0, span);
         for attr in attrs {
             if let Some((metric, text)) = attribute_override(attr, self.source) {
                 let line = line_of(attr.span());
@@ -499,7 +552,7 @@ impl<'ast> Visit<'ast> for Analyser<'_> {
             .remove(&(c as *const _))
             .unwrap_or_else(|| "closure".into());
         let nesting = self.stack.last().map_or(0, |f| f.nesting + 1);
-        self.enter(&own, line_of(c.inputs_begin.span()), nesting);
+        self.enter(&own, line_of(c.inputs_begin.span()), nesting, c.span().byte_range());
         self.visit_expr(&c.body);
         self.leave();
     }

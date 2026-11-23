@@ -8,8 +8,8 @@
     "incomplete": [],
     "markdown": [
       "## AutoRatchet",
-      "**Failed.** A function got more complex than the ratchet allows.",
-      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "**Failed.** A function got worse than the ratchet allows.",
+      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
       "| Function | Metric | Before | After | Limit |",
       "| `charts.ts::createChart` | cyclomatic | new | 12 | 10 |",
       "|---|---|--:|--:|--:|"
@@ -43,7 +43,8 @@
         "cyclomatic": 1,
         "filePath": "charts.ts",
         "functionName": "chartTitle",
-        "line": 1
+        "line": 1,
+        "lint": []
       }
     ],
     "problems": []
@@ -55,14 +56,16 @@
         "cyclomatic": 1,
         "filePath": "charts.ts",
         "functionName": "chartTitle",
-        "line": 1
+        "line": 1,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 12,
         "filePath": "charts.ts",
         "functionName": "createChart",
-        "line": 21
+        "line": 21,
+        "lint": []
       }
     ],
     "problems": []

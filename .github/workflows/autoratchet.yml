@@ -53,6 +53,6 @@ jobs:
       # conformance/cases holds deliberately complex code for the tests; measure the product only.
       - uses: ./
         with:
-          path: crates bin scripts conformance/run.ts conformance/bench.ts
+          path: crates :!crates/autoratchet/plugin bin scripts conformance/run.ts conformance/bench.ts conformance/fuzz.ts
           cli: node bin/autoratchet.js
           override-approval: review

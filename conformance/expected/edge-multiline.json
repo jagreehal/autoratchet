@@ -8,8 +8,8 @@
     "incomplete": [],
     "markdown": [
       "## AutoRatchet",
-      "**Passed.** No function got more complex than the ratchet allows.",
-      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+      "**Passed.** No function got worse than the ratchet allows.",
+      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>"
     ],
     "regressions": [],
     "unmatchedOverrides": [],
@@ -17,7 +17,7 @@
     "verdict": "pass"
   },
   "text": [
-    "No complexity regressions detected.",
+    "No regressions detected.",
     "Quality gate passed."
   ],
   "measureBase": {
@@ -31,14 +31,16 @@
         "cyclomatic": 5,
         "filePath": "m.ts",
         "functionName": "Repo.find",
-        "line": 15
+        "line": 15,
+        "lint": []
       },
       {
         "cognitive": 15,
         "cyclomatic": 6,
         "filePath": "m.ts",
         "functionName": "load",
-        "line": 1
+        "line": 1,
+        "lint": []
       }
     ],
     "problems": []

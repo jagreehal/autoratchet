@@ -1,6 +1,6 @@
 ---
 name: autoratchet-rust
-description: Write Rust that passes AutoRatchet's complexity check (cyclomatic 10, cognitive 15 for new code, and no function may get worse). Use whenever you write, edit or refactor .rs code in a repo that uses AutoRatchet (an autoratchet binary or dependency, a jagreehal/autoratchet workflow, or .claude/hooks/complexity-check.sh), and whenever an AutoRatchet hook or CI check reports "Complexity regressions detected" for Rust, even if the user only asks for a feature or a bug fix or mentions clippy's cognitive_complexity.
+description: Write Rust that passes AutoRatchet's complexity and lint check (cyclomatic 10, cognitive 15 and no anti-slop findings for new code, and no function may get worse). Use whenever you write, edit or refactor .rs code in a repo that uses AutoRatchet (an autoratchet binary or dependency, a jagreehal/autoratchet workflow, or .claude/hooks/complexity-check.sh), and whenever an AutoRatchet hook or CI check reports "regressions detected" (complexity or lint) for Rust, even if the user only asks for a feature or a bug fix or mentions clippy's cognitive_complexity.
 ---
 
 # Writing Rust that passes AutoRatchet
@@ -126,6 +126,19 @@ moment to switch shape, not after the check fails.
   `#![allow(clippy::cognitive_complexity)]`. The check uses the stricter of base and working-tree
   config, and module-wide allows approve nothing.
 
+## Lint findings: new code gets none
+
+AutoRatchet also counts anti-slop findings in each function (or the file's `(top level)`), with
+the same ratchet and a limit of 0. The report names the rule and line.
+
+- **No `.unwrap()`** outside tests (`#[cfg(test)]`, `tests/`, `benches/`, `*_test*.rs`):
+  propagate with `?`, handle the case, or `expect("<the invariant that makes this safe>")`.
+  `.lock().unwrap()` is flagged too (the rule cannot see that the receiver is a mutex): write `.lock().expect("lock poisoned")`, and the same for `RwLock`'s `read()`/`write()`.
+- **Every `unsafe` block and `unsafe impl` needs `// SAFETY: <invariant>`** on the line above it, or above the first line of its statement.
+- **No `mem::transmute`**: convert with `from_*`/`to_*` methods or a parser.
+- **No `dyn Any` in signatures**: take and return a named type or an enum of the cases.
+  The `dyn Any + Send` panic payload is exempt.
+
 ## Override attributes and comments are for people
 
 Some functions are fine over the limit: one arm per status code, a parser that follows a spec step
@@ -146,6 +159,16 @@ pub fn status_text(code: u16) -> &'static str {
 `clippy::cognitive_complexity` covers cognitive; Rust has no cyclomatic lint, so the comment covers
 `complexity`, `cognitive-complexity`, or both. Existing overrides stay in force for the score they
 approved, so making such a function worse still fails.
+
+The same goes for a lint finding. If one is a false positive, show the user the directive that
+approves it, on the line above, naming the rule:
+
+```rust
+// autoratchet-disable-next-line anti-slop-rust/no-unwrap -- the regex is a literal checked by tests
+let re = Regex::new(r"^\d+$").unwrap();
+```
+
+It approves only the findings it names on that line, once; other new findings still fail.
 
 ## Check before you hand back
 

@@ -8,8 +8,8 @@
     "incomplete": [],
     "markdown": [
       "## AutoRatchet",
-      "**Passed.** No function got more complex than the ratchet allows.",
-      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+      "**Passed.** No function got worse than the ratchet allows.",
+      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>"
     ],
     "regressions": [],
     "unmatchedOverrides": [],
@@ -17,7 +17,7 @@
     "verdict": "pass"
   },
   "text": [
-    "No complexity regressions detected.",
+    "No regressions detected.",
     "Quality gate passed."
   ],
   "measureBase": {
@@ -27,7 +27,8 @@
         "cyclomatic": 16,
         "filePath": "checkout.ts",
         "functionName": "applyDiscount",
-        "line": 2
+        "line": 2,
+        "lint": []
       }
     ],
     "problems": []
@@ -39,14 +40,16 @@
         "cyclomatic": 13,
         "filePath": "checkout.ts",
         "functionName": "applyDiscount",
-        "line": 5
+        "line": 5,
+        "lint": []
       },
       {
         "cognitive": 8,
         "cyclomatic": 9,
         "filePath": "checkout.ts",
         "functionName": "applyDiscountContinued",
-        "line": 21
+        "line": 21,
+        "lint": []
       }
     ],
     "problems": []

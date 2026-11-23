@@ -1,6 +1,6 @@
-//! Measure source files: cyclomatic complexity from Oxlint; names and cognitive complexity from
-//! the parser. Oxlint runs on a temporary copy with every disable comment defused, so no override
-//! can hide a function from measurement.
+//! Measure source files: cyclomatic complexity and lint findings from Oxlint; names and cognitive
+//! complexity from the parser. Oxlint runs on a temporary copy with every disable comment defused,
+//! so no override can hide a function from measurement.
 
 use std::collections::{HashMap, HashSet};
 use std::path::{Component, Path, PathBuf};
@@ -11,21 +11,172 @@ use regex::Regex;
 use serde::Deserialize;
 
 use crate::functions::{Analysis, analyse};
-use crate::gate::FunctionSnapshot;
-use crate::snapshots::{Snapshots, normalize_path};
+use crate::gate::{FunctionSnapshot, LintFinding, TOP_LEVEL};
+use crate::snapshots::{Snapshots, function_key, normalize_path};
 use crate::tools::Tools;
 
-const OXLINT_CONFIG: &str = include_str!("../config/oxlint-cyclomatic.json");
+/// Every function gets a complexity diagnostic (`max: 0`); the lint rules are the anti-slop
+/// plugin plus the native rules below.
+fn oxlint_config() -> String {
+    let mut rules = serde_json::Map::new();
+    rules.insert(
+        "complexity".into(),
+        serde_json::json!(["error", { "max": 0, "variant": "modified" }]),
+    );
+    for rule in NATIVE_RULES {
+        rules.insert(rule.into(), "error".into());
+    }
+    for rule in crate::plugin::RULES {
+        rules.insert(format!("anti-slop/{rule}"), "error".into());
+    }
+    serde_json::json!({
+        "plugins": ["typescript", "unicorn", "oxc", "import", "promise"],
+        "categories": { "correctness": "off" },
+        "jsPlugins": [{ "name": "anti-slop", "specifier": "./anti-slop/index.js" }],
+        "rules": rules,
+    })
+    .to_string()
+}
+
+/// Oxlint's own rules that need no type information.
+pub const NATIVE_RULES: [&str; 87] = [
+    "array-callback-return",
+    "constructor-super",
+    "eqeqeq",
+    "for-direction",
+    "getter-return",
+    "no-async-promise-executor",
+    "no-case-declarations",
+    "no-class-assign",
+    "no-compare-neg-zero",
+    "no-cond-assign",
+    "no-const-assign",
+    "no-constant-binary-expression",
+    "no-constant-condition",
+    "no-control-regex",
+    "no-debugger",
+    "no-dupe-else-if",
+    "no-dupe-keys",
+    "no-duplicate-case",
+    "no-empty-character-class",
+    "no-empty-pattern",
+    "no-eval",
+    "no-ex-assign",
+    "no-fallthrough",
+    "no-func-assign",
+    "no-global-assign",
+    "no-implied-eval",
+    "no-import-assign",
+    "no-invalid-regexp",
+    "no-loss-of-precision",
+    "no-misleading-character-class",
+    "no-new-native-nonconstructor",
+    "no-new-wrappers",
+    "no-nonoctal-decimal-escape",
+    "no-obj-calls",
+    "no-self-assign",
+    "no-self-compare",
+    "no-setter-return",
+    "no-shadow-restricted-names",
+    "no-sparse-arrays",
+    "no-this-before-super",
+    "no-throw-literal",
+    "no-unexpected-multiline",
+    "no-unreachable",
+    "no-unsafe-finally",
+    "no-unsafe-negation",
+    "no-unsafe-optional-chaining",
+    "no-unused-labels",
+    "no-unused-private-class-members",
+    "no-useless-backreference",
+    "no-useless-catch",
+    "no-with",
+    "prefer-promise-reject-errors",
+    "preserve-caught-error",
+    "require-yield",
+    "use-isnan",
+    "valid-typeof",
+    "import/no-self-import",
+    "oxc/approx-constant",
+    "oxc/bad-bitwise-operator",
+    "oxc/bad-char-at-comparison",
+    "oxc/bad-comparison-sequence",
+    "oxc/bad-min-max-func",
+    "oxc/bad-object-literal-comparison",
+    "oxc/bad-replace-all-arg",
+    "oxc/const-comparisons",
+    "oxc/double-comparisons",
+    "oxc/misrefactored-assign-op",
+    "oxc/missing-throw",
+    "oxc/no-accumulating-spread",
+    "oxc/number-arg-out-of-range",
+    "oxc/uninvoked-array-callback",
+    "promise/no-multiple-resolved",
+    "promise/no-return-in-finally",
+    "typescript/ban-ts-comment",
+    "typescript/no-duplicate-enum-values",
+    "typescript/no-explicit-any",
+    "typescript/no-extra-non-null-assertion",
+    "typescript/no-misused-new",
+    "typescript/no-non-null-asserted-nullish-coalescing",
+    "typescript/no-non-null-asserted-optional-chain",
+    "typescript/no-non-null-assertion",
+    "typescript/no-unsafe-declaration-merging",
+    "typescript/no-unsafe-function-type",
+    "typescript/no-wrapper-object-types",
+    "unicorn/no-array-fill-with-reference-type",
+    "unicorn/no-invalid-fetch-options",
+    "unicorn/no-invalid-remove-event-listener",
+];
+
+/// Diagnostic codes of the ratcheted rules: `eslint(no-eval)`, `oxc(missing-throw)`, `anti-slop(…)`.
+static LINT_CODES: LazyLock<HashSet<String>> = LazyLock::new(|| {
+    NATIVE_RULES
+        .iter()
+        .map(|r| match r.split_once('/') {
+            Some((plugin, rule)) => format!("{plugin}({rule})"),
+            None => format!("eslint({r})"),
+        })
+        .chain(crate::plugin::RULES.iter().map(|r| format!("anti-slop({r})")))
+        .collect()
+});
+
+fn is_lint_code(code: &str) -> bool {
+    LINT_CODES.contains(code)
+}
+
+/// Whether a rule named in a disable comment is a ratcheted one, under any plugin prefix:
+/// `no-eval`, `eslint/no-eval`, `@typescript-eslint/no-explicit-any`, `quality/no-eval`.
+pub fn is_lint_rule(name: &str) -> bool {
+    let rule = name.rsplit('/').next().unwrap_or(name);
+    crate::plugin::RULES.contains(&rule)
+        || NATIVE_RULES.iter().any(|r| r.rsplit('/').next() == Some(rule))
+        || crate::slop::rules().any(|(_, r)| r == rule)
+}
+
+/// A file the anti-slop plugin must flag. The standalone Oxlint binary skips JS plugins, so this
+/// proves the plugin ran.
+const PROBE_FILE: &str = "autoratchet-probe.ts";
+const PROBE_SOURCE: &str = "Reflect.get(globalThis, 'probe');\n";
 
 static COMPLEXITY_RE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"(?i)^(?P<label>.+?) has a complexity of (?P<score>\d+)\. Maximum allowed is \d+\.?$").unwrap()
 });
-static LINTER_DIRECTIVE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?-u:\b)(oxlint|eslint)-disable").unwrap());
+static LINTER_DIRECTIVE_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?-u:\b)(oxlint|eslint)-disable").expect("valid regex"));
 
-/// Turn every disable directive into an ordinary comment of the same length, so offsets stay put.
-/// Overrides decide what the gate enforces, never what it measures.
-pub fn defuse_directives(source: &str) -> String {
-    LINTER_DIRECTIVE_RE.replace_all(source, "${1}_disable").into_owned()
+/// Turn every disable directive in a comment into an ordinary comment of the same length, so
+/// offsets stay put. Overrides decide what the gate enforces, never what it measures; strings
+/// such as `import './oxlint-disable'` are code and stay as they are.
+pub fn defuse_directives(source: &str, comments: &[(u32, u32)]) -> String {
+    let mut out = source.to_string();
+    for &(start, end) in comments {
+        let range = start as usize..end as usize;
+        if let Some(text) = source.get(range.clone()) {
+            out.replace_range(range, &LINTER_DIRECTIVE_RE.replace_all(text, "${1}_disable"));
+        }
+    }
+    out
 }
 
 /// `path.relative(root, file)`: the path from `root` to `file`, with `..` where needed.
@@ -92,21 +243,42 @@ fn collect_native(root: &Path, files: &[PathBuf]) -> Result<Snapshots, String> {
                 .problems
                 .push(format!("{file_path}: does not parse ({error})"));
         }
-        for f in analysis.functions {
+        for f in &analysis.functions {
             snapshots.insert(FunctionSnapshot {
                 file_path: file_path.clone(),
-                function_name: f.name,
+                function_name: f.name.clone(),
                 cyclomatic: f.cyclomatic,
                 line: Some(f.line),
+                offset: None,
+                origin: Some(f.origin.clone()),
+                span: Some(f.span.clone()),
                 // Recorded as for JavaScript: 0 and 1 are both 1.
                 cognitive: Some(f.cognitive.max(1)),
+                lint: Some(Vec::new()),
             });
+        }
+        for finding in analysis.findings {
+            // The innermost function: the narrowest span around the finding.
+            let name = analysis
+                .functions
+                .iter()
+                .filter(|f| f.span.contains(&finding.offset))
+                .min_by_key(|f| f.span.len())
+                .map(|f| f.name.clone());
+            let lint = LintFinding {
+                rule: finding.rule,
+                line: Some(finding.line),
+                message: finding.message.into(),
+                identity: None,
+                span: Some(finding.offset..finding.end),
+            };
+            push_finding(&mut snapshots, &file_path, name, lint);
         }
     }
     Ok(snapshots)
 }
 
-/// JavaScript and TypeScript: Oxlint for cyclomatic complexity, the parser for the rest.
+/// JavaScript and TypeScript: Oxlint for cyclomatic complexity and lint, the parser for the rest.
 fn collect_js(root: &Path, files: &[PathBuf], tools: &Tools) -> Result<Snapshots, String> {
     // Nothing to measure (a base with no copy of a brand-new file): an empty, complete result.
     if files.is_empty() {
@@ -121,23 +293,29 @@ fn collect_js(root: &Path, files: &[PathBuf], tools: &Tools) -> Result<Snapshots
         .prefix("autoratchet-config-")
         .tempdir()
         .map_err(|e| e.to_string())?;
-    let copies: Vec<PathBuf> = files.iter().map(|f| copy.path().join(relative(root, f))).collect();
+    // Real paths: on macOS the temp dir sits behind the /var symlink, and Oxlint's import
+    // resolver then sees a file and its own import as two paths (import/no-self-import misses).
+    let target = std::fs::canonicalize(copy.path()).map_err(|e| e.to_string())?;
+    let config_dir = std::fs::canonicalize(config.path()).map_err(|e| e.to_string())?;
+    let copies: Vec<PathBuf> = files.iter().map(|f| target.join(relative(root, f))).collect();
 
     // Copy and parse in parallel: every file is parsed once, for names and parse errors.
     let analyses = parallel(files.iter().zip(&copies).collect(), |(file, dest)| {
-        let source = defuse_directives(&String::from_utf8_lossy(
-            &std::fs::read(file).map_err(|e| format!("{}: {e}", file.display()))?,
-        ));
+        let raw =
+            String::from_utf8_lossy(&std::fs::read(file).map_err(|e| format!("{}: {e}", file.display()))?).into_owned();
+        // Defusing keeps every length, so the analysis of the original holds for the copy.
+        let analysis = analyse(dest, &raw);
+        let source = defuse_directives(&raw, &analysis.comments);
         if let Some(parent) = dest.parent() {
             std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
         }
         std::fs::write(dest, &source).map_err(|e| e.to_string())?;
-        Ok(analyse(dest, &source))
+        Ok(analysis)
     })?;
     let parsed: HashMap<&Path, &Analysis> = copies.iter().map(PathBuf::as_path).zip(&analyses).collect();
 
-    let target = copy.path();
-    let mut snapshots = snapshots_from_diagnostics(run_oxlint(tools, oxlint, target, config.path())?, target, &parsed);
+    let target = target.as_path();
+    let mut snapshots = snapshots_from_diagnostics(run_oxlint(tools, oxlint, target, &config_dir)?, target, &parsed);
     for file in &copies {
         if let Some(error) = parsed[file.as_path()].errors.first() {
             let rel = normalize_path(&relative(target, file));
@@ -193,18 +371,27 @@ struct OxlintLabel {
 #[derive(Deserialize)]
 struct OxlintSpan {
     offset: Option<i64>,
+    length: Option<u64>,
     line: Option<u32>,
 }
 
 fn run_oxlint(tools: &Tools, oxlint: &Path, target: &Path, config_dir: &Path) -> Result<Vec<OxlintDiagnostic>, String> {
     let config = config_dir.join("oxlint.json");
-    std::fs::write(&config, OXLINT_CONFIG).map_err(|e| e.to_string())?;
+    std::fs::write(&config, oxlint_config()).map_err(|e| e.to_string())?;
+    for (file, text) in crate::plugin::FILES {
+        let path = config_dir.join("anti-slop").join(file);
+        std::fs::create_dir_all(path.parent().expect("plugin file in a directory")).map_err(|e| e.to_string())?;
+        std::fs::write(path, text).map_err(|e| e.to_string())?;
+    }
+    let probe = config_dir.join(PROBE_FILE);
+    std::fs::write(&probe, PROBE_SOURCE).map_err(|e| e.to_string())?;
     let output = tools
         .command(oxlint)
         .arg("-c")
         .arg(&config)
         .args(["-f", "json"])
         .arg(target)
+        .arg(&probe)
         .current_dir(config_dir)
         .output()
         .map_err(|e| format!("could not run oxlint ({}): {e}", oxlint.display()))?;
@@ -217,14 +404,27 @@ fn run_oxlint(tools: &Tools, oxlint: &Path, target: &Path, config_dir: &Path) ->
     }
     let parsed: OxlintOutput =
         serde_json::from_str(stdout.trim()).map_err(|e| format!("Failed to parse oxlint JSON output: {e}"))?;
-    Ok(parsed
+    let (probed, diagnostics): (Vec<_>, Vec<_>) = parsed
         .diagnostics
         .into_iter()
         .map(|mut d| {
             d.filename = d.filename.map(|f| config_dir.join(f).to_string_lossy().into_owned());
             d
         })
-        .collect())
+        .partition(|d| d.filename.as_deref().is_some_and(|f| Path::new(f) == probe));
+    if !probed.iter().any(|d| d.code.as_deref().is_some_and(is_lint_code)) {
+        return Err(format!(
+            "oxlint ({}) did not run AutoRatchet's lint rules. They are an Oxlint JS plugin, which only \
+             Oxlint's npm package running under Node.js loads; the standalone binary skips it. \
+             Point AUTORATCHET_OXLINT at node_modules/oxlint/bin/oxlint, or run AutoRatchet through npx.{}",
+            oxlint.display(),
+            String::from_utf8_lossy(&output.stderr)
+                .lines()
+                .next()
+                .map_or(String::new(), |l| format!(" Oxlint said: {l}"))
+        ));
+    }
+    Ok(diagnostics)
 }
 
 fn snapshots_from_diagnostics(
@@ -235,6 +435,9 @@ fn snapshots_from_diagnostics(
     let mut snapshots = Snapshots::default();
     let mut seen = HashSet::new();
 
+    let (lint, diagnostics): (Vec<_>, Vec<_>) = diagnostics
+        .into_iter()
+        .partition(|d| d.code.as_deref().is_some_and(is_lint_code));
     for d in diagnostics {
         if !d.code.as_deref().is_some_and(|c| c.contains("complexity")) {
             continue;
@@ -283,10 +486,73 @@ fn snapshots_from_diagnostics(
             function_name: name.clone(),
             cyclomatic: score,
             line,
+            offset: usize::try_from(offset).ok(),
+            origin: analysis.and_then(|a| a.origins.get(name).cloned()),
+            span: analysis
+                .and_then(|a| a.spans.get(&(offset as u32)))
+                .map(|&(from, end)| from as usize..end as usize),
             cognitive: Some(u32::from(cognitive)),
+            lint: Some(Vec::new()),
         });
     }
+    for d in lint {
+        add_lint_finding(&mut snapshots, d, root, parsed);
+    }
     snapshots
+}
+
+/// Count a finding against the innermost function around it, or against the file's top level.
+fn add_lint_finding(snapshots: &mut Snapshots, d: OxlintDiagnostic, root: &Path, parsed: &HashMap<&Path, &Analysis>) {
+    let absolute = d.filename.as_deref().map_or_else(|| root.to_path_buf(), PathBuf::from);
+    let file_path = relative_to(root, &absolute);
+    let span = d.labels.first().and_then(|l| l.span.as_ref());
+    let offset = span.and_then(|s| s.offset).and_then(|o| u32::try_from(o).ok());
+    let length = span.and_then(|s| s.length).map_or(0, |l| l as usize);
+    let line = span.and_then(|s| s.line);
+    let name = parsed.get(absolute.as_path()).and_then(|a| {
+        let offset = offset?;
+        // The innermost: the span that starts last.
+        let start = a
+            .spans
+            .iter()
+            .filter(|&(_, &(from, end))| from <= offset && offset < end)
+            .max_by_key(|&(_, &(from, _))| from)
+            .map(|(&start, _)| start)?;
+        a.functions.get(&start).cloned()
+    });
+    let finding = LintFinding {
+        rule: d.code.unwrap_or_default(),
+        line,
+        message: d.message,
+        identity: None,
+        span: offset.map(|o| o as usize..o as usize + length),
+    };
+    push_finding(snapshots, &file_path, name, finding);
+}
+
+/// Count a finding against its function, or the file's top level when it is in none we measure
+/// (a bodiless JavaScript declaration counts at the top level too).
+fn push_finding(snapshots: &mut Snapshots, file_path: &str, function: Option<String>, finding: LintFinding) {
+    let line = finding.line;
+    let key = function
+        .map(|n| function_key(file_path, &n))
+        .filter(|k| snapshots.get(k).is_some())
+        .unwrap_or_else(|| {
+            let top = function_key(file_path, TOP_LEVEL);
+            if snapshots.get(&top).is_none() {
+                snapshots.insert(FunctionSnapshot {
+                    file_path: file_path.to_string(),
+                    function_name: TOP_LEVEL.into(),
+                    line,
+                    lint: Some(Vec::new()),
+                    ..Default::default()
+                });
+            }
+            top
+        });
+    if let Some(list) = snapshots.get_mut(&key).and_then(|s| s.lint.as_mut()) {
+        list.push(finding);
+    }
 }
 
 #[cfg(test)]
@@ -295,10 +561,35 @@ mod tests {
 
     #[test]
     fn defuse_keeps_length() {
-        let src = "// oxlint-disable-next-line complexity\n// eslint-disable complexity\n";
-        let out = defuse_directives(src);
+        let src = "// oxlint-disable-next-line complexity\n// eslint-disable complexity\nimport './oxlint-disable';\n";
+        let out = defuse_directives(src, &analyse(Path::new("a.ts"), src).comments);
         assert_eq!(out.len(), src.len());
         assert!(out.contains("oxlint_disable") && out.contains("eslint_disable"));
+        assert!(out.contains("'./oxlint-disable'"), "strings are code: {out}");
+    }
+
+    #[test]
+    fn lint_rules_and_codes() {
+        for name in [
+            "eqeqeq",
+            "eslint/no-eval",
+            "@typescript-eslint/no-explicit-any",
+            "quality/no-reflect-get",
+        ] {
+            assert!(is_lint_rule(name), "{name}");
+        }
+        for name in ["complexity", "sonarjs/cognitive-complexity", "no-console"] {
+            assert!(!is_lint_rule(name), "{name}");
+        }
+        for code in [
+            "eslint(no-eval)",
+            "typescript(no-explicit-any)",
+            "oxc(missing-throw)",
+            "anti-slop(no-runtime-typeof)",
+        ] {
+            assert!(is_lint_code(code), "{code}");
+        }
+        assert!(!is_lint_code("eslint(complexity)"));
     }
 
     #[test]

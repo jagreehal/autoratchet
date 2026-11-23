@@ -8,8 +8,8 @@
     "incomplete": [],
     "markdown": [
       "## AutoRatchet",
-      "**Passed.** No function got more complex than the ratchet allows.",
-      "<sub>5 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+      "**Passed.** No function got worse than the ratchet allows.",
+      "<sub>5 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>"
     ],
     "regressions": [],
     "unmatchedOverrides": [],
@@ -17,7 +17,7 @@
     "verdict": "pass"
   },
   "text": [
-    "No complexity regressions detected.",
+    "No regressions detected.",
     "Quality gate passed."
   ],
   "measureBase": {
@@ -27,35 +27,40 @@
         "cyclomatic": 12,
         "filePath": "payments.ts",
         "functionName": "validateCustomer",
-        "line": 56
+        "line": 56,
+        "lint": []
       },
       {
         "cognitive": 28,
         "cyclomatic": 19,
         "filePath": "payments.ts",
         "functionName": "processPayment",
-        "line": 15
+        "line": 15,
+        "lint": []
       },
       {
         "cognitive": 3,
         "cyclomatic": 4,
         "filePath": "payments.ts",
         "functionName": "flat",
-        "line": 92
+        "line": 92,
+        "lint": []
       },
       {
         "cognitive": 4,
         "cyclomatic": 5,
         "filePath": "payments.ts",
         "functionName": "createOrder",
-        "line": 74
+        "line": 74,
+        "lint": []
       },
       {
         "cognitive": 6,
         "cyclomatic": 4,
         "filePath": "payments.ts",
         "functionName": "nested",
-        "line": 81
+        "line": 81,
+        "lint": []
       }
     ],
     "problems": []
@@ -67,35 +72,40 @@
         "cyclomatic": 13,
         "filePath": "payments.ts",
         "functionName": "processPayment",
-        "line": 14
+        "line": 14,
+        "lint": []
       },
       {
         "cognitive": 3,
         "cyclomatic": 4,
         "filePath": "payments.ts",
         "functionName": "flat",
-        "line": 76
+        "line": 76,
+        "lint": []
       },
       {
         "cognitive": 6,
         "cyclomatic": 4,
         "filePath": "payments.ts",
         "functionName": "nested",
-        "line": 65
+        "line": 65,
+        "lint": []
       },
       {
         "cognitive": 7,
         "cyclomatic": 8,
         "filePath": "payments.ts",
         "functionName": "createOrder",
-        "line": 56
+        "line": 56,
+        "lint": []
       },
       {
         "cognitive": 8,
         "cyclomatic": 9,
         "filePath": "payments.ts",
         "functionName": "validateCustomer",
-        "line": 45
+        "line": 45,
+        "lint": []
       }
     ],
     "problems": []

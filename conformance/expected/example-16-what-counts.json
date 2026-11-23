@@ -1,6 +1,6 @@
 {
-  "exit": 0,
-  "textExit": 0,
+  "exit": 1,
+  "textExit": 1,
   "report": {
     "approvals": [],
     "blockedOverrides": [],
@@ -8,17 +8,43 @@
     "incomplete": [],
     "markdown": [
       "## AutoRatchet",
-      "**Passed.** No function got more complex than the ratchet allows.",
-      "<sub>19 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+      "**Failed.** A function got worse than the ratchet allows.",
+      "**Lint findings in those functions:**",
+      "- `code.ts:73` anti-slop(no-unknown-returns): This function exposes `unknown` to its caller. Parse the value at its boundary and return a named domain type.",
+      "<sub>19 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `code.ts::tryCatch` | lint | new | 1 | 0 |",
+      "|---|---|--:|--:|--:|"
     ],
-    "regressions": [],
+    "regressions": [
+      {
+        "current": 1,
+        "filePath": "code.ts",
+        "findings": [
+          {
+            "line": 73,
+            "message": "This function exposes `unknown` to its caller. Parse the value at its boundary and return a named domain type.",
+            "rule": "anti-slop(no-unknown-returns)"
+          }
+        ],
+        "functionName": "tryCatch",
+        "kind": "new",
+        "line": 73,
+        "metric": "lint",
+        "threshold": 0
+      }
+    ],
     "unmatchedOverrides": [],
     "untracked": [],
-    "verdict": "pass"
+    "verdict": "fail"
   },
   "text": [
-    "No complexity regressions detected.",
-    "Quality gate passed."
+    "      line 73 anti-slop(no-unknown-returns): This function exposes `unknown` to its caller. Parse the value at its boundary and return a named domain type.",
+    "    lint: 1 (maximum for new code: 0)",
+    "  tryCatch (new function)",
+    "Lint regressions detected:",
+    "Quality gate failed.",
+    "code.ts"
   ],
   "measureBase": {
     "functions": [],
@@ -31,133 +57,158 @@
         "cyclomatic": 1,
         "filePath": "code.ts",
         "functionName": "callbackWithBranch",
-        "line": 102
+        "line": 102,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "code.ts",
         "functionName": "straightLine",
-        "line": 6
+        "line": 6,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "code.ts",
         "functionName": "tryFinally",
-        "line": 81
+        "line": 81,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "defaultParameter",
-        "line": 53
+        "line": 53,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "forLoop",
-        "line": 62
+        "line": 62,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "ifStatement",
-        "line": 10
+        "line": 10,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "logicalAnd",
-        "line": 29
+        "line": 29,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "logicalAssignment",
-        "line": 57
+        "line": 57,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "logicalOr",
-        "line": 33
+        "line": 33,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "nullishCoalescing",
-        "line": 41
+        "line": 41,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "switchFourCases",
-        "line": 89
+        "line": 89,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "ternary",
-        "line": 49
+        "line": 49,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "tryCatch",
-        "line": 73
+        "line": 73,
+        "lint": [
+          {
+            "line": 73,
+            "message": "This function exposes `unknown` to its caller. Parse the value at its boundary and return a named domain type.",
+            "rule": "anti-slop(no-unknown-returns)"
+          }
+        ]
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "whileLoop",
-        "line": 68
+        "line": 68,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 3,
         "filePath": "code.ts",
         "functionName": "optionalChaining",
-        "line": 45
+        "line": 45,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 4,
         "filePath": "code.ts",
         "functionName": "logicalChain",
-        "line": 37
+        "line": 37,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "callbackWithBranch>values.map()",
-        "line": 104
+        "line": 104,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "ifElse",
-        "line": 15
+        "line": 15,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 3,
         "filePath": "code.ts",
         "functionName": "elseIf",
-        "line": 23
+        "line": 23,
+        "lint": []
       }
     ],
     "problems": []

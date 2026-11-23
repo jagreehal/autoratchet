@@ -30,10 +30,10 @@
     "markdown": [
       "## AutoRatchet",
       "**Approved by a new override** (a reviewer must accept each reason; still measured):",
-      "**Failed.** A function got more complex than the ratchet allows.",
+      "**Failed.** A function got worse than the ratchet allows.",
       "- `orders.go::Parse` cognitive 17: //gocognit:ignore follows the parsing steps of the spec in order",
       "- `orders.go::Status` cyclomatic 11: //nolint:gocyclo // one case per status code, no logic",
-      "<sub>6 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "<sub>6 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
       "| Function | Metric | Before | After | Limit |",
       "| `orders.go::Route` | cognitive | 2 | 16 | 15 |",
       "| `orders.go::Route` | cyclomatic | 3 | 12 | 10 |",
@@ -86,14 +86,16 @@
         "cyclomatic": 2,
         "filePath": "orders.go",
         "functionName": "(*Order).Total",
-        "line": 8
+        "line": 8,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 3,
         "filePath": "orders.go",
         "functionName": "Route",
-        "line": 16
+        "line": 16,
+        "lint": []
       }
     ],
     "problems": []
@@ -105,42 +107,48 @@
         "cyclomatic": 11,
         "filePath": "orders.go",
         "functionName": "Status",
-        "line": 44
+        "line": 44,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "orders.go",
         "functionName": "(*Order).Total",
-        "line": 8
+        "line": 8,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "orders.go",
         "functionName": "Handler",
-        "line": 86
+        "line": 86,
+        "lint": []
       },
       {
         "cognitive": 16,
         "cyclomatic": 12,
         "filePath": "orders.go",
         "functionName": "Route",
-        "line": 16
+        "line": 16,
+        "lint": []
       },
       {
         "cognitive": 17,
         "cyclomatic": 8,
         "filePath": "orders.go",
         "functionName": "Parse",
-        "line": 71
+        "line": 71,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 2,
         "filePath": "orders.go",
         "functionName": "Walk",
-        "line": 93
+        "line": 93,
+        "lint": []
       }
     ],
     "problems": []

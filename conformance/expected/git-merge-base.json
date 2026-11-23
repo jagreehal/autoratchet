@@ -10,9 +10,9 @@
       "markdown": [
         "## AutoRatchet",
         "**Over a limit on base, missing on head** (deleted, renamed or moved):",
-        "**Passed.** No function got more complex than the ratchet allows.",
+        "**Passed.** No function got worse than the ratchet allows.",
         "- `a.ts::hot`",
-        "<sub>3 functions measured against `5051ea2`. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+        "<sub>3 functions measured against `5051ea2`. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>"
       ],
       "regressions": [],
       "unmatchedOverrides": [],
@@ -22,7 +22,8 @@
           "cyclomatic": 12,
           "filePath": "a.ts",
           "functionName": "hot",
-          "line": 1
+          "line": 1,
+          "lint": []
         }
       ],
       "verdict": "pass"

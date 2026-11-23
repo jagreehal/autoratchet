@@ -1,6 +1,6 @@
 # AutoRatchet
 
-**Deterministic complexity checks for AI coding agents and the people who review their code.**
+**Deterministic complexity and lint checks for AI coding agents and the people who review their code.**
 
 AutoRatchet stops functions in your TypeScript, JavaScript, Rust, Python and Go code from getting
 more complex, without asking you to fix the complex code you already have. It gives the same
@@ -40,18 +40,21 @@ AutoRatchet compares every function with the same function on your target branch
 - **Improvements stick.** The target branch is the baseline, so there is no baseline file to
   maintain, and every improvement becomes that function's new ceiling.
 
-It measures two things, because each misses regressions the other catches:
+It measures two complexity metrics, because each catches regressions the other misses, and
+counts lint findings ([JavaScript and TypeScript](#lint-rules-javascript-and-typescript),
+[Rust, Python and Go](#lint-rules-rust-python-and-go)):
 
 | Metric | Measures | Limit for new code |
 |--------|----------|-------------------:|
 | Cyclomatic complexity ([Oxlint](https://oxc.rs/docs/guide/usage/linter), modified variant) | Decisions in a function: roughly, testing effort | 10 |
 | Cognitive complexity ([SonarSource](https://www.sonarsource.com/docs/CognitiveComplexity.pdf), scored as [Biome](https://biomejs.dev/linter/rules/no-excessive-cognitive-complexity/) does) | How hard the function is to read, weighted by nesting | 15 |
+| Lint findings (anti-slop, plus Oxlint's built-in rules for JavaScript and TypeScript) | Unchecked casts, `unknown` contracts, unparsed `typeof` checks, likely bugs, wasteful array passes | 0 |
 
 ## Use it
 
 Needs a git repository. AutoRatchet is a native binary for macOS, Linux and Windows (x64 and
 arm64). It scores cognitive complexity itself, and runs the [Oxlint](https://oxc.rs) version the
-npm package ships with for cyclomatic complexity, so your scores match on every machine.
+npm package ships with for cyclomatic complexity and lint, so your scores match on every machine.
 
 ### Locally
 
@@ -96,8 +99,9 @@ jobs:
 ```
 
 The action downloads the AutoRatchet binary for its own version, checked against the release's
-`SHA256SUMS`, and the Oxlint binary when the paths include JavaScript or TypeScript. It needs no
-Node.js. It fails the check on a regression, marks each regressed function in the PR diff,
+`SHA256SUMS`. When the paths include JavaScript or TypeScript it also installs Oxlint from npm, so
+those runs need Node.js and npm on the runner. GitHub-hosted runners have both; on a self-hosted
+one, add `actions/setup-node` first. It fails the check on a regression, marks each regressed function in the PR diff,
 writes the report to the job summary, and keeps one comment on the PR updated (it only
 comments once there is something to say). The `labeled`, `unlabeled` and `pull_request_review`
 triggers run the check again when someone adds the approval label or approves the PR.
@@ -267,6 +271,95 @@ For an approval that the author cannot grant themselves, use `review` and also p
 require a review from someone else, dismiss stale approvals when new commits arrive, and use
 CODEOWNERS so workflow and configuration changes need their owners' approval.
 
+## Lint rules (JavaScript and TypeScript)
+
+AutoRatchet runs two sets of rules:
+
+- 17 anti-slop rules, vendored in `crates/autoratchet/plugin` (MIT).
+- 87 of Oxlint's built-in rules: `eqeqeq`, `no-eval`, `no-unreachable`,
+  `no-fallthrough`, `no-self-compare`, `no-throw-literal`, the `oxc/*` detectors,
+  `typescript/no-explicit-any`, `typescript/no-non-null-assertion`, `import/no-self-import`,
+  `promise/no-multiple-resolved` and more. `NATIVE_RULES` in `crates/autoratchet/src/collect.rs`
+  has the full list.
+
+The anti-slop rules:
+
+| Rule | Rejects |
+|------|---------|
+| `no-chained-type-assertions` | `x as object as User` |
+| `require-safety-comment-for-type-assertion` | `as` without a `// SAFETY: <invariant>` comment above it |
+| `no-widen-then-assert` | widening a known value to `unknown`, then asserting it back |
+| `no-known-value-widening` | known values flowing into `unknown`, `object` or open-dictionary targets |
+| `no-unknown-parameters`, `no-unknown-returns`, `no-unknown-type-aliases` | `unknown` as a function contract instead of parsing at the boundary |
+| `no-object-parameters` | `object` as a parameter type |
+| `no-unsafe-dictionary-type` | `Record<string, unknown>` and its equivalents |
+| `no-reflect-get`, `no-reflect-apply` | `Reflect.get` and `Reflect.apply` |
+| `no-runtime-typeof` | ad hoc `typeof` narrowing instead of parsing at the boundary |
+| `no-module-mocking` | `vi.mock` and `jest.mock`, instead of real dependency seams |
+| `no-shape-in-symbol-names` | `shape` in names you own (`UserShape`) |
+| `no-conditional-empty-object-spread` | `...(cond ? { a } : {})` |
+| `no-array-filter-map`, `no-reduce-accumulator-copy`, `oxc/no-accumulating-spread` | an extra array pass, or copying the accumulator in a reducer |
+
+Each finding counts against the innermost function around it, or the file's `(top level)`. A new
+function must have none, and an existing one may not gain any. Findings already on `main` stay
+until you fix them. The report lists each finding with its line.
+
+To approve one, put a disable comment naming the rule on the line above the finding:
+
+```ts
+// oxlint-disable-next-line anti-slop/no-reflect-get -- the SDK only exposes these through a proxy
+const value = Reflect.get(client, key);
+```
+
+Like a complexity override, the comment approves once and appears in the report for a reviewer. It
+approves the findings it names on that line; other new findings in the function still fail. Any
+plugin prefix works: `no-eval`, `eslint/no-eval`, `@typescript-eslint/no-explicit-any`. Start the
+comment with the directive, as Oxlint requires, and name the rule.
+
+An approval covers the finding under the comment. AutoRatchet follows each old finding by its code,
+the code around it, where you set its variables, the branches it is in and its place, so you can
+move, wrap, rename or edit around it. If two findings look alike, AutoRatchet treats the approved
+one as the old one, and you approve or fix the other too.
+
+The rules are an Oxlint JS plugin, which Oxlint's npm package loads under Node.js. The AutoRatchet
+npm package and the GitHub Action both run Oxlint that way. If Oxlint skips the plugin, AutoRatchet
+stops with exit 4. The rules read syntax, so they run without your project's types.
+
+## Lint rules (Rust, Python and Go)
+
+AutoRatchet ports the same ideas to the other languages: typed function boundaries, typed
+dictionaries, a stated invariant for each cast or `unsafe`, and checked assertions. The ports run on
+the syntax tree AutoRatchet already parses, so you install nothing extra. They follow the same
+ratchet as the JavaScript rules.
+
+| Rule | Rejects |
+|------|---------|
+| `anti-slop-rust/require-safety-comment-for-unsafe` | an `unsafe` block or `unsafe impl` without `// SAFETY: <invariant>` above it |
+| `anti-slop-rust/no-transmute` | `mem::transmute` and `transmute_copy` |
+| `anti-slop-rust/no-unwrap` | `.unwrap()` outside tests (`#[test]`, `#[cfg(test)]`, `tests/`, `benches/`, `*_test*.rs` files); use `?` or `expect("<invariant>")`. `.lock().unwrap()` too: without types a mutex looks like `File::lock`, so write `.lock().expect("lock poisoned")` |
+| `anti-slop-rust/no-dyn-any` | `dyn Any` in a function signature, except the `dyn Any + Send` panic payload |
+| `anti-slop-python/no-any-parameters`, `no-any-returns` | `Any` (or `Optional[Any]`, `Any \| None`) as a parameter or return type. `*args`/`**kwargs`, `TypeGuard`/`TypeIs` functions and dunder methods are exempt |
+| `anti-slop-python/no-object-parameters` | `object` as a parameter type, except in dunder methods such as `__eq__` and for an upper-case sentinel default (`default: object = MISSING`) |
+| `anti-slop-python/no-unsafe-dictionary-type` | `dict`, `Dict`, `Mapping` or `MutableMapping` of `Any` or `object` |
+| `anti-slop-python/require-safety-comment-for-cast` | `typing.cast` without `# SAFETY: <invariant>` above it, however it is imported or aliased |
+| `anti-slop-go/no-any-parameters`, `no-any-returns` | `any` or `interface{}` as a parameter or result type. Variadic `...any` is exempt |
+| `anti-slop-go/no-unsafe-dictionary-type` | `map[K]any` |
+| `anti-slop-go/no-unchecked-type-assertion` | `x.(T)` outside a comma-ok assignment or a type switch |
+| `anti-slop-go/require-safety-comment-for-unsafe` | package `unsafe` without `// SAFETY: <invariant>` above it, under whatever name it is imported (`u.Pointer`, or `Pointer` after `import . "unsafe"`) |
+
+A `SAFETY:` comment counts on the line itself, directly above it, or above the first line of the
+statement it is in, so a call that wraps over several lines needs one comment at its top.
+
+To approve one, put an AutoRatchet directive naming the rule on the line above the finding:
+
+```go
+// autoratchet-disable-next-line anti-slop-go/no-unchecked-type-assertion -- set in init()
+cfg := registry["config"].(Config)
+```
+
+Use `#` in Python. The directive approves that finding once; other new findings in the function
+still fail.
+
 ## Outcomes and exit codes
 
 | Exit code | Meaning |
@@ -374,8 +467,8 @@ For Rust, Python and Go, a comment on the line above a function reading
 
 Each GitHub release has an archive per platform with the `autoratchet` binary, and a `SHA256SUMS`
 file. Put the binary on your `PATH`. That is all Rust, Python and Go need. For JavaScript and
-TypeScript, also install the [Oxlint](https://github.com/oxc-project/oxc/releases) 1.93.0 binary,
-which measures their cyclomatic complexity. AutoRatchet looks for it in `AUTORATCHET_OXLINT`, then
+TypeScript, also install Node.js and Oxlint 1.93.0 from npm (`npm install -D oxlint@1.93.0`),
+which measures their cyclomatic complexity and runs the lint rules. AutoRatchet looks for Oxlint in `AUTORATCHET_OXLINT`, then
 in `node_modules/.bin`, then on `PATH`. Another Oxlint version can score code differently.
 
 ## CLI
@@ -425,17 +518,21 @@ and exit codes. Add a case under `conformance/cases/<name>/{base,head}`, then
 Each function is matched across commits by file path and a qualified name from its syntax
 (Rust's are in [Rust](#rust)): `PaymentService.validate`, `handlers.onSubmit`, `createChart>helper`,
 `render>items.map()`, `PAYMENT_RULES["flagged-vip-review"]`. Moving a function to another file
-or renaming it makes it look new, so it must meet the limits for new code. Callbacks and table
-entries without a key are named by position, so reordering them pairs a function with another
-function's history; give table entries a key (`['name', fn]`, or an `id`/`key`/`name` property)
-to avoid that.
+or renaming it makes it look new, so it must meet the limits for new code. A name that repeats in a
+file gets `#2`, `#3`, …; AutoRatchet matches those functions by their code and what they are in,
+so adding, removing or reordering callbacks leaves each its own history. Table entries
+without a key are named by position, so reordering them pairs a function with another function's
+history; give them a key (`['name', fn]`, or an `id`/`key`/`name` property) to avoid that.
 
 ## Limits
 
 - JavaScript, TypeScript (`.js`, `.jsx`, `.ts`, `.tsx` and the `m`/`c` variants), Rust (`.rs`),
   Python (`.py`) and Go (`.go`).
 - Rust code inside macro invocations (`vec![…]`, `assert!(…)`, `macro_rules!`) is not measured.
-- Two metrics: cyclomatic and cognitive complexity.
+- Two complexity metrics, cyclomatic and cognitive, plus lint findings. The lint rules are
+  the same in every repo, whatever its lint config.
+- The Rust, Python and Go lint rules read syntax: they see `Any` and `interface{}` where
+  you write them, not through aliases.
 - Cognitive scores of 0 and 1 are both recorded as 1, as earlier versions recorded them.
 - Getters and setters have no cognitive score of their own: their logic counts toward the
   function around them, as in Biome.

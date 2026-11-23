@@ -1,5 +1,5 @@
 name: 'AutoRatchet'
-description: 'Deterministic complexity gate for AI coding agents and CI: TypeScript, JavaScript, Rust, Python and Go, locally or on PRs.'
+description: 'Deterministic complexity and lint ratchet for AI agents and CI: TypeScript, JavaScript, Rust, Python and Go.'
 author: 'Jag Reehal'
 branding:
   icon: 'trending-down'
@@ -83,6 +83,7 @@ runs:
       env:
         CLI: ${{ inputs.cli }}
         PATHS: ${{ inputs.path }}
+        BASE: ${{ steps.refs.outputs.base }}
         ACTION_REPO: ${{ github.action_repository }}
       run: |
         set -euo pipefail
@@ -91,12 +92,12 @@ runs:
           exit 0
         fi
         case "$RUNNER_OS-$RUNNER_ARCH" in
-          Linux-X64) platform=linux-x64 target=x86_64-unknown-linux-musl ;;
-          Linux-ARM64) platform=linux-arm64 target=aarch64-unknown-linux-musl ;;
-          macOS-X64) platform=darwin-x64 target=x86_64-apple-darwin ;;
-          macOS-ARM64) platform=darwin-arm64 target=aarch64-apple-darwin ;;
-          Windows-X64) platform=win32-x64 target=x86_64-pc-windows-msvc ;;
-          Windows-ARM64) platform=win32-arm64 target=aarch64-pc-windows-msvc ;;
+          Linux-X64) platform=linux-x64 ;;
+          Linux-ARM64) platform=linux-arm64 ;;
+          macOS-X64) platform=darwin-x64 ;;
+          macOS-ARM64) platform=darwin-arm64 ;;
+          Windows-X64) platform=win32-x64 ;;
+          Windows-ARM64) platform=win32-arm64 ;;
           *) echo "::error::AutoRatchet has no binary for $RUNNER_OS $RUNNER_ARCH"; exit 1 ;;
         esac
         exe=""; [ "$RUNNER_OS" = Windows ] && exe=.exe
@@ -114,22 +115,37 @@ runs:
         tar -xzf "autoratchet-$platform.tar.gz"
         echo "cli=$dir/autoratchet$exe" >> "$GITHUB_OUTPUT"
 
-        # Oxlint measures cyclomatic complexity in JavaScript and TypeScript; Rust, Python and Go need none.
+        # Oxlint measures cyclomatic complexity and lint findings in JavaScript and TypeScript; Rust,
+        # Python and Go need none. The lint rules are an Oxlint JS plugin: only Oxlint's npm package,
+        # running under Node.js, loads one.
         # shellcheck disable=SC2086 # pathspecs split on purpose
         # set -f: `path` holds git pathspecs; the shell must not expand src/*.go against the disk.
-        # -z: raw names, as the CLI reads them (without it git quotes src/café.ts and the suffix test misses it).
-        js=$(set -f; git -C "$GITHUB_WORKSPACE" ls-files -z -- ${PATHS:-.} | tr '\0' '\n' | grep -cE '\.[cm]?[jt]sx?$' || true)
-        if [ "$js" -gt 0 ]; then
-          oxlint_version=$(jq -r .dependencies.oxlint "$GITHUB_ACTION_PATH/package.json")
-          oxc="https://github.com/oxc-project/oxc/releases/download/oxlint_v$oxlint_version"
-          if [ "$RUNNER_OS" = Windows ]; then
-            curl -fsSL --retry 3 -o oxlint.zip "$oxc/oxlint-$target.zip"
-            unzip -q oxlint.zip
-          else
-            curl -fsSL --retry 3 -o oxlint.tar.gz "$oxc/oxlint-$target.tar.gz"
-            tar -xzf oxlint.tar.gz
+        # Read NUL-delimited paths so whitespace and line breaks in filenames stay intact.
+        # The diff since the merge base adds files the change deleted or renamed away (hence
+        # --no-renames): the check measures those on the base side.
+        js=$(set -f
+          while IFS= read -r -d '' file; do
+            if [[ "$file" =~ \.[cm]?[jt]sx?$ && ! "$file" =~ \.d\.[cm]?ts$ ]]; then
+              echo yes
+              break
+            fi
+          done < <(
+            git -C "$GITHUB_WORKSPACE" ls-files -z --cached --others --exclude-standard -- ${PATHS:-.}
+            git -C "$GITHUB_WORKSPACE" diff --name-only --no-renames -z "$BASE...HEAD" -- ${PATHS:-.} 2>/dev/null || true
+          )
+        )
+        if [ -n "$js" ]; then
+          if ! command -v node >/dev/null; then
+            echo "::error::AutoRatchet needs Node.js to measure JavaScript and TypeScript. Add actions/setup-node before this step."
+            exit 1
           fi
-          echo "AUTORATCHET_OXLINT=$dir/oxlint-$target$exe" >> "$GITHUB_ENV"
+          oxlint_version=$(jq -r .dependencies.oxlint "$GITHUB_ACTION_PATH/package.json")
+          npm install --prefix "$dir/oxlint" --no-save --no-audit --no-fund --ignore-scripts "oxlint@$oxlint_version" >/dev/null
+          {
+            echo "AUTORATCHET_OXLINT=$dir/oxlint/node_modules/oxlint/bin/oxlint"
+            # process.execPath: a native path on Windows, where `command -v` gives a POSIX one.
+            echo "AUTORATCHET_NODE=$(node -p process.execPath)"
+          } >> "$GITHUB_ENV"
         fi
 
     - name: Decide override approval
@@ -222,8 +238,15 @@ runs:
       env:
         REPORT: ${{ steps.check.outputs.report }}
       run: |
+        # A lint regression is annotated on each finding's own line, which the diff holds;
+        # a complexity one on the function.
         jq -r '.regressions[] |
-          "::error file=\(.filePath),line=\(.line // 1),title=AutoRatchet: \(.functionName)::\(.metric) complexity \(.previous // "new") → \(.current) (limit \(if .kind == "new" then .threshold else ([.previous, .threshold] | max) end))"' \
+          if .metric == "lint" and ((.findings // []) | length) > 0 then
+            . as $r | .findings[] |
+            "::error file=\($r.filePath),line=\(.line // $r.line // 1),title=AutoRatchet: \($r.functionName)::\(.rule): \(.message | gsub("%"; "%25") | gsub("\r"; "%0D") | gsub("\n"; "%0A")) (lint \($r.previous // "new") → \($r.current), limit \(if $r.kind == "new" then $r.threshold else ([$r.previous, $r.threshold] | max) end))"
+          else
+            "::error file=\(.filePath),line=\(.line // 1),title=AutoRatchet: \(.functionName)::\(.metric) complexity \(.previous // "new") → \(.current) (limit \(if .kind == "new" then .threshold else ([.previous, .threshold] | max) end))"
+          end' \
           "$REPORT"
 
     - name: Post comment

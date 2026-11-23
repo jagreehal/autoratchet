@@ -1,0 +1,244 @@
+{
+  "exit": 1,
+  "textExit": 1,
+  "report": {
+    "approvals": [
+      {
+        "functionName": "added",
+        "override": {
+          "filePath": "l.ts",
+          "line": 12,
+          "metric": "lint",
+          "text": "// oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion -- branded at the boundary"
+        },
+        "score": 1
+      },
+      {
+        "functionName": "compare",
+        "override": {
+          "filePath": "n.ts",
+          "line": 2,
+          "metric": "lint",
+          "text": "// oxlint-disable-next-line eqeqeq -- loose on purpose"
+        },
+        "score": 1
+      }
+    ],
+    "blockedOverrides": [],
+    "functions": 7,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Approved by a new override** (a reviewer must accept each reason; still measured):",
+      "**Failed.** A function got worse than the ratchet allows.",
+      "**Lint findings in those functions:**",
+      "- `l.ts:5` anti-slop(no-reflect-get): Replace `Reflect.get` with typed property access. Parse dynamic input into a named domain type before reading it.",
+      "- `l.ts::added` lint 1: // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion -- branded at the boundary",
+      "- `n.ts:7` anti-slop(no-runtime-typeof): A `typeof` check narrows a representation without establishing its contract. Parse input at its I/O boundary, then branch on the domain value.",
+      "- `n.ts::compare` lint 1: // oxlint-disable-next-line eqeqeq -- loose on purpose",
+      "<sub>7 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `l.ts::clean` | lint | 0 | 1 | 0 |",
+      "| `n.ts::kind` | lint | new | 1 | 0 |",
+      "|---|---|--:|--:|--:|"
+    ],
+    "regressions": [
+      {
+        "current": 1,
+        "filePath": "l.ts",
+        "findings": [
+          {
+            "line": 5,
+            "message": "Replace `Reflect.get` with typed property access. Parse dynamic input into a named domain type before reading it.",
+            "rule": "anti-slop(no-reflect-get)"
+          }
+        ],
+        "functionName": "clean",
+        "kind": "worsened",
+        "line": 5,
+        "metric": "lint",
+        "previous": 0,
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "n.ts",
+        "findings": [
+          {
+            "line": 7,
+            "message": "A `typeof` check narrows a representation without establishing its contract. Parse input at its I/O boundary, then branch on the domain value.",
+            "rule": "anti-slop(no-runtime-typeof)"
+          }
+        ],
+        "functionName": "kind",
+        "kind": "new",
+        "line": 6,
+        "metric": "lint",
+        "threshold": 0
+      }
+    ],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "fail"
+  },
+  "text": [
+    "      line 5 anti-slop(no-reflect-get): Replace `Reflect.get` with typed property access. Parse dynamic input into a named domain type before reading it.",
+    "      line 7 anti-slop(no-runtime-typeof): A `typeof` check narrows a representation without establishing its contract. Parse input at its I/O boundary, then branch on the domain value.",
+    "    line 12: // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion -- branded at the boundary",
+    "    line 2: // oxlint-disable-next-line eqeqeq -- loose on purpose",
+    "    lint: 0 → 1 (+1)",
+    "    lint: 1 (maximum for new code: 0)",
+    "  clean",
+    "  kind (new function)",
+    "  l.ts::added lint 1",
+    "  n.ts::compare lint 1",
+    "Approved by a new override. A reviewer must accept each reason:",
+    "Lint regressions detected:",
+    "Quality gate failed.",
+    "Still measured: if one of these gets worse in a later PR, the gate fails.",
+    "l.ts",
+    "n.ts"
+  ],
+  "measureBase": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "l.ts",
+        "functionName": "clean",
+        "line": 5,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "l.ts",
+        "functionName": "fixed",
+        "line": 7,
+        "lint": [
+          {
+            "line": 7,
+            "message": "Parameter `x` leaves input unparsed. Accept a named domain type; run the expected schema or parser at the I/O boundary before calling this function.",
+            "rule": "anti-slop(no-unknown-parameters)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "l.ts",
+        "functionName": "legacy",
+        "line": 3,
+        "lint": [
+          {
+            "line": 3,
+            "message": "Parameter `input` leaves input unparsed. Accept a named domain type; run the expected schema or parser at the I/O boundary before calling this function.",
+            "rule": "anti-slop(no-unknown-parameters)"
+          },
+          {
+            "line": 3,
+            "message": "Replace `Reflect.get` with typed property access. Parse dynamic input into a named domain type before reading it.",
+            "rule": "anti-slop(no-reflect-get)"
+          }
+        ]
+      }
+    ],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "l.ts",
+        "functionName": "added",
+        "line": 9,
+        "lint": [
+          {
+            "line": 13,
+            "message": "This type assertion has no `SAFETY:` justification. State the checked invariant immediately before the assertion or its containing statement.",
+            "rule": "anti-slop(require-safety-comment-for-type-assertion)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "l.ts",
+        "functionName": "clean",
+        "line": 5,
+        "lint": [
+          {
+            "line": 5,
+            "message": "Replace `Reflect.get` with typed property access. Parse dynamic input into a named domain type before reading it.",
+            "rule": "anti-slop(no-reflect-get)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "l.ts",
+        "functionName": "fixed",
+        "line": 7,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "l.ts",
+        "functionName": "later",
+        "line": 16,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "l.ts",
+        "functionName": "legacy",
+        "line": 3,
+        "lint": [
+          {
+            "line": 3,
+            "message": "Parameter `input` leaves input unparsed. Accept a named domain type; run the expected schema or parser at the I/O boundary before calling this function.",
+            "rule": "anti-slop(no-unknown-parameters)"
+          },
+          {
+            "line": 3,
+            "message": "Replace `Reflect.get` with typed property access. Parse dynamic input into a named domain type before reading it.",
+            "rule": "anti-slop(no-reflect-get)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "n.ts",
+        "functionName": "compare",
+        "line": 1,
+        "lint": [
+          {
+            "line": 3,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "n.ts",
+        "functionName": "kind",
+        "line": 6,
+        "lint": [
+          {
+            "line": 7,
+            "message": "A `typeof` check narrows a representation without establishing its contract. Parse input at its I/O boundary, then branch on the domain value.",
+            "rule": "anti-slop(no-runtime-typeof)"
+          }
+        ]
+      }
+    ],
+    "problems": []
+  }
+}

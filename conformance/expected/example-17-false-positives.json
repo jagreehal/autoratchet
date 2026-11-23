@@ -8,8 +8,8 @@
     "incomplete": [],
     "markdown": [
       "## AutoRatchet",
-      "**Failed.** A function got more complex than the ratchet allows.",
-      "<sub>4 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "**Failed.** A function got worse than the ratchet allows.",
+      "<sub>4 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
       "| Function | Metric | Before | After | Limit |",
       "| `code.ts::createChart` | cyclomatic | new | 12 | 10 |",
       "| `code.ts::deliveryCity` | cyclomatic | new | 11 | 10 |",
@@ -71,28 +71,32 @@
         "cyclomatic": 11,
         "filePath": "code.ts",
         "functionName": "deliveryCity",
-        "line": 46
+        "line": 46,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 12,
         "filePath": "code.ts",
         "functionName": "createChart",
-        "line": 22
+        "line": 22,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "statusCode",
-        "line": 97
+        "line": 97,
+        "lint": []
       },
       {
         "cognitive": 11,
         "cyclomatic": 12,
         "filePath": "code.ts",
         "functionName": "signupErrors",
-        "line": 68
+        "line": 68,
+        "lint": []
       }
     ],
     "problems": []

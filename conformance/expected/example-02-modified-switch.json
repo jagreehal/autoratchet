@@ -8,8 +8,8 @@
     "incomplete": [],
     "markdown": [
       "## AutoRatchet",
-      "**Passed.** No function got more complex than the ratchet allows.",
-      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+      "**Passed.** No function got worse than the ratchet allows.",
+      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>"
     ],
     "regressions": [],
     "unmatchedOverrides": [],
@@ -17,7 +17,7 @@
     "verdict": "pass"
   },
   "text": [
-    "No complexity regressions detected.",
+    "No regressions detected.",
     "Quality gate passed."
   ],
   "measureBase": {
@@ -31,14 +31,16 @@
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "statusLabelModified",
-        "line": 9
+        "line": 9,
+        "lint": []
       },
       {
         "cognitive": 5,
         "cyclomatic": 6,
         "filePath": "code.ts",
         "functionName": "statusLabelIfElse",
-        "line": 25
+        "line": 25,
+        "lint": []
       }
     ],
     "problems": []

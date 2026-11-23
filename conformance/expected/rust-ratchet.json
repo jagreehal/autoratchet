@@ -30,10 +30,10 @@
     "markdown": [
       "## AutoRatchet",
       "**Approved by a new override** (a reviewer must accept each reason; still measured):",
-      "**Failed.** A function got more complex than the ratchet allows.",
+      "**Failed.** A function got worse than the ratchet allows.",
       "- `orders.rs::parse` cognitive 23: #[expect(clippy::cognitive_complexity, reason = \"follows the parsing steps of the spec in order\")]",
       "- `orders.rs::status` cyclomatic 12: // autoratchet-disable-next-line complexity -- one arm per status code, no logic",
-      "<sub>5 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "<sub>5 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
       "| Function | Metric | Before | After | Limit |",
       "| `orders.rs::route` | cyclomatic | 3 | 12 | 10 |",
       "|---|---|--:|--:|--:|"
@@ -74,21 +74,24 @@
         "cyclomatic": 1,
         "filePath": "orders.rs",
         "functionName": "Order::total",
-        "line": 7
+        "line": 7,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 2,
         "filePath": "orders.rs",
         "functionName": "Order::discount",
-        "line": 11
+        "line": 11,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 3,
         "filePath": "orders.rs",
         "functionName": "route",
-        "line": 16
+        "line": 16,
+        "lint": []
       }
     ],
     "problems": []
@@ -100,35 +103,40 @@
         "cyclomatic": 1,
         "filePath": "orders.rs",
         "functionName": "Order::total",
-        "line": 7
+        "line": 7,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 12,
         "filePath": "orders.rs",
         "functionName": "status",
-        "line": 42
+        "line": 42,
+        "lint": []
       },
       {
         "cognitive": 15,
         "cyclomatic": 12,
         "filePath": "orders.rs",
         "functionName": "route",
-        "line": 16
+        "line": 16,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 2,
         "filePath": "orders.rs",
         "functionName": "Order::discount",
-        "line": 11
+        "line": 11,
+        "lint": []
       },
       {
         "cognitive": 23,
         "cyclomatic": 9,
         "filePath": "orders.rs",
         "functionName": "parse",
-        "line": 59
+        "line": 59,
+        "lint": []
       }
     ],
     "problems": []

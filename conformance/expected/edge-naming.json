@@ -1,24 +1,99 @@
 {
-  "exit": 0,
-  "textExit": 0,
+  "exit": 1,
+  "textExit": 1,
   "report": {
     "approvals": [],
     "blockedOverrides": [],
-    "functions": 44,
+    "functions": 45,
     "incomplete": [],
     "markdown": [
       "## AutoRatchet",
-      "**Passed.** No function got more complex than the ratchet allows.",
-      "<sub>44 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+      "**Failed.** A function got worse than the ratchet allows.",
+      "**Lint findings in those functions:**",
+      "- `names.ts:11` eslint(no-constant-binary-expression): Unexpected constant relational comparison",
+      "- `names.ts:11` eslint(no-constant-condition): Unexpected constant condition",
+      "- `names.ts:25` anti-slop(no-unsafe-dictionary-type): This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+      "- `names.ts:30` anti-slop(no-array-filter-map): Avoid consecutive array `map` and `filter` passes. Prefer `.values().map(...).filter(...).toArray()` where iterator helpers are supported, or a single `flatMap`/mutating reducer. Preserve callback ordering, indexes, and filtering semantics.",
+      "- `names.ts:37` eslint(no-sparse-arrays): Unexpected comma in middle of array",
+      "- `names.ts:51` anti-slop(no-unsafe-dictionary-type): This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+      "<sub>45 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `names.ts::(top level)` | lint | new | 5 | 0 |",
+      "| `names.ts::outer` | lint | new | 1 | 0 |",
+      "|---|---|--:|--:|--:|"
     ],
-    "regressions": [],
+    "regressions": [
+      {
+        "current": 1,
+        "filePath": "names.ts",
+        "findings": [
+          {
+            "line": 30,
+            "message": "Avoid consecutive array `map` and `filter` passes. Prefer `.values().map(...).filter(...).toArray()` where iterator helpers are supported, or a single `flatMap`/mutating reducer. Preserve callback ordering, indexes, and filtering semantics.",
+            "rule": "anti-slop(no-array-filter-map)"
+          }
+        ],
+        "functionName": "outer",
+        "kind": "new",
+        "line": 28,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 5,
+        "filePath": "names.ts",
+        "findings": [
+          {
+            "line": 11,
+            "message": "Unexpected constant condition",
+            "rule": "eslint(no-constant-condition)"
+          },
+          {
+            "line": 11,
+            "message": "Unexpected constant relational comparison",
+            "rule": "eslint(no-constant-binary-expression)"
+          },
+          {
+            "line": 25,
+            "message": "This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+            "rule": "anti-slop(no-unsafe-dictionary-type)"
+          },
+          {
+            "line": 37,
+            "message": "Unexpected comma in middle of array",
+            "rule": "eslint(no-sparse-arrays)"
+          },
+          {
+            "line": 51,
+            "message": "This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+            "rule": "anti-slop(no-unsafe-dictionary-type)"
+          }
+        ],
+        "functionName": "(top level)",
+        "kind": "new",
+        "line": 11,
+        "metric": "lint",
+        "threshold": 0
+      }
+    ],
     "unmatchedOverrides": [],
     "untracked": [],
-    "verdict": "pass"
+    "verdict": "fail"
   },
   "text": [
-    "No complexity regressions detected.",
-    "Quality gate passed."
+    "      line 11 eslint(no-constant-binary-expression): Unexpected constant relational comparison",
+    "      line 11 eslint(no-constant-condition): Unexpected constant condition",
+    "      line 25 anti-slop(no-unsafe-dictionary-type): This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+    "      line 30 anti-slop(no-array-filter-map): Avoid consecutive array `map` and `filter` passes. Prefer `.values().map(...).filter(...).toArray()` where iterator helpers are supported, or a single `flatMap`/mutating reducer. Preserve callback ordering, indexes, and filtering semantics.",
+    "      line 37 eslint(no-sparse-arrays): Unexpected comma in middle of array",
+    "      line 51 anti-slop(no-unsafe-dictionary-type): This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 5 (maximum for new code: 0)",
+    "  (top level) (new function)",
+    "  outer (new function)",
+    "Lint regressions detected:",
+    "Quality gate failed.",
+    "names.ts"
   ],
   "measureBase": {
     "functions": [],
@@ -31,308 +106,391 @@
         "cyclomatic": 1,
         "filePath": "dupes.js",
         "functionName": "first",
-        "line": 2
+        "line": 2,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "dupes.js",
         "functionName": "second",
-        "line": 3
+        "line": 3,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "names.ts",
         "functionName": "outer",
-        "line": 28
+        "line": 28,
+        "lint": [
+          {
+            "line": 30,
+            "message": "Avoid consecutive array `map` and `filter` passes. Prefer `.values().map(...).filter(...).toArray()` where iterator helpers are supported, or a single `flatMap`/mutating reducer. Preserve callback ordering, indexes, and filtering semantics.",
+            "rule": "anti-slop(no-array-filter-map)"
+          }
+        ]
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "names.ts",
         "functionName": "Service.field",
-        "line": 8
+        "line": 8,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "view.tsx",
         "functionName": "List",
-        "line": 1
+        "line": 1,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "dupes.js",
         "functionName": "[1, 2].forEach()",
-        "line": 5
+        "line": 5,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "dupes.js",
         "functionName": "[1, 2].forEach()#2",
-        "line": 6
+        "line": 6,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "dupes.js",
         "functionName": "twice",
-        "line": 1
+        "line": 1,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "Anon.run",
-        "line": 15
+        "line": 15,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "arrow",
-        "line": 2
+        "line": 2,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "BY_ID[\"deny\"].test",
-        "line": 46
+        "line": 46,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "BY_ID[\"vip\"].test",
-        "line": 45
+        "line": 45,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "BY_ID[2].test",
-        "line": 47
+        "line": 47,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "cast.go",
-        "line": 26
+        "line": 26,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "default",
-        "line": 3
+        "line": 3,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "dup",
-        "line": 50
+        "line": 50,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "exportsObj.dynamic",
-        "line": 52
+        "line": 52,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "handlers.1",
-        "line": 22
+        "line": 22,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "handlers.nested.deep",
-        "line": 20
+        "line": 20,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "handlers.onReset",
-        "line": 19
+        "line": 19,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "handlers.onSubmit",
-        "line": 18
+        "line": 18,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "handlers.quoted-key",
-        "line": 21
+        "line": 21,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "Inner.run",
-        "line": 14
+        "line": 14,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "KEYED[\"first\"]",
-        "line": 41
+        "line": 41,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "KEYED[\"second\"]",
-        "line": 42
+        "line": 42,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "Promise()",
-        "line": 54
+        "line": 54,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "RULES[0]",
-        "line": 36
+        "line": 36,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "RULES[2]",
-        "line": 38
+        "line": 38,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "Service.#secret",
-        "line": 6
+        "line": 6,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "Service.computed",
-        "line": 10
+        "line": 10,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "Service.make",
-        "line": 9
+        "line": 9,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "Service.value",
-        "line": 7
+        "line": 7,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "setTimeout()",
-        "line": 53
+        "line": 53,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "top",
-        "line": 1
+        "line": 1,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "typed.go",
-        "line": 25
+        "line": 25,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 2,
         "filePath": "dupes.js",
         "functionName": "first>twice",
-        "line": 2
+        "line": 2,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 2,
         "filePath": "dupes.js",
         "functionName": "second>twice",
-        "line": 3
+        "line": 3,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "outer>inner",
-        "line": 29
+        "line": 29,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "outer>items.map().filter()",
-        "line": 30
+        "line": 30,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "outer>items.map()",
-        "line": 30
+        "line": 30,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 2,
         "filePath": "names.ts",
         "functionName": "outer>Local.m",
-        "line": 31
+        "line": 31,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 2,
         "filePath": "view.tsx",
         "functionName": "List>items.map()",
-        "line": 2
+        "line": 2,
+        "lint": []
       },
       {
         "cognitive": 3,
         "cyclomatic": 3,
         "filePath": "common.cjs",
         "functionName": "module.exports.run",
-        "line": 1
+        "line": 1,
+        "lint": []
       },
       {
         "cognitive": 3,
         "cyclomatic": 3,
         "filePath": "mod.mjs",
         "functionName": "m",
-        "line": 1
+        "line": 1,
+        "lint": []
+      },
+      {
+        "cyclomatic": 0,
+        "filePath": "names.ts",
+        "functionName": "(top level)",
+        "line": 11,
+        "lint": [
+          {
+            "line": 11,
+            "message": "Unexpected constant condition",
+            "rule": "eslint(no-constant-condition)"
+          },
+          {
+            "line": 11,
+            "message": "Unexpected constant relational comparison",
+            "rule": "eslint(no-constant-binary-expression)"
+          },
+          {
+            "line": 25,
+            "message": "This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+            "rule": "anti-slop(no-unsafe-dictionary-type)"
+          },
+          {
+            "line": 37,
+            "message": "Unexpected comma in middle of array",
+            "rule": "eslint(no-sparse-arrays)"
+          },
+          {
+            "line": 51,
+            "message": "This dictionary's unknown value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+            "rule": "anti-slop(no-unsafe-dictionary-type)"
+          }
+        ]
       }
     ],
     "problems": []

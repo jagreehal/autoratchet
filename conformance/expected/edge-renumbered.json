@@ -1,0 +1,356 @@
+{
+  "exit": 1,
+  "textExit": 1,
+  "report": {
+    "approvals": [
+      {
+        "functionName": "Worker.run#2",
+        "override": {
+          "filePath": "shifted.ts",
+          "line": 51,
+          "metric": "lint",
+          "text": "// oxlint-disable-next-line eqeqeq -- loose on purpose"
+        },
+        "score": 2
+      }
+    ],
+    "blockedOverrides": [],
+    "functions": 11,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Approved by a new override** (a reviewer must accept each reason; still measured):",
+      "**Failed.** A function got worse than the ratchet allows.",
+      "**Lint findings in those functions:**",
+      "- `shifted.ts:13` eslint(eqeqeq): Expected === and instead saw ==",
+      "- `shifted.ts:14` eslint(eqeqeq): Expected === and instead saw ==",
+      "- `shifted.ts:37` eslint(eqeqeq): Expected === and instead saw ==",
+      "- `shifted.ts:50` eslint(eqeqeq): Expected === and instead saw ==",
+      "- `shifted.ts::Worker.run#2` lint 2: // oxlint-disable-next-line eqeqeq -- loose on purpose",
+      "<sub>11 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `shifted.ts::Worker.run#2` | lint | new | 1 | 0 |",
+      "| `shifted.ts::swapped>run()` | lint | new | 1 | 0 |",
+      "| `shifted.ts::worse>run()#2` | lint | 1 | 2 | 1 |",
+      "|---|---|--:|--:|--:|"
+    ],
+    "regressions": [
+      {
+        "current": 1,
+        "filePath": "shifted.ts",
+        "findings": [
+          {
+            "line": 37,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ],
+        "functionName": "swapped>run()",
+        "kind": "new",
+        "line": 36,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "shifted.ts",
+        "findings": [
+          {
+            "line": 50,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ],
+        "functionName": "Worker.run#2",
+        "kind": "new",
+        "line": 49,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 2,
+        "filePath": "shifted.ts",
+        "findings": [
+          {
+            "line": 13,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          },
+          {
+            "line": 14,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ],
+        "functionName": "worse>run()#2",
+        "kind": "worsened",
+        "line": 12,
+        "metric": "lint",
+        "previous": 1,
+        "threshold": 0
+      }
+    ],
+    "unmatchedOverrides": [],
+    "untracked": [],
+    "verdict": "fail"
+  },
+  "text": [
+    "      line 13 eslint(eqeqeq): Expected === and instead saw ==",
+    "      line 14 eslint(eqeqeq): Expected === and instead saw ==",
+    "      line 37 eslint(eqeqeq): Expected === and instead saw ==",
+    "      line 50 eslint(eqeqeq): Expected === and instead saw ==",
+    "    line 51: // oxlint-disable-next-line eqeqeq -- loose on purpose",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 1 → 2 (+1)",
+    "  Worker.run#2 (new function)",
+    "  shifted.ts::Worker.run#2 lint 2",
+    "  swapped>run() (new function)",
+    "  worse>run()#2",
+    "Approved by a new override. A reviewer must accept each reason:",
+    "Lint regressions detected:",
+    "Quality gate failed.",
+    "Still measured: if one of these gets worse in a later PR, the gate fails.",
+    "shifted.ts"
+  ],
+  "measureBase": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "shifted.ts",
+        "functionName": "Quoted.run",
+        "line": 40,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "shifted.ts",
+        "functionName": "Quoted.run>2",
+        "line": 43,
+        "lint": [
+          {
+            "line": 44,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "shifted.ts",
+        "functionName": "same>run()",
+        "line": 16,
+        "lint": [
+          {
+            "line": 17,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "shifted.ts",
+        "functionName": "swapped>run()",
+        "line": 25,
+        "lint": [
+          {
+            "line": 26,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "shifted.ts",
+        "functionName": "Worker.run",
+        "line": 33,
+        "lint": [
+          {
+            "line": 34,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "shifted.ts",
+        "functionName": "worse>run()",
+        "line": 7,
+        "lint": [
+          {
+            "line": 8,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "shifted.ts",
+        "functionName": "same",
+        "line": 14,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "shifted.ts",
+        "functionName": "swapped",
+        "line": 23,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 2,
+        "filePath": "shifted.ts",
+        "functionName": "worse",
+        "line": 5,
+        "lint": []
+      }
+    ],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "shifted.ts",
+        "functionName": "Quoted.run>2",
+        "line": 58,
+        "lint": [
+          {
+            "line": 59,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "shifted.ts",
+        "functionName": "same>run()",
+        "line": 22,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "shifted.ts",
+        "functionName": "same>run()#2",
+        "line": 27,
+        "lint": [
+          {
+            "line": 28,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "shifted.ts",
+        "functionName": "swapped>run()",
+        "line": 36,
+        "lint": [
+          {
+            "line": 37,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "shifted.ts",
+        "functionName": "swapped>run()#2",
+        "line": 41,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "shifted.ts",
+        "functionName": "Worker.run#2",
+        "line": 49,
+        "lint": [
+          {
+            "line": 50,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          },
+          {
+            "line": 52,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "shifted.ts",
+        "functionName": "worse>run()",
+        "line": 7,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "shifted.ts",
+        "functionName": "worse>run()#2",
+        "line": 12,
+        "lint": [
+          {
+            "line": 13,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          },
+          {
+            "line": 14,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 3,
+        "filePath": "shifted.ts",
+        "functionName": "same",
+        "line": 20,
+        "lint": []
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 3,
+        "filePath": "shifted.ts",
+        "functionName": "swapped",
+        "line": 34,
+        "lint": []
+      },
+      {
+        "cognitive": 2,
+        "cyclomatic": 3,
+        "filePath": "shifted.ts",
+        "functionName": "worse",
+        "line": 5,
+        "lint": []
+      }
+    ],
+    "problems": []
+  }
+}

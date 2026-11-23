@@ -8,8 +8,8 @@
     "incomplete": [],
     "markdown": [
       "## AutoRatchet",
-      "**Failed.** A function got more complex than the ratchet allows.",
-      "<sub>1 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "**Failed.** A function got worse than the ratchet allows.",
+      "<sub>1 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
       "| Function | Metric | Before | After | Limit |",
       "| `score.go::Score` | cognitive | new | 8 | 5 from .golangci.yml |",
       "| `score.go::Score` | cyclomatic | new | 9 | 8 from .golangci.yml |",
@@ -60,7 +60,8 @@
         "cyclomatic": 9,
         "filePath": "score.go",
         "functionName": "Score",
-        "line": 3
+        "line": 3,
+        "lint": []
       }
     ],
     "problems": []

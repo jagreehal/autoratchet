@@ -1,6 +1,6 @@
 ---
 name: autoratchet-python
-description: Write Python that passes AutoRatchet's complexity check (cyclomatic 10, cognitive 15 for new code, and no function may get worse). Use whenever you write, edit or refactor .py code in a repo that uses AutoRatchet (an autoratchet binary or dependency, a jagreehal/autoratchet workflow, or .claude/hooks/complexity-check.sh), and whenever an AutoRatchet hook or CI check reports "Complexity regressions detected" for Python, even if the user only asks for a feature or a bug fix or mentions radon, complexipy or ruff C901.
+description: Write Python that passes AutoRatchet's complexity and lint check (cyclomatic 10, cognitive 15 and no anti-slop findings for new code, and no function may get worse). Use whenever you write, edit or refactor .py code in a repo that uses AutoRatchet (an autoratchet binary or dependency, a jagreehal/autoratchet workflow, or .claude/hooks/complexity-check.sh), and whenever an AutoRatchet hook or CI check reports "regressions detected" (complexity or lint) for Python, even if the user only asks for a feature or a bug fix or mentions radon, complexipy or ruff C901.
 ---
 
 # Writing Python that passes AutoRatchet
@@ -124,6 +124,17 @@ moment to switch shape, not after the check fails.
 - Raising `--threshold` or `max-complexity`, or removing the rule. The check uses the stricter of
   base and working-tree config.
 
+## Lint findings: new code gets none
+
+AutoRatchet also counts anti-slop findings in each function (or the module's `(top level)`), with
+the same ratchet and a limit of 0. The report names the rule and line.
+
+- **No `Any` or `object` parameters, no `Any` returns**: take and return a named type (a
+  dataclass, TypedDict or Protocol) and parse raw data where it enters. `*args`/`**kwargs` and
+  `TypeGuard`/`TypeIs` functions and dunder methods (`__eq__(self, other: object)`) are exempt.
+- **No `dict[str, Any]`** (or `Mapping`/`object` variants): use a TypedDict or dataclass.
+- **Every `cast(...)` needs `# SAFETY: <the checked invariant>`** on the line above it, or above the first line of its statement.
+
 ## Override comments are for people
 
 Some functions are fine over the limit: one branch per status code, a parser that follows a spec
@@ -143,6 +154,16 @@ def parse_uri(text):
 `# noqa: C901` covers cyclomatic; `# noqa: complexipy` and `# complexipy: ignore` cover cognitive.
 Existing overrides stay in force for the score they approved, so making such a function worse
 still fails.
+
+The same goes for a lint finding. If one is a false positive, show the user the directive that
+approves it, on the line above, naming the rule:
+
+```python
+# autoratchet-disable-next-line anti-slop-python/require-safety-comment-for-cast -- validated by the schema above
+user = cast(User, payload)
+```
+
+It approves only the findings it names on that line, once; other new findings still fail.
 
 ## Check before you hand back
 

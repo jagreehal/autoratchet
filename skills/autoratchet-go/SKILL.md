@@ -1,6 +1,6 @@
 ---
 name: autoratchet-go
-description: Write Go that passes AutoRatchet's complexity check (cyclomatic 10, cognitive 15 for new code, and no function may get worse). Use whenever you write, edit or refactor .go code in a repo that uses AutoRatchet (an autoratchet binary or dependency, a jagreehal/autoratchet workflow, or .claude/hooks/complexity-check.sh), and whenever an AutoRatchet hook or CI check reports "Complexity regressions detected" for Go, even if the user only asks for a feature or a bug fix or mentions gocyclo, gocognit, cyclop or golangci-lint.
+description: Write Go that passes AutoRatchet's complexity and lint check (cyclomatic 10, cognitive 15 and no anti-slop findings for new code, and no function may get worse). Use whenever you write, edit or refactor .go code in a repo that uses AutoRatchet (an autoratchet binary or dependency, a jagreehal/autoratchet workflow, or .claude/hooks/complexity-check.sh), and whenever an AutoRatchet hook or CI check reports "regressions detected" (complexity or lint) for Go, even if the user only asks for a feature or a bug fix or mentions gocyclo, gocognit, cyclop or golangci-lint.
 ---
 
 # Writing Go that passes AutoRatchet
@@ -125,6 +125,17 @@ shape, not after the check fails.
 - Raising `--threshold` or the golangci-lint settings, or disabling the linters. The check uses the
   stricter of base and working-tree config.
 
+## Lint findings: new code gets none
+
+AutoRatchet also counts anti-slop findings in each function (or the file's `(top level)`), with
+the same ratchet and a limit of 0. The report names the rule and line.
+
+- **No `any`/`interface{}` parameters or results**: use a named type, a generic constraint or a
+  small interface. Variadic `args ...any` for fmt-style wrappers is fine.
+- **No `map[string]any`**: use a struct.
+- **No single-value type assertions**: `v, ok := x.(T)` or a type switch.
+- **Every use of package `unsafe` needs `// SAFETY: <invariant>`** on the line above it, or above the first line of its statement.
+
 ## Override comments are for people
 
 Some functions are fine over the limit: one case per status code, a parser that follows a spec step
@@ -140,6 +151,16 @@ func StatusText(code int) string {
 `gocyclo` (or `cyclop`) covers cyclomatic and `gocognit` cognitive; `//nolint:gocyclo,gocognit`
 covers both, and `//gocognit:ignore` also covers cognitive. Existing overrides stay in force for
 the score they approved, so making such a function worse still fails.
+
+The same goes for a lint finding. If one is a false positive, show the user the directive that
+approves it, on the line above, naming the rule:
+
+```go
+// autoratchet-disable-next-line anti-slop-go/no-unchecked-type-assertion -- set in init()
+cfg := registry["config"].(Config)
+```
+
+It approves only the findings it names on that line, once; other new findings still fail.
 
 ## Check before you hand back
 

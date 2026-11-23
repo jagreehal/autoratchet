@@ -8,8 +8,8 @@
     "incomplete": [],
     "markdown": [
       "## AutoRatchet",
-      "**Failed.** A function got more complex than the ratchet allows.",
-      "<sub>1 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "**Failed.** A function got worse than the ratchet allows.",
+      "<sub>1 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
       "| Function | Metric | Before | After | Limit |",
       "| `score.py::score` | cyclomatic | new | 9 | 8 from pyproject.toml |",
       "|---|---|--:|--:|--:|"
@@ -48,7 +48,8 @@
         "cyclomatic": 9,
         "filePath": "score.py",
         "functionName": "score",
-        "line": 1
+        "line": 1,
+        "lint": []
       }
     ],
     "problems": []

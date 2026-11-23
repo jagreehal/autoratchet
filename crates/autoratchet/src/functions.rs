@@ -19,9 +19,16 @@ use oxc::parser::Parser;
 use oxc::span::SourceType;
 use serde_json::{Map, Value};
 
+use crate::lang::{Names, Origin};
+
 pub struct Analysis {
     /// Function start offset (UTF-8 bytes) → qualified name. Empty when the file does not parse.
     pub functions: HashMap<u32, String>,
+    /// Function start offset → the span its lint findings belong to, for each entry in
+    /// `functions`: the function, and a method's name before it (`shape() {}`, `get x() {}`).
+    pub spans: HashMap<u32, (u32, u32)>,
+    /// What each name in `functions` comes from.
+    pub origins: HashMap<String, Origin>,
     pub errors: Vec<String>,
     /// Starts of bodiless declarations (overload signatures, `declare function`, abstract
     /// methods). Oxlint scores them, but they hold no logic to measure.
@@ -33,15 +40,65 @@ pub struct Analysis {
     pub comments: Vec<(u32, u32)>,
 }
 
-pub fn analyse(path: &Path, source: &str) -> Analysis {
-    let allocator = Allocator::default();
+/// Oxlint reads JSX in .js files (common in React projects); so does the parser here.
+fn source_type_of(path: &Path) -> SourceType {
     let source_type = SourceType::from_path(path).unwrap_or_default();
-    // Oxlint reads JSX in .js files (common in React projects); so does the parser here.
-    let source_type = if source_type.is_javascript() {
+    if source_type.is_javascript() {
         source_type.with_jsx(true)
     } else {
         source_type
+    }
+}
+
+/// A file's syntax, for lining up revisions; comments only when it does not parse. Minified
+/// bundles nest deeply: callers give the thread a large stack.
+pub fn syntax(path: &Path, source: &str) -> crate::lang::Syntax {
+    let allocator = Allocator::default();
+    let source_type = source_type_of(path);
+    let parsed = Parser::new(&allocator, source, source_type).parse();
+    let range = |(start, end): (u32, u32)| start as usize..end as usize;
+    let mut syntax = crate::lang::Syntax {
+        comments: parsed
+            .program
+            .comments
+            .iter()
+            .map(|c| range((c.span.start, c.span.end)))
+            .collect(),
+        ..Default::default()
     };
+    if !parsed.diagnostics.is_empty() {
+        return syntax;
+    }
+    let json = parsed.program.to_estree_json(source_type.is_typescript(), false);
+    let json = replace_lone_surrogates(&json);
+    let mut reader = serde_json::Deserializer::from_str(&json);
+    reader.disable_recursion_limit();
+    let Ok(program) = <Value as serde::Deserialize>::deserialize(&mut reader) else {
+        return syntax;
+    };
+    let mut stack = vec![&program];
+    while let Some(value) = stack.pop() {
+        match value {
+            Value::Array(items) => stack.extend(items),
+            Value::Object(fields) => {
+                if let Some(n) = node(value) {
+                    let span = offset(n, "start")..offset(n, "end");
+                    if matches!(kind(n), "Literal" | "TemplateElement" | "JSXText") {
+                        syntax.literals.push(span.clone());
+                    }
+                    syntax.node(kind(n), span);
+                }
+                stack.extend(fields.values());
+            }
+            _ => {}
+        }
+    }
+    syntax
+}
+
+pub fn analyse(path: &Path, source: &str) -> Analysis {
+    let allocator = Allocator::default();
+    let source_type = source_type_of(path);
     let parsed = Parser::new(&allocator, source, source_type).parse();
     let comments = parsed
         .program
@@ -53,6 +110,8 @@ pub fn analyse(path: &Path, source: &str) -> Analysis {
         let errors = parsed.diagnostics.iter().map(|e| e.message.to_string()).collect();
         return Analysis {
             functions: HashMap::new(),
+            spans: HashMap::new(),
+            origins: HashMap::new(),
             errors,
             bodiless: HashSet::new(),
             cognitive: HashMap::new(),
@@ -70,6 +129,8 @@ pub fn analyse(path: &Path, source: &str) -> Analysis {
         Err(e) => {
             return Analysis {
                 functions: HashMap::new(),
+                spans: HashMap::new(),
+                origins: HashMap::new(),
                 errors: vec![format!("could not read its syntax tree: {e}")],
                 bodiless: HashSet::new(),
                 cognitive: HashMap::new(),
@@ -80,7 +141,8 @@ pub fn analyse(path: &Path, source: &str) -> Analysis {
     let mut walker = Walker {
         source,
         found: HashMap::new(),
-        seen: HashMap::new(),
+        spans: HashMap::new(),
+        names: Names::default(),
         bodiless: HashSet::new(),
     };
     walker.visit(&program, None, &Context::default());
@@ -89,6 +151,8 @@ pub fn analyse(path: &Path, source: &str) -> Analysis {
     Analysis {
         cognitive: cognitive.scores,
         functions: walker.found,
+        spans: walker.spans,
+        origins: walker.names.origins,
         errors: Vec::new(),
         bodiless: walker.bodiless,
         comments,
@@ -140,6 +204,8 @@ fn replace_lone_surrogates(json: &str) -> std::borrow::Cow<'_, str> {
 struct Context {
     /// Qualified name of the enclosing function.
     scope: Option<String>,
+    /// The same, in a class body too.
+    outer: Option<String>,
     /// Name of the enclosing class, when walking its body.
     class_name: Option<String>,
     /// Name of the variable an object or array literal is assigned to.
@@ -216,7 +282,8 @@ const KEEPS_OWNER: [&str; 5] = [
 struct Walker<'s> {
     source: &'s str,
     found: HashMap<u32, String>,
-    seen: HashMap<String, u32>,
+    spans: HashMap<u32, (u32, u32)>,
+    names: Names,
     bodiless: HashSet<u32>,
 }
 
@@ -333,18 +400,28 @@ impl Walker<'_> {
     /// Class members get no scope prefix: the class name already carries it.
     fn record(&mut self, func: &Node, parent: Option<&Node>, ctx: &Context) -> String {
         let own = self.own_name(func, parent, ctx);
-        self.record_as(func, own, ctx)
+        // A method's name is written before its function: `shape() {}`, `get x() {}`, a class
+        // method. A property holding a function (`shape: () => 1`) keeps its key outside.
+        let method = parent.filter(|p| match kind(p) {
+            "MethodDefinition" => true,
+            "Property" => {
+                p.get("method") == Some(&Value::Bool(true)) || p.get("kind").and_then(Value::as_str) != Some("init")
+            }
+            _ => false,
+        });
+        let from = method.map_or_else(|| offset(func, "start"), |p| offset(p, "start"));
+        self.record_as(func, own, from, ctx)
     }
 
-    fn record_as(&mut self, func: &Node, own: String, ctx: &Context) -> String {
+    fn record_as(&mut self, func: &Node, own: String, from: usize, ctx: &Context) -> String {
         let base = match &ctx.scope {
             Some(scope) => format!("{scope}>{own}"),
             None => own,
         };
-        let count = self.seen.entry(base.clone()).or_insert(0);
-        *count += 1;
-        let name = if *count == 1 { base } else { format!("{base}#{count}") };
+        let name = self.names.add(base, ctx.outer.as_deref());
         self.found.insert(offset(func, "start") as u32, name.clone());
+        self.spans
+            .insert(offset(func, "start") as u32, (from as u32, offset(func, "end") as u32));
         name
     }
 
@@ -358,6 +435,7 @@ impl Walker<'_> {
         match &ctx.scope {
             Some(scope) => Context {
                 class_name: Some(format!("{scope}>{name}")),
+                outer: ctx.outer.clone(),
                 ..Context::default()
             },
             None => Context {
@@ -422,18 +500,21 @@ impl Walker<'_> {
         if matches!(kind(n), "TSDeclareFunction" | "TSEmptyBodyFunctionExpression") {
             self.bodiless.insert(offset(n, "start") as u32);
         }
+        let in_function = |name: String| Context {
+            scope: Some(name.clone()),
+            outer: Some(name),
+            ..Context::default()
+        };
         let child_ctx = if is_function(n) {
-            Context {
-                scope: Some(self.record(n, parent, ctx)),
-                ..Context::default()
-            }
+            in_function(self.record(n, parent, ctx))
         } else if kind(n) == "StaticBlock" {
             // `static { … }` holds logic Oxlint scores like a function's: Class.static.
             let own = format!("{}.static", ctx.class_name.as_deref().unwrap_or("class"));
-            Context {
-                scope: Some(self.record_as(n, own, &Context::default())),
+            let of_class = Context {
+                outer: ctx.outer.clone(),
                 ..Context::default()
-            }
+            };
+            in_function(self.record_as(n, own, offset(n, "start"), &of_class))
         } else {
             self.child_context(n, parent, ctx)
         };
@@ -663,6 +744,21 @@ mod tests {
         let mut found: Vec<_> = analyse(Path::new("a.ts"), source).functions.into_iter().collect();
         found.sort();
         found.into_iter().map(|(_, n)| n).collect()
+    }
+
+    #[test]
+    fn a_method_owns_its_name() {
+        let source = "const o = { shapeMethod() { return 1; }, get size() { return 2; }, arrow: () => 3 };\nclass C { classMethod() {} }\n";
+        let analysis = analyse(Path::new("a.ts"), source);
+        let from = |name: &str| {
+            let (start, _) = analysis.functions.iter().find(|(_, n)| n.ends_with(name)).expect(name);
+            analysis.spans[start].0 as usize
+        };
+        assert_eq!(from("shapeMethod"), source.find("shapeMethod").unwrap());
+        assert_eq!(from("size"), source.find("get size").unwrap());
+        assert_eq!(from("classMethod"), source.find("classMethod").unwrap());
+        // A property holding a function keeps its key at the top level.
+        assert_eq!(from("arrow"), source.find("() => 3").unwrap());
     }
 
     #[test]

@@ -20,7 +20,7 @@
 //! run of one boolean operator costs 1; a nested function's body sits one level deeper, unless the
 //! function is a decorator's wrapper; and a function that calls itself costs 1 more.
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use tree_sitter::{Node, Parser};
 
@@ -28,6 +28,17 @@ use crate::gate::Metric;
 use crate::lang::{
     MeasuredFunction, NativeAnalysis, attached_overrides, directive_metrics, named_children, tree_sitter_error,
 };
+
+/// A file's syntax, for lining up revisions; empty when it does not parse.
+pub fn syntax(source: &str) -> crate::lang::Syntax {
+    let mut parser = Parser::new();
+    parser
+        .set_language(&tree_sitter_python::LANGUAGE.into())
+        .expect("Python grammar");
+    parser.parse(source, None).map_or_else(Default::default, |tree| {
+        crate::lang::tree_syntax(tree.root_node(), &["string", "integer", "float"])
+    })
+}
 
 pub fn analyse_python(source: &str) -> NativeAnalysis {
     let mut parser = Parser::new();
@@ -51,7 +62,7 @@ pub fn analyse_python(source: &str) -> NativeAnalysis {
         comments: crate::lang::comments(tree.root_node(), source),
     };
     let mut out = NativeAnalysis::default();
-    let mut seen = std::collections::HashMap::new();
+    let mut names = crate::lang::Names::default();
     let mut defs = Vec::new();
     collect_defs(tree.root_node(), None, &file, &mut defs);
     let graph = CallGraph::of(tree.root_node(), &file);
@@ -64,16 +75,16 @@ pub fn analyse_python(source: &str) -> NativeAnalysis {
             None => own.to_string(),
         };
         let base = class.as_ref().map_or(qualified.clone(), |c| format!("{c}.{qualified}"));
-        let count = seen.entry(base.clone()).or_insert(0u32);
-        *count += 1;
-        let name = if *count == 1 { base } else { format!("{base}#{count}") };
+        let name = names.add(base, None);
         let line = def.start_position().row as u32 + 1;
         let recursive = graph.recursion(def);
         out.functions.push(MeasuredFunction {
+            origin: names.origin(&name),
             name: name.clone(),
             line,
             cyclomatic: 1 + radon_decisions(body(def), &file),
             cognitive: root_cognitive(def, &file) + recursive,
+            span: def.byte_range(),
         });
         let first_line = decorated.unwrap_or(def).start_position().row as u32 + 1;
         out.overrides.extend(attached_overrides(
@@ -84,6 +95,8 @@ pub fn analyse_python(source: &str) -> NativeAnalysis {
             comment_metrics,
         ));
     }
+    out.findings = crate::slop::python(tree.root_node(), source, &file.comments);
+    out.overrides.extend(crate::slop::tree_lint_overrides(&file.comments));
     out
 }
 
@@ -544,6 +557,8 @@ fn flatten<'t>(node: Node<'t>, file: &File, operators: &mut Vec<String>, operand
 /// complexipy's recursion: a function on a call cycle costs 1.
 struct CallGraph {
     defs: Vec<GraphDef>,
+    /// Each `def`'s recursion count, by its tree-sitter id: see `recursion`.
+    recursion: HashMap<usize, u32>,
 }
 
 /// One function in the module's call graph.
@@ -567,9 +582,30 @@ struct GraphDef {
 
 impl CallGraph {
     fn of(root: Node, file: &File) -> CallGraph {
-        let mut graph = CallGraph { defs: Vec::new() };
+        let mut graph = CallGraph {
+            defs: Vec::new(),
+            recursion: HashMap::new(),
+        };
         graph.walk(root, None, false, None, file);
+        graph.recursion = graph.count_recursion();
         graph
+    }
+
+    /// 1 for each function on a call cycle, summed into every function it is nested in.
+    fn count_recursion(&self) -> HashMap<usize, u32> {
+        let mut by_name: HashMap<&str, Vec<usize>> = HashMap::new();
+        for (index, def) in self.defs.iter().enumerate() {
+            by_name.entry(&def.name).or_default().push(index);
+        }
+        let edges: Vec<_> = (0..self.defs.len()).map(|from| self.edges(from, &by_name)).collect();
+        let mut counts: Vec<u32> = on_cycle(&edges).into_iter().map(u32::from).collect();
+        // `walk` pushes a def before the defs nested in it, so a reverse pass sums inner first.
+        for index in (0..self.defs.len()).rev() {
+            if let Some(parent) = self.defs[index].parent {
+                counts[parent] += counts[index];
+            }
+        }
+        self.defs.iter().map(|d| d.node_id).zip(counts).collect()
     }
 
     fn walk(&mut self, node: Node, class: Option<usize>, in_class_body: bool, parent: Option<usize>, file: &File) {
@@ -618,9 +654,13 @@ impl CallGraph {
         target.is_none() && !self.defs[def].is_method && self.defs[def].class.is_none()
     }
 
-    fn edges(&self, from: usize) -> Vec<usize> {
+    fn edges(&self, from: usize, by_name: &HashMap<&str, Vec<usize>>) -> Vec<usize> {
         let caller = &self.defs[from];
-        (0..self.defs.len())
+        let named = caller.functions.iter().chain(&caller.methods);
+        named
+            .filter_map(|name| by_name.get(name.as_str()))
+            .flatten()
+            .copied()
             .filter(|&to| {
                 let target = &self.defs[to];
                 if target.is_method {
@@ -632,38 +672,99 @@ impl CallGraph {
             .collect()
     }
 
-    fn on_cycle(&self, start: usize) -> bool {
-        let mut seen = HashSet::new();
-        let mut stack = self.edges(start);
-        while let Some(next) = stack.pop() {
-            if next == start {
-                return true;
-            }
-            if seen.insert(next) {
-                stack.extend(self.edges(next));
-            }
-        }
-        false
-    }
-
     /// 1 for the function if it is on a call cycle, and 1 for each function nested in it that is.
     fn recursion(&self, def: Node) -> u32 {
-        let Some(index) = self.defs.iter().position(|d| d.node_id == def.id()) else {
-            return 0;
-        };
-        (0..self.defs.len())
-            .filter(|&d| {
-                let mut ancestor = Some(d);
-                while let Some(a) = ancestor {
-                    if a == index {
-                        return true;
-                    }
-                    ancestor = self.defs[a].parent;
-                }
-                false
-            })
-            .filter(|&d| self.on_cycle(d))
-            .count() as u32
+        self.recursion.get(&def.id()).copied().unwrap_or(0)
+    }
+}
+
+/// Which nodes lie on a cycle: those in a strongly connected component of more than one node,
+/// or with an edge to themselves.
+fn on_cycle(edges: &[Vec<usize>]) -> Vec<bool> {
+    let mut tarjan = Tarjan {
+        edges,
+        order: vec![UNSEEN; edges.len()],
+        low: vec![0; edges.len()],
+        open: vec![false; edges.len()],
+        stack: Vec::new(),
+        out: vec![false; edges.len()],
+        next: 0,
+    };
+    for root in 0..edges.len() {
+        if tarjan.order[root] == UNSEEN {
+            tarjan.search(root);
+        }
+    }
+    tarjan.out
+}
+
+const UNSEEN: usize = usize::MAX;
+
+/// Tarjan's strongly connected components, iterative so a deep call chain cannot overflow the
+/// stack.
+struct Tarjan<'a> {
+    edges: &'a [Vec<usize>],
+    /// The order each node was first reached in.
+    order: Vec<usize>,
+    /// The earliest node reachable from each, through nodes still open.
+    low: Vec<usize>,
+    /// Whether each node is on `stack`, its component not yet closed.
+    open: Vec<bool>,
+    stack: Vec<usize>,
+    out: Vec<bool>,
+    next: usize,
+}
+
+impl Tarjan<'_> {
+    fn search(&mut self, root: usize) {
+        self.enter(root);
+        // Each frame is a node and how many of its edges have been followed.
+        let mut frames = vec![(root, 0)];
+        while let Some(frame) = frames.last_mut() {
+            let node = frame.0;
+            let Some(&to) = self.edges[node].get(frame.1) else {
+                frames.pop();
+                self.leave(node, frames.last().map(|f| f.0));
+                continue;
+            };
+            frame.1 += 1;
+            if self.order[to] == UNSEEN {
+                self.enter(to);
+                frames.push((to, 0));
+            } else if self.open[to] {
+                self.low[node] = self.low[node].min(self.order[to]);
+            }
+        }
+    }
+
+    fn enter(&mut self, node: usize) {
+        (self.order[node], self.low[node]) = (self.next, self.next);
+        self.next += 1;
+        self.stack.push(node);
+        self.open[node] = true;
+    }
+
+    /// Done with `node`: pass its reach to the node it was reached from, and close its
+    /// component if it is the component's first node.
+    fn leave(&mut self, node: usize, from: Option<usize>) {
+        if let Some(parent) = from {
+            self.low[parent] = self.low[parent].min(self.low[node]);
+        }
+        if self.low[node] != self.order[node] {
+            return;
+        }
+        let mut component = Vec::new();
+        while let Some(member) = self.stack.pop() {
+            self.open[member] = false;
+            component.push(member);
+            if member == node {
+                break;
+            }
+        }
+        let cycles = component.len() > 1 || self.edges[node].contains(&node);
+        for member in component {
+            self.out[member] = cycles;
+        }
     }
 }
 
@@ -935,6 +1036,13 @@ mod tests {
             ("u", 2),
         ];
         assert_eq!(got, want.map(|(n, c)| (n.to_string(), c)));
+    }
+
+    #[test]
+    fn on_cycle_finds_components_and_self_calls() {
+        // 0 → 1 → 2 → 0 is a cycle; 3 → 0 only reaches it; 4 calls itself; 5 → 6 is a chain.
+        let edges = vec![vec![1], vec![2], vec![0], vec![0], vec![4], vec![6], vec![]];
+        assert_eq!(super::on_cycle(&edges), [true, true, true, false, true, false, false]);
     }
 
     #[test]

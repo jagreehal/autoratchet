@@ -1,7 +1,7 @@
 {
   "name": "autoratchet",
   "version": "0.6.0",
-  "description": "Deterministic complexity checks for AI coding agents and the people who review their code. A ratchet on cyclomatic and cognitive complexity for TypeScript, JavaScript, Rust, Python and Go, on your machine, in agent hooks and in CI.",
+  "description": "Deterministic complexity and lint checks for AI coding agents and the people who review their code. A ratchet on complexity and lint findings for TypeScript, JavaScript, Rust, Python and Go, on your machine, in agent hooks and in CI.",
   "license": "Apache-2.0",
   "author": "Jag Reehal",
   "repository": {
@@ -50,12 +50,13 @@
     "version-packages": "changeset version && node scripts/sync-version.mjs && pnpm install --lockfile-only",
     "prepublishOnly": "node scripts/check-binaries.mjs",
     "release": "changeset publish",
-    "test": "cargo test --release && pnpm conformance",
+    "test": "cargo test --release && pnpm conformance && pnpm fuzz",
     "conformance": "tsx conformance/run.ts --cli target/release/autoratchet",
+    "fuzz": "tsx conformance/fuzz.ts --cli target/release/autoratchet",
     "bench": "tsx conformance/bench.ts",
     "lint": "cargo clippy --release --all-targets -- -D warnings && oxlint --disable-nested-config",
-    "format": "cargo fmt && oxfmt bin scripts conformance/run.ts conformance/bench.ts",
-    "format:check": "cargo fmt --check && oxfmt --check bin scripts conformance/run.ts conformance/bench.ts",
+    "format": "cargo fmt && oxfmt bin scripts conformance/run.ts conformance/bench.ts conformance/fuzz.ts",
+    "format:check": "cargo fmt --check && oxfmt --check bin scripts conformance/run.ts conformance/bench.ts conformance/fuzz.ts",
     "quality": "pnpm lint && pnpm format:check && pnpm build && pnpm test"
   },
   "dependencies": {

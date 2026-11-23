@@ -38,10 +38,10 @@ const toolEnv = {
   AUTORATCHET_OXLINT: process.env.AUTORATCHET_OXLINT || path.join(bin, 'oxlint'),
 };
 
-function cli(args: string[], cwd: string): Run {
+function cli(args: string[], cwd: string, env = toolEnv): Run {
   const r = spawnSync(cmd!, [...cmdArgs, ...args], {
     cwd,
-    env: toolEnv,
+    env,
     encoding: 'utf8',
     maxBuffer: 1 << 30,
   });
@@ -215,6 +215,80 @@ const gitCases: Record<string, (tmp: string) => unknown> = {
     });
     return caseResult(dir, []);
   },
+  'git-lint': (tmp) => {
+    // A renamed function keeps no history, a top-level count may not grow, a `quality/`
+    // prefix names the same rule, and strict mode blocks lint overrides like any other.
+    const reflect = (name: string, override = '') =>
+      [
+        `export function ${name}(owner: { a: number }) {`,
+        ...(override ? [`  // oxlint-disable-next-line ${override}`] : []),
+        "  return Reflect.get(owner, 'a');",
+        '}',
+        '',
+      ].join('\n');
+    const loose = (name: string) => `export type ${name} = Record<string, unknown>;\n\n`;
+    // Rust, Python and Go: an `autoratchet-disable-next-line` comment above the finding approves
+    // it, and a module-level finding counts at the top level.
+    const py = (extra: string) => `from typing import Any\n\nConfig = dict[str, Any]\n${extra}`;
+    const repo = newRepo(tmp, 'lint', {
+      'a.ts': loose('Loose') + reflect('oldName') + '\n' + reflect('legacy'),
+      'b.py': py(''),
+      'c.go': 'package c\n\nfunc Name(v any) string {\n\treturn ""\n}\n',
+    });
+    write(repo, {
+      'a.ts':
+        loose('Loose') +
+        loose('Looser') +
+        reflect('newName') +
+        '\n' +
+        reflect('legacy', 'quality/no-reflect-get -- proxied SDK object') +
+        '\n' +
+        reflect('added', 'anti-slop/no-reflect-get -- proxied SDK object'),
+      'b.py': py(
+        '\nMore = dict[str, Any]\n\n\n' +
+          '# autoratchet-disable-next-line anti-slop-python/no-any-parameters -- plugin hook\n' +
+          'def hook(event: Any) -> None:\n    return None\n',
+      ),
+      'c.go':
+        'package c\n\nfunc Name(v any, w any) string {\n\treturn ""\n}\n\n' +
+        'func Must(v any) error {\n' +
+        '\t// autoratchet-disable-next-line anti-slop-go/no-unchecked-type-assertion -- set by init\n' +
+        '\treturn v.(error)\n}\n',
+    });
+    return {
+      check: checkResult(repo, ['--base', 'main']),
+      strict: checkResult(repo, ['--base', 'main', '--require-override-approval']),
+    };
+  },
+  'oxlint-without-plugins': (tmp) => {
+    // The standalone Oxlint binary skips JS plugins: AutoRatchet must stop.
+    const dir = path.join(tmp, 'no-plugins');
+    write(dir, {
+      'base/a.ts': 'export const a = 1;\n',
+      'head/a.ts': "export const a = Reflect.get(globalThis, 'a');\n",
+      'oxlint.mjs': '#!/usr/bin/env node\nconsole.log(JSON.stringify({ diagnostics: [] }));\n',
+    });
+    fs.chmodSync(path.join(dir, 'oxlint.mjs'), 0o755);
+    const run = cli(['compare', '--base', 'base', '--head', 'head'], dir, {
+      ...toolEnv,
+      AUTORATCHET_OXLINT: path.join(dir, 'oxlint.mjs'),
+    });
+    return { exit: run.exit, explains: run.stderr.includes('did not run AutoRatchet') };
+  },
+  'json-snapshots-lint': (tmp) => {
+    // Snapshots from before lint existed have no `lint` field: nothing to compare, not gated.
+    const dir = path.join(tmp, 'json');
+    const finding = { rule: 'anti-slop(no-reflect-get)', line: 2, message: 'm' };
+    const fn = { filePath: 'a.ts', functionName: 'f', cyclomatic: 1, line: 1, cognitive: 1 };
+    write(dir, {
+      'old.json': JSON.stringify([fn]),
+      'clean.json': JSON.stringify([{ ...fn, lint: [] }]),
+      'dirty.json': JSON.stringify([{ ...fn, lint: [finding] }]),
+    });
+    const exit = (base: string) =>
+      cli(['compare', '--base', base, '--head', 'dirty.json'], dir).exit;
+    return { fromOld: exit('old.json'), fromClean: exit('clean.json'), same: exit('dirty.json') };
+  },
   'usage-errors': (tmp) => ({
     help: cli(['--help'], tmp).exit,
     noCommand: cli([], tmp).exit,
@@ -246,8 +320,59 @@ try {
   fs.rmSync(tmp, { recursive: true, force: true });
 }
 
-fs.mkdirSync(expectedDir, { recursive: true });
 let failed = 0;
+
+// lint-rules checks itself, not only against its snapshot: every ratcheted anti-slop rule has a
+// fixture, and each fixture file, named after its rule, reports that rule.
+// SAFETY: caseResult built every directory case, lint-rules included, with measureHead.
+const lintRules = results.get('lint-rules') as
+  | { measureHead: { functions: { filePath: string; lint?: { rule: string }[] }[] } }
+  | undefined;
+if (lintRules) {
+  const problems: string[] = [];
+  const found = new Map<string, string[]>();
+  for (const f of lintRules.measureHead.functions) {
+    found.set(f.filePath, [...(found.get(f.filePath) ?? []), ...(f.lint ?? []).map((l) => l.rule)]);
+  }
+  const fixtures = path.join(casesDir, 'lint-rules', 'head');
+  // Each fixture directory: the code a file reports, from its name, and the rules that must all
+  // have a fixture there.
+  const source = (file: string) =>
+    fs.readFileSync(path.join(here, '../crates/autoratchet', file), 'utf8');
+  const names = (text: string) => [...text.matchAll(/\(?\s*"([a-z-]+)",/g)].map((m) => m[1] ?? '');
+  const block = (text: string, start: string) =>
+    text.slice(text.indexOf(start), text.indexOf('];', text.indexOf(start)));
+  const slop = source('src/slop.rs');
+  const dirs = {
+    'anti-slop': {
+      code: (s) => `anti-slop(${s})`,
+      rules: names(block(source('plugin/files.rs'), 'RULES')),
+    },
+    native: { code: (s) => s.replace(/^([^.]+)\.(.+)$/, '$1($2)'), rules: [] },
+    rust: { code: (s) => `anti-slop-rust(${s})`, rules: names(block(slop, 'const RUST')) },
+    python: { code: (s) => `anti-slop-python(${s})`, rules: names(block(slop, 'const PYTHON')) },
+    go: { code: (s) => `anti-slop-go(${s})`, rules: names(block(slop, 'const GO')) },
+  };
+  for (const [dir, { code, rules: required }] of Object.entries(dirs)) {
+    const files = fs.readdirSync(path.join(fixtures, dir));
+    for (const file of files) {
+      const rule = code(file.replace(/(\.test)?\.[a-z]+$/, ''));
+      const rules = found.get(`${dir}/${file}`) ?? [];
+      if (!rules.includes(rule))
+        problems.push(`${dir}/${file}: expected ${rule}, got [${rules.join(', ')}]`);
+    }
+    for (const rule of required) {
+      if (!files.some((f) => f.startsWith(`${rule}.`)))
+        problems.push(`no fixture for ${dir} rule ${rule}`);
+    }
+  }
+  if (problems.length > 0) {
+    failed++;
+    console.log(`FAIL lint-rules (rule coverage)\n  ${problems.join('\n  ')}`);
+  }
+}
+
+fs.mkdirSync(expectedDir, { recursive: true });
 for (const [name, actual] of results) {
   const file = path.join(expectedDir, `${name}.json`);
   const text = `${JSON.stringify(actual, null, 2)}\n`;

@@ -1,6 +1,6 @@
 ---
 name: autoratchet-typescript
-description: Write TypeScript and JavaScript that passes AutoRatchet's complexity check (cyclomatic 10, cognitive 15 for new code, and no function may get worse). Use whenever you write, edit or refactor .ts, .tsx, .js, .jsx, .mts, .cts, .mjs or .cjs code in a repo that uses AutoRatchet (autoratchet in package.json, a jagreehal/autoratchet workflow, or .claude/hooks/complexity-check.sh), and whenever an AutoRatchet hook or CI check reports "Complexity regressions detected", even if the user only asks for a feature or a bug fix.
+description: Write TypeScript and JavaScript that passes AutoRatchet's complexity and lint check (cyclomatic 10, cognitive 15 and no anti-slop lint findings for new code, and no function may get worse). Use whenever you write, edit or refactor .ts, .tsx, .js, .jsx, .mts, .cts, .mjs or .cjs code in a repo that uses AutoRatchet (autoratchet in package.json, a jagreehal/autoratchet workflow, or .claude/hooks/complexity-check.sh), and whenever an AutoRatchet hook or CI check reports "regressions detected" (complexity or lint), even if the user only asks for a feature or a bug fix.
 ---
 
 # Writing TypeScript and JavaScript that passes AutoRatchet
@@ -121,6 +121,28 @@ Reach for these first. They read better, and they score low without any effort:
 When a function you are writing starts to need a third level of nesting or a fourth branch on the
 same value, that is the moment to switch shape, not after the check fails.
 
+## Lint findings: new code gets none
+
+AutoRatchet also counts lint findings (anti-slop rules plus Oxlint's built-in rules) in each function
+(or the file's `(top level)`), with the same ratchet and a limit of 0. A new function may have none,
+and an existing one may not gain any. The report lists each finding's line and rule:
+
+- **Parse at the boundary instead of passing `unknown` around.** No `unknown` parameters, return
+  types or type aliases, no `object` parameters, no `Record<string, unknown>`: take and return a
+  named domain type, and run the schema or parser where the data enters.
+- **Every `as` needs evidence.** Put `// SAFETY: <the invariant that makes it true>` directly above
+  it. Never chain assertions (`as unknown as T`) or widen a known value to `unknown` and assert
+  it back. `as const` is always fine.
+- **No `Reflect.get` or `Reflect.apply`**: use property access and plain calls.
+- **No `...(cond ? { a } : {})`**: build the object, then set the field in an `if`.
+- **No `typeof` narrowing on values you received**: parse them into a type at the boundary.
+  `typeof x === 'undefined'` existence checks are fine.
+- **No `vi.mock`/`jest.mock`**: pass the dependency in. No `shape` in names you own.
+- **No likely bugs**: `===` always (`=== null || === undefined` for both), no `any`, no `!`
+  non-null assertions, no `eval`, throw `Error`s, no unreachable code or fallthrough.
+- **One array pass**: not `.filter().map()` (use `flatMap` or `.values().filter().map().toArray()`),
+  and no spreading or copying the accumulator in `reduce` (push to it and return it).
+
 ## Don't game the metric
 
 The check exists so humans can review agent code. Tricks that lower the number without making the
@@ -150,6 +172,16 @@ export function createChart({ width = 640, height = 400 /* … */ } = {}) {
 comma-separated, for both. `eslint-` and `biome-ignore lint/complexity/noExcessiveCognitiveComplexity`
 spellings work too. Existing overrides stay in force for the score they approved, so making such a
 function worse still fails.
+
+The same goes for a lint finding. If one is a false positive, show the user the directive that
+approves it, on the line above, naming the rule:
+
+```ts
+// oxlint-disable-next-line anti-slop/no-reflect-get -- the SDK only exposes these through a proxy
+const value = Reflect.get(client, key);
+```
+
+It approves only the findings it names on that line, once; other new findings still fail.
 
 ## Check before you hand back
 

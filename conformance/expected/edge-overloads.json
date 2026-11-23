@@ -1,24 +1,78 @@
 {
-  "exit": 0,
-  "textExit": 0,
+  "exit": 1,
+  "textExit": 1,
   "report": {
     "approvals": [],
     "blockedOverrides": [],
-    "functions": 2,
+    "functions": 3,
     "incomplete": [],
     "markdown": [
       "## AutoRatchet",
-      "**Passed.** No function got more complex than the ratchet allows.",
-      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+      "**Failed.** A function got worse than the ratchet allows.",
+      "**Lint findings in those functions:**",
+      "- `overloads.ts:2` anti-slop(no-unknown-parameters): Parameter `data` leaves input unparsed. Accept a named domain type; run the expected schema or parser at the I/O boundary before calling this function.",
+      "- `overloads.ts:3` anti-slop(no-unknown-parameters): Parameter `data` leaves input unparsed. Accept a named domain type; run the expected schema or parser at the I/O boundary before calling this function.",
+      "- `overloads.ts:7` anti-slop(no-shape-in-symbol-names): Rename symbol \"Shape\" for its domain role; \"shape\" describes structure rather than ownership.",
+      "<sub>3 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `overloads.ts::(top level)` | lint | new | 2 | 0 |",
+      "| `overloads.ts::step` | lint | new | 1 | 0 |",
+      "|---|---|--:|--:|--:|"
     ],
-    "regressions": [],
+    "regressions": [
+      {
+        "current": 1,
+        "filePath": "overloads.ts",
+        "findings": [
+          {
+            "line": 3,
+            "message": "Parameter `data` leaves input unparsed. Accept a named domain type; run the expected schema or parser at the I/O boundary before calling this function.",
+            "rule": "anti-slop(no-unknown-parameters)"
+          }
+        ],
+        "functionName": "step",
+        "kind": "new",
+        "line": 3,
+        "metric": "lint",
+        "threshold": 0
+      },
+      {
+        "current": 2,
+        "filePath": "overloads.ts",
+        "findings": [
+          {
+            "line": 2,
+            "message": "Parameter `data` leaves input unparsed. Accept a named domain type; run the expected schema or parser at the I/O boundary before calling this function.",
+            "rule": "anti-slop(no-unknown-parameters)"
+          },
+          {
+            "line": 7,
+            "message": "Rename symbol \"Shape\" for its domain role; \"shape\" describes structure rather than ownership.",
+            "rule": "anti-slop(no-shape-in-symbol-names)"
+          }
+        ],
+        "functionName": "(top level)",
+        "kind": "new",
+        "line": 2,
+        "metric": "lint",
+        "threshold": 0
+      }
+    ],
     "unmatchedOverrides": [],
     "untracked": [],
-    "verdict": "pass"
+    "verdict": "fail"
   },
   "text": [
-    "No complexity regressions detected.",
-    "Quality gate passed."
+    "      line 2 anti-slop(no-unknown-parameters): Parameter `data` leaves input unparsed. Accept a named domain type; run the expected schema or parser at the I/O boundary before calling this function.",
+    "      line 3 anti-slop(no-unknown-parameters): Parameter `data` leaves input unparsed. Accept a named domain type; run the expected schema or parser at the I/O boundary before calling this function.",
+    "      line 7 anti-slop(no-shape-in-symbol-names): Rename symbol \"Shape\" for its domain role; \"shape\" describes structure rather than ownership.",
+    "    lint: 1 (maximum for new code: 0)",
+    "    lint: 2 (maximum for new code: 0)",
+    "  (top level) (new function)",
+    "  step (new function)",
+    "Lint regressions detected:",
+    "Quality gate failed.",
+    "overloads.ts"
   ],
   "measureBase": {
     "functions": [],
@@ -31,14 +85,40 @@
         "cyclomatic": 2,
         "filePath": "overloads.ts",
         "functionName": "Shape.scale",
-        "line": 11
+        "line": 11,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 2,
         "filePath": "overloads.ts",
         "functionName": "step",
-        "line": 3
+        "line": 3,
+        "lint": [
+          {
+            "line": 3,
+            "message": "Parameter `data` leaves input unparsed. Accept a named domain type; run the expected schema or parser at the I/O boundary before calling this function.",
+            "rule": "anti-slop(no-unknown-parameters)"
+          }
+        ]
+      },
+      {
+        "cyclomatic": 0,
+        "filePath": "overloads.ts",
+        "functionName": "(top level)",
+        "line": 2,
+        "lint": [
+          {
+            "line": 2,
+            "message": "Parameter `data` leaves input unparsed. Accept a named domain type; run the expected schema or parser at the I/O boundary before calling this function.",
+            "rule": "anti-slop(no-unknown-parameters)"
+          },
+          {
+            "line": 7,
+            "message": "Rename symbol \"Shape\" for its domain role; \"shape\" describes structure rather than ownership.",
+            "rule": "anti-slop(no-shape-in-symbol-names)"
+          }
+        ]
       }
     ],
     "problems": []

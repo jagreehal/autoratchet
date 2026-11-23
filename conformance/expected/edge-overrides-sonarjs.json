@@ -40,11 +40,11 @@
     "markdown": [
       "## AutoRatchet",
       "**Approved by a new override** (a reviewer must accept each reason; still measured):",
-      "**Passed.** No function got more complex than the ratchet allows.",
+      "**Passed.** No function got worse than the ratchet allows.",
       "- `spec.ts::both` cognitive 23: // eslint-disable-next-line complexity, sonarjs/cognitive-complexity -- generated state machine",
       "- `spec.ts::both` cyclomatic 14: // eslint-disable-next-line complexity, sonarjs/cognitive-complexity -- generated state machine",
       "- `spec.ts::parse` cognitive 22: // eslint-disable-next-line sonarjs/cognitive-complexity -- follows the spec step by step",
-      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>"
     ],
     "regressions": [],
     "unmatchedOverrides": [],
@@ -59,7 +59,7 @@
     "  spec.ts::both cyclomatic 14",
     "  spec.ts::parse cognitive 22",
     "Approved by a new override. A reviewer must accept each reason:",
-    "No complexity regressions detected.",
+    "No regressions detected.",
     "Quality gate passed.",
     "Still measured: if one of these gets worse in a later PR, the gate fails."
   ],
@@ -70,14 +70,16 @@
         "cyclomatic": 2,
         "filePath": "spec.ts",
         "functionName": "both",
-        "line": 2
+        "line": 2,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "spec.ts",
         "functionName": "parse",
-        "line": 1
+        "line": 1,
+        "lint": []
       }
     ],
     "problems": []
@@ -89,14 +91,16 @@
         "cyclomatic": 8,
         "filePath": "spec.ts",
         "functionName": "parse",
-        "line": 2
+        "line": 2,
+        "lint": []
       },
       {
         "cognitive": 23,
         "cyclomatic": 14,
         "filePath": "spec.ts",
         "functionName": "both",
-        "line": 7
+        "line": 7,
+        "lint": []
       }
     ],
     "problems": []

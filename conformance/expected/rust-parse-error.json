@@ -13,7 +13,7 @@
       "**Could not measure:**",
       "**Failed.** AutoRatchet could not measure every function, so it cannot vouch for this change.",
       "- head: broken.rs: does not parse (cannot parse string into token stream (line 1))",
-      "<sub>3 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+      "<sub>3 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>"
     ],
     "regressions": [],
     "unmatchedOverrides": [],
@@ -32,21 +32,24 @@
         "cyclomatic": 1,
         "filePath": "orders.rs",
         "functionName": "Order::total",
-        "line": 7
+        "line": 7,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 2,
         "filePath": "orders.rs",
         "functionName": "Order::discount",
-        "line": 11
+        "line": 11,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 3,
         "filePath": "orders.rs",
         "functionName": "route",
-        "line": 16
+        "line": 16,
+        "lint": []
       }
     ],
     "problems": []
@@ -58,21 +61,24 @@
         "cyclomatic": 1,
         "filePath": "orders.rs",
         "functionName": "Order::total",
-        "line": 7
+        "line": 7,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 2,
         "filePath": "orders.rs",
         "functionName": "Order::discount",
-        "line": 11
+        "line": 11,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 3,
         "filePath": "orders.rs",
         "functionName": "route",
-        "line": 16
+        "line": 16,
+        "lint": []
       }
     ],
     "problems": [

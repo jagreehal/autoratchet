@@ -9,8 +9,8 @@
       "incomplete": [],
       "markdown": [
         "## AutoRatchet",
-        "**Failed.** A function got more complex than the ratchet allows.",
-        "<sub>2 functions measured against `bd75afc`. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+        "**Failed.** A function got worse than the ratchet allows.",
+        "<sub>2 functions measured against `bd75afc`. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
         "| Function | Metric | Before | After | Limit |",
         "| `score.py::score` | cyclomatic | new | 9 | 8 from ruff.toml |",
         "| `score.ts::score` | cyclomatic | new | 9 | 8 from .oxlintrc.json |",
@@ -53,8 +53,8 @@
       "incomplete": [],
       "markdown": [
         "## AutoRatchet",
-        "**Passed.** No function got more complex than the ratchet allows.",
-        "<sub>2 functions measured against `bd75afc`. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+        "**Passed.** No function got worse than the ratchet allows.",
+        "<sub>2 functions measured against `bd75afc`. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>"
       ],
       "regressions": [],
       "unmatchedOverrides": [],

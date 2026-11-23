@@ -13,7 +13,7 @@
       "**Could not measure:**",
       "**Failed.** AutoRatchet could not measure every function, so it cannot vouch for this change.",
       "- head: u.ts: does not parse (Expected `}` but found `EOF`)",
-      "<sub>1 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+      "<sub>1 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>"
     ],
     "regressions": [],
     "unmatchedOverrides": [],
@@ -32,7 +32,8 @@
         "cyclomatic": 2,
         "filePath": "u.ts",
         "functionName": "cold",
-        "line": 1
+        "line": 1,
+        "lint": []
       }
     ],
     "problems": []
@@ -44,7 +45,8 @@
         "cyclomatic": 2,
         "filePath": "ok.ts",
         "functionName": "cold",
-        "line": 1
+        "line": 1,
+        "lint": []
       }
     ],
     "problems": [

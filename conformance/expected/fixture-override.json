@@ -20,9 +20,9 @@
     "markdown": [
       "## AutoRatchet",
       "**Approved by a new override** (a reviewer must accept each reason; still measured):",
-      "**Passed.** No function got more complex than the ratchet allows.",
+      "**Passed.** No function got worse than the ratchet allows.",
       "- `charts.ts::createChart` cyclomatic 12: // oxlint-disable-next-line complexity -- options bag: each default is one line, no logic",
-      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+      "<sub>2 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>"
     ],
     "regressions": [],
     "unmatchedOverrides": [],
@@ -33,7 +33,7 @@
     "    line 20: // oxlint-disable-next-line complexity -- options bag: each default is one line, no logic",
     "  charts.ts::createChart cyclomatic 12",
     "Approved by a new override. A reviewer must accept each reason:",
-    "No complexity regressions detected.",
+    "No regressions detected.",
     "Quality gate passed.",
     "Still measured: if one of these gets worse in a later PR, the gate fails."
   ],
@@ -44,7 +44,8 @@
         "cyclomatic": 1,
         "filePath": "charts.ts",
         "functionName": "chartTitle",
-        "line": 1
+        "line": 1,
+        "lint": []
       }
     ],
     "problems": []
@@ -56,14 +57,16 @@
         "cyclomatic": 1,
         "filePath": "charts.ts",
         "functionName": "chartTitle",
-        "line": 1
+        "line": 1,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 12,
         "filePath": "charts.ts",
         "functionName": "createChart",
-        "line": 21
+        "line": 21,
+        "lint": []
       }
     ],
     "problems": []

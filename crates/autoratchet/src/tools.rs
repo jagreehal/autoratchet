@@ -41,14 +41,19 @@ fn find(name: &str, env: &str, cwd: &Path) -> Result<PathBuf, String> {
     if let Some(path) = std::env::var_os(env).filter(|p| !p.is_empty()) {
         return std::path::absolute(&path).map_err(|e| e.to_string());
     }
-    let exe = format!("{name}{}", std::env::consts::EXE_SUFFIX);
-    let in_node_modules = cwd.ancestors().map(|dir| dir.join("node_modules/.bin").join(&exe));
+    // npm installs a `.cmd` shim on Windows; Rust's `Command` runs batch files.
+    let files = if cfg!(windows) {
+        vec![format!("{name}.exe"), format!("{name}.cmd")]
+    } else {
+        vec![name.to_owned()]
+    };
+    let in_node_modules = cwd.ancestors().map(|dir| dir.join("node_modules/.bin"));
     let on_path = std::env::var_os("PATH")
         .into_iter()
-        .flat_map(|p| std::env::split_paths(&p).collect::<Vec<_>>())
-        .map(|dir| dir.join(&exe));
+        .flat_map(|p| std::env::split_paths(&p).collect::<Vec<_>>());
     in_node_modules
         .chain(on_path)
+        .flat_map(|dir| files.iter().map(move |file| dir.join(file)))
         .find(|p| p.is_file())
         .ok_or_else(|| format!("could not find {name}. Install it (npm install -D {name}) or set {env} to its path."))
 }

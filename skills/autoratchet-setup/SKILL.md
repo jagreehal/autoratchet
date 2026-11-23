@@ -1,13 +1,13 @@
 ---
 name: autoratchet-setup
-description: Set up AutoRatchet, the complexity ratchet for TypeScript, JavaScript, Rust, Python and Go, in a repository. Covers installing it, the first check, the GitHub Action, the Claude Code hooks, the per-language skills and limits from the existing linter config. Use when the user asks to add, install, configure or roll out AutoRatchet, or asks for a complexity ratchet that stops functions getting more complex in CI or in agent hooks. Not for tuning an existing linter's complexity rule on its own.
+description: Set up AutoRatchet, the complexity and lint ratchet for TypeScript, JavaScript, Rust, Python and Go, in a repository. Covers installing it, the first check, the GitHub Action, the Claude Code hooks, the per-language skills and limits from the existing linter config. Use when the user asks to add, install, configure or roll out AutoRatchet, or asks for a ratchet that stops functions getting more complex, or gaining lint findings, in CI or in agent hooks. Not for tuning an existing linter's complexity rule on its own.
 ---
 
 # Setting up AutoRatchet
 
 AutoRatchet compares every function with the same function on the target branch. A new function
-must stay under the limit (cyclomatic 10, cognitive 15 by default), a function already over it may
-not get worse, and there is no baseline file. That is why setup is short: there is nothing to
+must stay under the limit (cyclomatic 10, cognitive 15 by default) with no lint findings, a
+function already over may not get worse, and there is no baseline file. That is why setup is short: there is nothing to
 record and no existing code to fix first.
 
 ## Do what was asked, offer the rest
@@ -56,7 +56,7 @@ npm install -D autoratchet        # or: pnpm add -D / yarn add -D / bun add -d
 ```
 
 It needs Node 24 or later. The package ships the native binary and the Oxlint version used for
-JS/TS cyclomatic scores, so everyone gets the same numbers.
+JS/TS cyclomatic scores and lint findings, so everyone gets the same numbers.
 
 **Rust, Python or Go with no `package.json`**: use the release binary. Archives are
 `autoratchet-<platform>.tar.gz` with `<platform>` one of `darwin-arm64`, `darwin-x64`,
@@ -75,8 +75,10 @@ Keep it one `&&` chain: `tar` must run only if both downloads succeeded and the 
 (a mismatch or a missing line both fail `shasum -c`). On Linux, `sha256sum -c -` does the same.
 
 Verify the checksum; do not skip it. Ask the user where they want the binary if it is not obvious
-(`~/.local/bin`, a tools directory). JS/TS without npm also needs the Oxlint 1.93.0 binary, found
-via `AUTORATCHET_OXLINT`, `node_modules/.bin` or `PATH`; prefer the npm route for JS/TS.
+(`~/.local/bin`, a tools directory). For JS/TS use the npm route: the lint
+rules are an Oxlint JS plugin, which needs Node and Oxlint's npm package. With the release binary,
+install `oxlint@1.93.0` from npm; AutoRatchet finds it via `AUTORATCHET_OXLINT`, `node_modules/.bin`
+or `PATH`.
 
 ## 3. First run
 
@@ -128,10 +130,11 @@ jobs:
           override-approval: review
 ```
 
-The action needs no Node and no `fetch-depth` setting. Inputs worth asking about:
+The action needs no `fetch-depth` setting. JavaScript and TypeScript need Node.js and npm on the
+runner; GitHub-hosted runners have both. Inputs worth asking about:
 
-- `override-approval`: who may approve a new `// …-disable-next-line complexity -- reason`
-  comment. `none` lists it for reviewers, `strict` fails every new one, `review` (recommended)
+- `override-approval`: who may approve a new `// …-disable-next-line <rule> -- reason`
+  comment, for complexity or a lint finding. `none` lists it for reviewers, `strict` fails every new one, `review` (recommended)
   needs an approval from someone other than the PR author on the current head commit, `label`
   needs the `complexity-override-approved` label.
 - `threshold` / `cognitive-threshold`: leave out so the linter config applies (step 5).
@@ -157,7 +160,7 @@ that language, and the report names the file it came from:
 Only root config is read, only explicit numbers count, and a rule that is `off` is ignored. Keep
 the linter rule at `warn` if it should not fail lint. Otherwise the defaults are 10 and 15. Only
 set `--threshold` / `--cognitive-threshold` if the user asks for different limits, because a flag
-overrides every language's config.
+overrides every language's config. The lint limit is 0 for new code and the rules are fixed.
 
 ## 6. Claude Code hooks
 

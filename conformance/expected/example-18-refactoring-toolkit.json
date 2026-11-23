@@ -8,8 +8,8 @@
     "incomplete": [],
     "markdown": [
       "## AutoRatchet",
-      "**Failed.** A function got more complex than the ratchet allows.",
-      "<sub>25 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "**Failed.** A function got worse than the ratchet allows.",
+      "<sub>25 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
       "| Function | Metric | Before | After | Limit |",
       "| `code.ts::canRefundInline` | cyclomatic | new | 11 | 10 |",
       "| `code.ts::shippingZoneLadder` | cyclomatic | new | 11 | 10 |",
@@ -59,175 +59,200 @@
         "cyclomatic": 1,
         "filePath": "code.ts",
         "functionName": "PAYMENT_RULES[\"flagged-review\"]",
-        "line": 94
+        "line": 94,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "code.ts",
         "functionName": "PAYMENT_RULES[\"intl\"]",
-        "line": 104
+        "line": 104,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "code.ts",
         "functionName": "PAYMENT_RULES[\"invalid-amount\"]",
-        "line": 90
+        "line": 90,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "code.ts",
         "functionName": "PAYMENT_RULES[\"large\"]",
-        "line": 105
+        "line": 105,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "code.ts",
         "functionName": "PAYMENT_RULES[\"medium\"]",
-        "line": 106
+        "line": 106,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "code.ts",
         "functionName": "PAYMENT_RULES[\"refund\"]",
-        "line": 102
+        "line": 102,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "code.ts",
         "functionName": "PAYMENT_RULES[\"vip\"]",
-        "line": 99
+        "line": 99,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 1,
         "filePath": "code.ts",
         "functionName": "processPaymentTable>PAYMENT_RULES.find()",
-        "line": 110
+        "line": 110,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "PAYMENT_RULES[\"flagged-intl-review\"]",
-        "line": 93
+        "line": 93,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "PAYMENT_RULES[\"flagged-vip-review\"]",
-        "line": 92
+        "line": 92,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "PAYMENT_RULES[\"intl-large\"]",
-        "line": 103
+        "line": 103,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "PAYMENT_RULES[\"refund-intl\"]",
-        "line": 100
+        "line": 100,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "PAYMENT_RULES[\"refund-large\"]",
-        "line": 101
+        "line": 101,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "PAYMENT_RULES[\"unsupported-currency\"]",
-        "line": 91
+        "line": 91,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "PAYMENT_RULES[\"vip-intl\"]",
-        "line": 97
+        "line": 97,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "PAYMENT_RULES[\"vip-large\"]",
-        "line": 98
+        "line": 98,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "PAYMENT_RULES[\"vip-refund\"]",
-        "line": 96
+        "line": 96,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 2,
         "filePath": "code.ts",
         "functionName": "shippingZoneLookup",
-        "line": 38
+        "line": 38,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 3,
         "filePath": "code.ts",
         "functionName": "PAYMENT_RULES[\"vip-refund-large\"]",
-        "line": 95
+        "line": 95,
+        "lint": []
       },
       {
         "cognitive": 1,
         "cyclomatic": 3,
         "filePath": "code.ts",
         "functionName": "processPaymentTable",
-        "line": 109
+        "line": 109,
+        "lint": []
       },
       {
         "cognitive": 10,
         "cyclomatic": 11,
         "filePath": "code.ts",
         "functionName": "shippingZoneLadder",
-        "line": 9
+        "line": 9,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 3,
         "filePath": "code.ts",
         "functionName": "coveredByWarranty",
-        "line": 66
+        "line": 66,
+        "lint": []
       },
       {
         "cognitive": 2,
         "cyclomatic": 3,
         "filePath": "code.ts",
         "functionName": "withinReturnWindow",
-        "line": 61
+        "line": 61,
+        "lint": []
       },
       {
         "cognitive": 3,
         "cyclomatic": 4,
         "filePath": "code.ts",
         "functionName": "canRefundNamed",
-        "line": 70
+        "line": 70,
+        "lint": []
       },
       {
         "cognitive": 9,
         "cyclomatic": 11,
         "filePath": "code.ts",
         "functionName": "canRefundInline",
-        "line": 52
+        "line": 52,
+        "lint": []
       }
     ],
     "problems": []

@@ -20,9 +20,9 @@
     "markdown": [
       "## AutoRatchet",
       "**Approved by a new override** (a reviewer must accept each reason; still measured):",
-      "**Failed.** A function got more complex than the ratchet allows.",
+      "**Failed.** A function got worse than the ratchet allows.",
       "- `checkout.ts::applyDiscount` cyclomatic 21: // oxlint-disable-next-line complexity -- legacy, will refactor later",
-      "<sub>1 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>",
+      "<sub>1 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
       "| Function | Metric | Before | After | Limit |",
       "| `checkout.ts::applyDiscount` | cognitive | 14 | 19 | 15 |",
       "|---|---|--:|--:|--:|"
@@ -61,7 +61,8 @@
         "cyclomatic": 16,
         "filePath": "checkout.ts",
         "functionName": "applyDiscount",
-        "line": 2
+        "line": 2,
+        "lint": []
       }
     ],
     "problems": []
@@ -73,7 +74,8 @@
         "cyclomatic": 21,
         "filePath": "checkout.ts",
         "functionName": "applyDiscount",
-        "line": 3
+        "line": 3,
+        "lint": []
       }
     ],
     "problems": []

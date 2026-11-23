@@ -1,0 +1,553 @@
+{
+  "exit": 1,
+  "textExit": 1,
+  "report": {
+    "approvals": [
+      {
+        "functionName": "lineApproved",
+        "override": {
+          "filePath": "d.ts",
+          "line": 2,
+          "metric": "lint",
+          "text": "// oxlint-disable-next-line eqeqeq -- reason"
+        },
+        "score": 1
+      },
+      {
+        "functionName": "lineBefore",
+        "override": {
+          "filePath": "d.ts",
+          "line": 43,
+          "metric": "lint",
+          "text": "// oxlint-disable-line eqeqeq"
+        },
+        "score": 1
+      },
+      {
+        "functionName": "lineBothSides",
+        "override": {
+          "filePath": "d.ts",
+          "line": 51,
+          "metric": "lint",
+          "text": "/* oxlint-disable-line eqeqeq */"
+        },
+        "score": 2
+      },
+      {
+        "functionName": "reasonNamesAnother",
+        "override": {
+          "filePath": "d.ts",
+          "line": 55,
+          "metric": "lint",
+          "text": "// oxlint-disable-next-line eqeqeq -- not a -disable-line"
+        },
+        "score": 1
+      },
+      {
+        "functionName": "restOfTheClosingLine",
+        "override": {
+          "filePath": "d.ts",
+          "line": 34,
+          "metric": "lint",
+          "text": "/* oxlint-disable-next-line eqeqeq */"
+        },
+        "score": 1
+      },
+      {
+        "functionName": "rulesOnTheNextLine",
+        "override": {
+          "filePath": "d.ts",
+          "line": 28,
+          "metric": "lint",
+          "text": "/* oxlint-disable-next-line no-eval, eqeqeq */"
+        },
+        "score": 1
+      },
+      {
+        "functionName": "twoLineBlock",
+        "override": {
+          "filePath": "d.ts",
+          "line": 22,
+          "metric": "lint",
+          "text": "/* oxlint-disable-next-line eqeqeq -- reason */"
+        },
+        "score": 1
+      }
+    ],
+    "blockedOverrides": [],
+    "functions": 12,
+    "incomplete": [],
+    "markdown": [
+      "## AutoRatchet",
+      "**Approved by a new override** (a reviewer must accept each reason; still measured):",
+      "**Failed.** A function got worse than the ratchet allows.",
+      "**Lint findings in those functions:**",
+      "**Overrides on no single function** (ignored by the gate):",
+      "- `d.ts:13` eslint(eqeqeq): Expected === and instead saw ==",
+      "- `d.ts:18` eslint(eqeqeq): Expected === and instead saw ==",
+      "- `d.ts:38` /* oxlint-disable-next-line eqeqeq */",
+      "- `d.ts:38` eslint(eqeqeq): Expected === and instead saw ==",
+      "- `d.ts:47` /* oxlint-disable-line eqeqeq */",
+      "- `d.ts:47` eslint(eqeqeq): Expected === and instead saw ==",
+      "- `d.ts:51` eslint(eqeqeq): Expected === and instead saw ==",
+      "- `d.ts:8` eslint(eqeqeq): Expected === and instead saw ==",
+      "- `d.ts::lineApproved` lint 1: // oxlint-disable-next-line eqeqeq -- reason",
+      "- `d.ts::lineBefore` lint 1: // oxlint-disable-line eqeqeq",
+      "- `d.ts::lineBothSides` lint 2: /* oxlint-disable-line eqeqeq */",
+      "- `d.ts::reasonNamesAnother` lint 1: // oxlint-disable-next-line eqeqeq -- not a -disable-line",
+      "- `d.ts::restOfTheClosingLine` lint 1: /* oxlint-disable-next-line eqeqeq */",
+      "- `d.ts::rulesOnTheNextLine` lint 1: /* oxlint-disable-next-line no-eval, eqeqeq */",
+      "- `d.ts::twoLineBlock` lint 1: /* oxlint-disable-next-line eqeqeq -- reason */",
+      "<sub>12 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>",
+      "| Function | Metric | Before | After | Limit |",
+      "| `d.ts::docIsNot` | lint | 0 | 1 | 0 |",
+      "| `d.ts::lineBothSides` | lint | 0 | 1 | 0 |",
+      "| `d.ts::lineNotAfter` | lint | 0 | 1 | 0 |",
+      "| `d.ts::notBeforeTheComment` | lint | 0 | 1 | 0 |",
+      "| `d.ts::proseIsNot` | lint | 0 | 1 | 0 |",
+      "| `d.ts::tripleSlashIsNot` | lint | 0 | 1 | 0 |",
+      "|---|---|--:|--:|--:|"
+    ],
+    "regressions": [
+      {
+        "current": 1,
+        "filePath": "d.ts",
+        "findings": [
+          {
+            "line": 13,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ],
+        "functionName": "docIsNot",
+        "kind": "worsened",
+        "line": 11,
+        "metric": "lint",
+        "previous": 0,
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "d.ts",
+        "findings": [
+          {
+            "line": 18,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ],
+        "functionName": "tripleSlashIsNot",
+        "kind": "worsened",
+        "line": 16,
+        "metric": "lint",
+        "previous": 0,
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "d.ts",
+        "findings": [
+          {
+            "line": 38,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ],
+        "functionName": "notBeforeTheComment",
+        "kind": "worsened",
+        "line": 37,
+        "metric": "lint",
+        "previous": 0,
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "d.ts",
+        "findings": [
+          {
+            "line": 47,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ],
+        "functionName": "lineNotAfter",
+        "kind": "worsened",
+        "line": 46,
+        "metric": "lint",
+        "previous": 0,
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "d.ts",
+        "findings": [
+          {
+            "line": 51,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ],
+        "functionName": "lineBothSides",
+        "kind": "worsened",
+        "line": 50,
+        "metric": "lint",
+        "previous": 0,
+        "threshold": 0
+      },
+      {
+        "current": 1,
+        "filePath": "d.ts",
+        "findings": [
+          {
+            "line": 8,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ],
+        "functionName": "proseIsNot",
+        "kind": "worsened",
+        "line": 6,
+        "metric": "lint",
+        "previous": 0,
+        "threshold": 0
+      }
+    ],
+    "unmatchedOverrides": [
+      {
+        "filePath": "d.ts",
+        "line": 38,
+        "metric": "lint",
+        "text": "/* oxlint-disable-next-line eqeqeq */"
+      },
+      {
+        "filePath": "d.ts",
+        "line": 47,
+        "metric": "lint",
+        "text": "/* oxlint-disable-line eqeqeq */"
+      }
+    ],
+    "untracked": [],
+    "verdict": "fail"
+  },
+  "text": [
+    "      line 13 eslint(eqeqeq): Expected === and instead saw ==",
+    "      line 18 eslint(eqeqeq): Expected === and instead saw ==",
+    "      line 38 eslint(eqeqeq): Expected === and instead saw ==",
+    "      line 47 eslint(eqeqeq): Expected === and instead saw ==",
+    "      line 51 eslint(eqeqeq): Expected === and instead saw ==",
+    "      line 8 eslint(eqeqeq): Expected === and instead saw ==",
+    "    line 22: /* oxlint-disable-next-line eqeqeq -- reason */",
+    "    line 28: /* oxlint-disable-next-line no-eval, eqeqeq */",
+    "    line 2: // oxlint-disable-next-line eqeqeq -- reason",
+    "    line 34: /* oxlint-disable-next-line eqeqeq */",
+    "    line 43: // oxlint-disable-line eqeqeq",
+    "    line 51: /* oxlint-disable-line eqeqeq */",
+    "    line 55: // oxlint-disable-next-line eqeqeq -- not a -disable-line",
+    "    lint: 0 → 1 (+1)",
+    "    lint: 0 → 1 (+1)",
+    "    lint: 0 → 1 (+1)",
+    "    lint: 0 → 1 (+1)",
+    "    lint: 0 → 1 (+1)",
+    "    lint: 0 → 1 (+1)",
+    "  d.ts:38  /* oxlint-disable-next-line eqeqeq */",
+    "  d.ts:47  /* oxlint-disable-line eqeqeq */",
+    "  d.ts::lineApproved lint 1",
+    "  d.ts::lineBefore lint 1",
+    "  d.ts::lineBothSides lint 2",
+    "  d.ts::reasonNamesAnother lint 1",
+    "  d.ts::restOfTheClosingLine lint 1",
+    "  d.ts::rulesOnTheNextLine lint 1",
+    "  d.ts::twoLineBlock lint 1",
+    "  docIsNot",
+    "  lineBothSides",
+    "  lineNotAfter",
+    "  notBeforeTheComment",
+    "  proseIsNot",
+    "  tripleSlashIsNot",
+    "Approved by a new override. A reviewer must accept each reason:",
+    "Lint regressions detected:",
+    "Quality gate failed.",
+    "Still measured: if one of these gets worse in a later PR, the gate fails.",
+    "Warning: new overrides that sit on no single function (file-wide or misplaced). The gate ignores them:",
+    "d.ts"
+  ],
+  "measureBase": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "docIsNot",
+        "line": 9,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "lineApproved",
+        "line": 1,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "lineBefore",
+        "line": 33,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "lineBothSides",
+        "line": 41,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "lineNotAfter",
+        "line": 37,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "notBeforeTheComment",
+        "line": 29,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "proseIsNot",
+        "line": 5,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "reasonNamesAnother",
+        "line": 45,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "restOfTheClosingLine",
+        "line": 25,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "rulesOnTheNextLine",
+        "line": 21,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "tripleSlashIsNot",
+        "line": 13,
+        "lint": []
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "twoLineBlock",
+        "line": 17,
+        "lint": []
+      }
+    ],
+    "problems": []
+  },
+  "measureHead": {
+    "functions": [
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "docIsNot",
+        "line": 11,
+        "lint": [
+          {
+            "line": 13,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "lineApproved",
+        "line": 1,
+        "lint": [
+          {
+            "line": 3,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "lineBefore",
+        "line": 42,
+        "lint": [
+          {
+            "line": 43,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "lineBothSides",
+        "line": 50,
+        "lint": [
+          {
+            "line": 51,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          },
+          {
+            "line": 51,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "lineNotAfter",
+        "line": 46,
+        "lint": [
+          {
+            "line": 47,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "notBeforeTheComment",
+        "line": 37,
+        "lint": [
+          {
+            "line": 38,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "proseIsNot",
+        "line": 6,
+        "lint": [
+          {
+            "line": 8,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "reasonNamesAnother",
+        "line": 54,
+        "lint": [
+          {
+            "line": 56,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "restOfTheClosingLine",
+        "line": 33,
+        "lint": [
+          {
+            "line": 34,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "rulesOnTheNextLine",
+        "line": 27,
+        "lint": [
+          {
+            "line": 30,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "tripleSlashIsNot",
+        "line": 16,
+        "lint": [
+          {
+            "line": 18,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      },
+      {
+        "cognitive": 1,
+        "cyclomatic": 1,
+        "filePath": "d.ts",
+        "functionName": "twoLineBlock",
+        "line": 21,
+        "lint": [
+          {
+            "line": 24,
+            "message": "Expected === and instead saw ==",
+            "rule": "eslint(eqeqeq)"
+          }
+        ]
+      }
+    ],
+    "problems": []
+  }
+}

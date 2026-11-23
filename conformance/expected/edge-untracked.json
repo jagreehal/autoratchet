@@ -9,9 +9,9 @@
     "markdown": [
       "## AutoRatchet",
       "**Over a limit on base, missing on head** (deleted, renamed or moved):",
-      "**Passed.** No function got more complex than the ratchet allows.",
+      "**Passed.** No function got worse than the ratchet allows.",
       "- `u.ts::hot`",
-      "<sub>1 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured.</sub>"
+      "<sub>1 functions measured. Limits for new code: cyclomatic 10, cognitive 15 unless configured, no lint findings.</sub>"
     ],
     "regressions": [],
     "unmatchedOverrides": [],
@@ -21,14 +21,15 @@
         "cyclomatic": 12,
         "filePath": "u.ts",
         "functionName": "hot",
-        "line": 1
+        "line": 1,
+        "lint": []
       }
     ],
     "verdict": "pass"
   },
   "text": [
     "  u.ts::hot (was cyclomatic 12, cognitive 11)",
-    "No complexity regressions detected.",
+    "No regressions detected.",
     "Quality gate passed.",
     "Warning: over a threshold on base, missing on head (deleted, renamed or moved):"
   ],
@@ -39,14 +40,16 @@
         "cyclomatic": 2,
         "filePath": "u.ts",
         "functionName": "cold",
-        "line": 7
+        "line": 7,
+        "lint": []
       },
       {
         "cognitive": 11,
         "cyclomatic": 12,
         "filePath": "u.ts",
         "functionName": "hot",
-        "line": 1
+        "line": 1,
+        "lint": []
       }
     ],
     "problems": []
@@ -58,7 +61,8 @@
         "cyclomatic": 2,
         "filePath": "u.ts",
         "functionName": "cold",
-        "line": 1
+        "line": 1,
+        "lint": []
       }
     ],
     "problems": []
