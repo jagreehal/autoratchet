@@ -1,6 +1,6 @@
 {
   "name": "autoratchet",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Deterministic complexity and lint checks for AI coding agents and the people who review their code. A ratchet on complexity and lint findings for TypeScript, JavaScript, Rust, Python and Go, on your machine, in agent hooks and in CI.",
   "license": "Apache-2.0",
   "author": "Jag Reehal",
